@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, Lock, User, ArrowRight, AlertCircle, KeyRound } from 'lucide-react';
+import { X, ShieldCheck, Lock, User, ArrowRight, AlertCircle } from 'lucide-react';
 import { AdminAccount } from '../../types';
 
 interface AdminLoginModalProps {
@@ -88,17 +88,6 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               <p className="font-medium leading-relaxed">{errorMsg}</p>
             </div>
           )}
-
-          {/* Quick Demo Info */}
-          <div className="bg-blue-50/60 border border-blue-200/80 rounded-xl p-3 text-[11px] text-slate-600 flex items-start gap-2">
-            <KeyRound className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold text-blue-950 block">Akun Bawaan Sistem:</span>
-              <p className="text-slate-600 mt-0.5">
-                Username: <code className="bg-white px-1.5 py-0.2 rounded border font-mono font-bold text-blue-700">admin</code> &bull; Password: <code className="bg-white px-1.5 py-0.2 rounded border font-mono font-bold text-blue-700">admin123</code>
-              </p>
-            </div>
-          </div>
 
           {/* Username Input */}
           <div>
