@@ -353,25 +353,10 @@ export default function App() {
       {/* Simplified Concise Footer (hidden during active exam and print) */}
       {studentFlow.phase !== 'exam' && (
         <footer className="print:hidden bg-white text-slate-500 text-xs py-4 border-t border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 text-center sm:text-left">
-            <div className="flex items-center gap-2">
-              <p className="font-semibold text-slate-700">
-                &copy; {new Date().getFullYear()} CBT SMAN 1 Batu &bull; Created by TIM IT SMAN 1 Batu
-              </p>
-            </div>
-            <div className="flex items-center gap-2 text-[11px]">
-              {isCloudConnected ? (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Firebase Cloud Terhubung
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                  Penyimpanan Lokal (Offline)
-                </span>
-              )}
-            </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+            <p className="font-semibold text-slate-700">
+              &copy; {new Date().getFullYear()} CBT SMAN 1 Batu &bull; Created by TIM IT SMAN 1 Batu
+            </p>
           </div>
         </footer>
       )}
