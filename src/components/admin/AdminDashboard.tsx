@@ -42,6 +42,7 @@ import {
   StudentExamSubmission,
 } from '../../types';
 import { exportExamResultsToExcel } from '../../utils/exportTools';
+import { ALL_SCHOOL_CLASSES, sortClassList } from '../../utils/constants';
 import { AccountEditorModal } from './AccountEditorModal';
 import { ExamEditorModal } from './ExamEditorModal';
 import { StudentBatchImportModal } from './StudentBatchImportModal';
@@ -412,10 +413,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }));
   };
 
-  // Distinct classes in submissions & registered students
-  const availableClasses = Array.from(
-    new Set([...submissions.map((s) => s.studentClass), ...students.map((s) => s.studentClass)])
-  ).sort();
+  // Distinct classes in submissions, registered students, & full school catalog sorted naturally
+  const availableClasses = sortClassList(
+    Array.from(
+      new Set([
+        ...ALL_SCHOOL_CLASSES,
+        ...submissions.map((s) => s.studentClass).filter(Boolean),
+        ...students.map((s) => s.studentClass).filter(Boolean),
+      ])
+    )
+  );
 
   // Navigation items with "Manajemen Akun"
   const navItems = [

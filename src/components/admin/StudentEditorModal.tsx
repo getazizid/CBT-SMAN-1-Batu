@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, User, Hash, Lock, GraduationCap, CheckCircle2 } from 'lucide-react';
 import { RegisteredStudent } from '../../types';
+import { ALL_SCHOOL_CLASSES } from '../../utils/constants';
 
 interface StudentEditorModalProps {
   isOpen: boolean;
@@ -8,12 +9,6 @@ interface StudentEditorModalProps {
   student: RegisteredStudent | null;
   onSaveStudent: (student: RegisteredStudent) => void;
 }
-
-const CLASS_OPTIONS = [
-  'X-1', 'X-2', 'X-3', 'X-4', 'X-5', 'X-6', 'X-7', 'X-8',
-  'XI MIPA 1', 'XI MIPA 2', 'XI MIPA 3', 'XI MIPA 4', 'XI IPS 1', 'XI IPS 2', 'XI IPS 3',
-  'XII MIPA 1', 'XII MIPA 2', 'XII MIPA 3', 'XII MIPA 4', 'XII IPS 1', 'XII IPS 2', 'XII IPS 3'
-];
 
 export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
   isOpen,
@@ -23,7 +18,7 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
 }) => {
   const [nisn, setNisn] = useState('');
   const [name, setName] = useState('');
-  const [studentClass, setStudentClass] = useState('XII MIPA 1');
+  const [studentClass, setStudentClass] = useState('X-1');
   const [password, setPassword] = useState('');
   const [gender, setGender] = useState<'L' | 'P'>('L');
   const [isActive, setIsActive] = useState(true);
@@ -34,7 +29,7 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
     if (student) {
       setNisn(student.nisn);
       setName(student.name);
-      setStudentClass(student.studentClass || 'XII MIPA 1');
+      setStudentClass(student.studentClass || 'X-1');
       setPassword(student.password || '');
       setGender(student.gender || 'L');
       setIsActive(student.isActive ?? true);
@@ -42,7 +37,7 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
     } else {
       setNisn('');
       setName('');
-      setStudentClass('XII MIPA 1');
+      setStudentClass('X-1');
       setPassword('');
       setGender('L');
       setIsActive(true);
@@ -180,7 +175,7 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
                 onChange={(e) => setStudentClass(e.target.value)}
                 className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none"
               >
-                {CLASS_OPTIONS.map((c) => (
+                {ALL_SCHOOL_CLASSES.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>

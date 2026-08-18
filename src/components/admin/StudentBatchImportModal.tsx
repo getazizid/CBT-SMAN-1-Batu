@@ -14,7 +14,7 @@ export const StudentBatchImportModal: React.FC<StudentBatchImportModalProps> = (
   onImportStudents,
 }) => {
   const [inputText, setInputText] = useState(
-    `0061829110, Budi Santoso, XII MIPA 1, 110\n0061829111, Citra Lestari, XII MIPA 2, 111\n0061829112, Doni Setiawan, XII IPS 1, 112`
+    `0061829110, Budi Santoso, X-1, 110\n0061829111, Citra Lestari, XI-1, 111\n0061829112, Doni Setiawan, XII-1, 112`
   );
   const [errorMsg, setErrorMsg] = useState('');
   const [parsedPreview, setParsedPreview] = useState<RegisteredStudent[]>([]);
@@ -44,7 +44,7 @@ export const StudentBatchImportModal: React.FC<StudentBatchImportModalProps> = (
 
       const nisn = cleanParts[0];
       const name = cleanParts[1];
-      const studentClass = cleanParts[2] || 'XII MIPA 1';
+      const studentClass = cleanParts[2] || 'X-1';
       const password = cleanParts[3] || undefined;
 
       if (nisn && name) {
@@ -137,7 +137,7 @@ export const StudentBatchImportModal: React.FC<StudentBatchImportModalProps> = (
                 setInputText(e.target.value);
                 handleParse(e.target.value);
               }}
-              placeholder={`0061829110, Budi Santoso, XII MIPA 1, 110\n0061829111, Citra Lestari, XII MIPA 2, 111`}
+              placeholder={`0061829110, Budi Santoso, X-1, 110\n0061829111, Citra Lestari, XI-1, 111`}
               className="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none"
             />
           </div>

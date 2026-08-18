@@ -14,6 +14,14 @@ import {
   Shuffle
 } from 'lucide-react';
 import { Exam, OptionKey, OptionScoreMap, Question, QuestionOption } from '../../types';
+import {
+  ALL_SCHOOL_CLASSES,
+  KELAS_X_OPTIONS,
+  KELAS_XI_OPTIONS,
+  KELAS_XII_OPTIONS,
+  parseTargetClasses,
+  sortClassList
+} from '../../utils/constants';
 
 interface ExamEditorModalProps {
   isOpen: boolean;
@@ -30,7 +38,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('');
-  const [gradeClass, setGradeClass] = useState('Kelas X & XI (Calon Pengurus)');
+  const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
   const [academicYear, setAcademicYear] = useState('2025/2026 Ganjil');
   const [durationMinutes, setDurationMinutes] = useState(90);
   const [token, setToken] = useState('OSIS2026');
@@ -55,7 +63,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
     if (exam) {
       setTitle(exam.title || '');
       setSubject(exam.subject || '');
-      setGradeClass(exam.gradeClass || 'Kelas X & XI (Calon Pengurus)');
+      setSelectedClasses(parseTargetClasses(exam.gradeClass));
       setAcademicYear(exam.academicYear || '2025/2026 Ganjil');
       setDurationMinutes(exam.durationMinutes || 90);
       setToken(exam.token || 'OSIS2026');
@@ -72,7 +80,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
     } else {
       setTitle('');
       setSubject('');
-      setGradeClass('Kelas X & XI (Calon Pengurus)');
+      setSelectedClasses([...ALL_SCHOOL_CLASSES]);
       setAcademicYear('2025/2026 Ganjil');
       setDurationMinutes(90);
       setToken('BATU' + Math.floor(1000 + Math.random() * 9000));
@@ -160,6 +168,32 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
     setQuestions(updated);
   };
 
+  const toggleClass = (cls: string) => {
+    setSelectedClasses((prev) =>
+      prev.includes(cls) ? prev.filter((c) => c !== cls) : [...prev, cls]
+    );
+  };
+
+  const handleSelectAllClasses = () => {
+    setSelectedClasses([...ALL_SCHOOL_CLASSES]);
+  };
+
+  const handleSelectGradeX = () => {
+    setSelectedClasses((prev) => Array.from(new Set([...prev, ...KELAS_X_OPTIONS])));
+  };
+
+  const handleSelectGradeXI = () => {
+    setSelectedClasses((prev) => Array.from(new Set([...prev, ...KELAS_XI_OPTIONS])));
+  };
+
+  const handleSelectGradeXII = () => {
+    setSelectedClasses((prev) => Array.from(new Set([...prev, ...KELAS_XII_OPTIONS])));
+  };
+
+  const handleClearClasses = () => {
+    setSelectedClasses([]);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !subject.trim()) {
@@ -167,11 +201,21 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       return;
     }
 
+    if (selectedClasses.length === 0) {
+      alert('Pilih minimal 1 target kelas untuk paket ujian ini.');
+      return;
+    }
+
+    const formattedGradeClass =
+      selectedClasses.length === ALL_SCHOOL_CLASSES.length
+        ? 'Semua Kelas (X, XI, XII)'
+        : sortClassList(selectedClasses).join(', ');
+
     const saved: Exam = {
       id: exam?.id || `exam-${Date.now()}`,
       title: title.trim(),
       subject: subject.trim(),
-      gradeClass,
+      gradeClass: formattedGradeClass,
       academicYear,
       durationMinutes: Number(durationMinutes),
       token: token.trim().toUpperCase(),
@@ -283,19 +327,158 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
-                    Target Kelas
-                  </label>
-                  <input
-                    type="text"
-                    value={gradeClass}
-                    onChange={(e) => setGradeClass(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  />
+              {/* Target Classes Selection Box (Checkboxes for 36 classes) */}
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-900 uppercase">
+                      Target Kelas Peserta Ujian (Centangan)
+                    </label>
+                    <p className="text-[11px] text-slate-500">
+                      Centang kelas yang berhak mengikuti paket ujian ini. Hanya siswa dari kelas terpilih yang dapat mengakses ujian.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="bg-blue-100 text-blue-800 text-[11px] font-bold px-2.5 py-1 rounded-full border border-blue-200">
+                      {selectedClasses.length === ALL_SCHOOL_CLASSES.length
+                        ? 'Semua 36 Kelas Terpilih'
+                        : `${selectedClasses.length} / 36 Kelas Terpilih`}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleSelectAllClasses}
+                      className="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold rounded-lg border border-slate-200 shadow-xs cursor-pointer"
+                    >
+                      Pilih Semua
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSelectGradeX}
+                      className="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold rounded-lg border border-slate-200 shadow-xs cursor-pointer"
+                    >
+                      + Semua X
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSelectGradeXI}
+                      className="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold rounded-lg border border-slate-200 shadow-xs cursor-pointer"
+                    >
+                      + Semua XI
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSelectGradeXII}
+                      className="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold rounded-lg border border-slate-200 shadow-xs cursor-pointer"
+                    >
+                      + Semua XII
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClearClasses}
+                      className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold rounded-lg border border-rose-200 shadow-xs cursor-pointer"
+                    >
+                      Reset
+                    </button>
+                  </div>
                 </div>
 
+                <div className="space-y-3 pt-2">
+                  {/* Tingkat X */}
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                      Tingkat Kelas X (X-1 s/d X-12):
+                    </span>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5">
+                      {KELAS_X_OPTIONS.map((cls) => {
+                        const isChecked = selectedClasses.includes(cls);
+                        return (
+                          <button
+                            key={cls}
+                            type="button"
+                            onClick={() => toggleClass(cls)}
+                            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
+                              isChecked
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span>{cls}</span>
+                            <span className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] font-bold ${
+                              isChecked ? 'bg-white text-blue-600' : 'border border-slate-300'
+                            }`}>
+                              {isChecked ? '✓' : ''}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Tingkat XI */}
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                      Tingkat Kelas XI (XI-1 s/d XI-12):
+                    </span>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5">
+                      {KELAS_XI_OPTIONS.map((cls) => {
+                        const isChecked = selectedClasses.includes(cls);
+                        return (
+                          <button
+                            key={cls}
+                            type="button"
+                            onClick={() => toggleClass(cls)}
+                            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
+                              isChecked
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span>{cls}</span>
+                            <span className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] font-bold ${
+                              isChecked ? 'bg-white text-blue-600' : 'border border-slate-300'
+                            }`}>
+                              {isChecked ? '✓' : ''}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Tingkat XII */}
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                      Tingkat Kelas XII (XII-1 s/d XII-12):
+                    </span>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5">
+                      {KELAS_XII_OPTIONS.map((cls) => {
+                        const isChecked = selectedClasses.includes(cls);
+                        return (
+                          <button
+                            key={cls}
+                            type="button"
+                            onClick={() => toggleClass(cls)}
+                            className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
+                              isChecked
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span>{cls}</span>
+                            <span className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] font-bold ${
+                              isChecked ? 'bg-white text-blue-600' : 'border border-slate-300'
+                            }`}>
+                              {isChecked ? '✓' : ''}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
                     Durasi Pengerjaan (Menit)
