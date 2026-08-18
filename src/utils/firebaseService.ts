@@ -143,10 +143,17 @@ export const subscribeToExams = (
   }
 };
 
+/**
+ * Safely strips `undefined` properties to prevent Firestore serialization errors
+ */
+export const cleanForFirestore = <T>(obj: T): T => {
+  return JSON.parse(JSON.stringify(obj));
+};
+
 export const saveExamToFirestore = async (exam: Exam): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
-    await setDoc(doc(db, COLLECTIONS.EXAMS, exam.id), exam);
+    await setDoc(doc(db, COLLECTIONS.EXAMS, exam.id), cleanForFirestore(exam));
   } catch (err) {
     console.error('Error saving exam to Firestore:', err);
   }
@@ -168,7 +175,7 @@ export const syncAllExamsToFirestore = async (exams: Exam[]): Promise<void> => {
 
     // Save/update all current exams
     exams.forEach((exam) => {
-      batch.set(doc(db, COLLECTIONS.EXAMS, exam.id), exam);
+      batch.set(doc(db, COLLECTIONS.EXAMS, exam.id), cleanForFirestore(exam));
     });
 
     await batch.commit();
@@ -224,7 +231,7 @@ export const subscribeToSubmissions = (
 export const saveSubmissionToFirestore = async (submission: StudentExamSubmission): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
-    await setDoc(doc(db, COLLECTIONS.SUBMISSIONS, submission.id), submission);
+    await setDoc(doc(db, COLLECTIONS.SUBMISSIONS, submission.id), cleanForFirestore(submission));
   } catch (err) {
     console.error('Error saving submission to Firestore:', err);
   }
@@ -244,7 +251,7 @@ export const syncAllSubmissionsToFirestore = async (submissions: StudentExamSubm
     });
 
     submissions.forEach((sub) => {
-      batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), sub);
+      batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), cleanForFirestore(sub));
     });
 
     await batch.commit();
@@ -300,7 +307,7 @@ export const subscribeToStudents = (
 export const saveStudentToFirestore = async (student: RegisteredStudent): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
-    await setDoc(doc(db, COLLECTIONS.STUDENTS, student.id), student);
+    await setDoc(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
   } catch (err) {
     console.error('Error saving student to Firestore:', err);
   }
@@ -320,7 +327,7 @@ export const syncAllStudentsToFirestore = async (students: RegisteredStudent[]):
     });
 
     students.forEach((s) => {
-      batch.set(doc(db, COLLECTIONS.STUDENTS, s.id), s);
+      batch.set(doc(db, COLLECTIONS.STUDENTS, s.id), cleanForFirestore(s));
     });
 
     await batch.commit();
@@ -375,7 +382,7 @@ export const subscribeToAdminAccounts = (
 export const saveAdminAccountToFirestore = async (account: AdminAccount): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
-    await setDoc(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), account);
+    await setDoc(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), cleanForFirestore(account));
   } catch (err) {
     console.error('Error saving admin account to Firestore:', err);
   }
@@ -395,7 +402,7 @@ export const syncAllAdminAccountsToFirestore = async (accounts: AdminAccount[]):
     });
 
     accounts.forEach((acc) => {
-      batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, acc.id), acc);
+      batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, acc.id), cleanForFirestore(acc));
     });
 
     await batch.commit();
@@ -446,11 +453,11 @@ export const subscribeToSettings = (
 export const saveSettingsToFirestore = async (settings: { enforceWhitelist: boolean }): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
-    await setDoc(doc(db, COLLECTIONS.SETTINGS, 'general'), {
+    await setDoc(doc(db, COLLECTIONS.SETTINGS, 'general'), cleanForFirestore({
       ...settings,
       isInitialized: true,
       updatedAt: new Date().toISOString(),
-    }, { merge: true });
+    }), { merge: true });
   } catch (err) {
     console.error('Error saving settings to Firestore:', err);
   }

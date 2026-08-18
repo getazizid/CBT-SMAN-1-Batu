@@ -62,9 +62,9 @@ export const AccountEditorModal: React.FC<AccountEditorModalProps> = ({
       password: password.trim(),
       name: name.trim(),
       role,
-      email: email.trim() || undefined,
+      ...(email.trim() ? { email: email.trim() } : {}),
       createdAt: account?.createdAt || new Date().toISOString(),
-      lastLogin: account?.lastLogin,
+      ...(account?.lastLogin ? { lastLogin: account.lastLogin } : {}),
     };
 
     onSaveAccount(saved);
