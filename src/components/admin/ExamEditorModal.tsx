@@ -10,7 +10,8 @@ import {
   X,
   Sliders,
   Sparkles,
-  Info
+  Info,
+  Shuffle
 } from 'lucide-react';
 import { Exam, OptionKey, OptionScoreMap, Question, QuestionOption } from '../../types';
 
@@ -45,6 +46,8 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isActive, setIsActive] = useState<boolean>(true);
   const [showInstantScore, setShowInstantScore] = useState<boolean>(true);
+  const [shuffleQuestions, setShuffleQuestions] = useState<boolean>(false);
+  const [shuffleOptions, setShuffleOptions] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'settings' | 'questions'>('settings');
 
   // Sync state whenever exam prop or isOpen changes so existing data is always loaded
@@ -64,6 +67,8 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setQuestions(exam.questions ? [...exam.questions] : []);
       setIsActive(exam.isActive ?? true);
       setShowInstantScore(exam.showInstantScore ?? true);
+      setShuffleQuestions(exam.shuffleQuestions ?? false);
+      setShuffleOptions(exam.shuffleOptions ?? false);
     } else {
       setTitle('');
       setSubject('');
@@ -77,6 +82,8 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setQuestions([]);
       setIsActive(true);
       setShowInstantScore(true);
+      setShuffleQuestions(false);
+      setShuffleOptions(false);
     }
     setActiveTab('settings');
   }, [exam, isOpen]);
@@ -172,8 +179,8 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       teacherName: teacherName.trim(),
       defaultOptionScores,
       questions,
-      shuffleQuestions: exam?.shuffleQuestions ?? false,
-      shuffleOptions: exam?.shuffleOptions ?? false,
+      shuffleQuestions,
+      shuffleOptions,
       showInstantScore,
       showExplanationAfter: exam?.showExplanationAfter ?? true,
       allowReview: exam?.allowReview ?? true,
@@ -401,6 +408,87 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                       />
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Randomization / Anti-Cheat Section */}
+              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+                    <Shuffle className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-900 text-xs uppercase tracking-wide">
+                      Pengacakan Soal & Pilihan Jawaban (Anti-Mencontek)
+                    </h4>
+                    <p className="text-[11px] text-slate-500">
+                      Hasil akhir, penilaian, dan analisis butir soal tetap 100% tersinkronisasi akurat dengan kunci jawaban master.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* Shuffle Questions Toggle Card */}
+                  <div
+                    onClick={() => setShuffleQuestions(!shuffleQuestions)}
+                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                      shuffleQuestions
+                        ? 'bg-purple-50/70 border-purple-300 text-purple-950 shadow-xs'
+                        : 'bg-white border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      id="shuffle-questions-toggle"
+                      checked={shuffleQuestions}
+                      onChange={(e) => setShuffleQuestions(e.target.checked)}
+                      className="w-4 h-4 text-purple-600 rounded cursor-pointer mt-0.5"
+                    />
+                    <div>
+                      <label htmlFor="shuffle-questions-toggle" className="text-xs font-bold text-slate-900 cursor-pointer flex items-center gap-1.5">
+                        <span>Acak Urutan Soal</span>
+                        {shuffleQuestions && (
+                          <span className="bg-purple-100 text-purple-700 text-[10px] font-semibold px-1.5 py-0.2 rounded">
+                            Aktif
+                          </span>
+                        )}
+                      </label>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                        Setiap siswa menerima urutan butir soal yang berbeda secara acak saat ujian berlangsung.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Shuffle Options Toggle Card */}
+                  <div
+                    onClick={() => setShuffleOptions(!shuffleOptions)}
+                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                      shuffleOptions
+                        ? 'bg-purple-50/70 border-purple-300 text-purple-950 shadow-xs'
+                        : 'bg-white border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      id="shuffle-options-toggle"
+                      checked={shuffleOptions}
+                      onChange={(e) => setShuffleOptions(e.target.checked)}
+                      className="w-4 h-4 text-purple-600 rounded cursor-pointer mt-0.5"
+                    />
+                    <div>
+                      <label htmlFor="shuffle-options-toggle" className="text-xs font-bold text-slate-900 cursor-pointer flex items-center gap-1.5">
+                        <span>Acak Pilihan Opsi (A-E)</span>
+                        {shuffleOptions && (
+                          <span className="bg-purple-100 text-purple-700 text-[10px] font-semibold px-1.5 py-0.2 rounded">
+                            Aktif
+                          </span>
+                        )}
+                      </label>
+                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                        Pilihan ganda A, B, C, D, E pada setiap soal diacak secara dinamis bagi setiap peserta.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

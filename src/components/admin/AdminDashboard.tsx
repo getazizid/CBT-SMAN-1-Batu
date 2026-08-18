@@ -23,6 +23,7 @@ import {
   Shield,
   ShieldAlert,
   ShieldCheck,
+  Shuffle,
   Sliders,
   Trash2,
   Upload,
@@ -788,6 +789,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             >
                               {exam.showInstantScore ? 'Ditampilkan' : 'Disembunyikan'}
                             </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span>Acak Soal / Opsi:</span>
+                            <div className="flex items-center gap-1 font-semibold text-[10px]">
+                              <span
+                                className={`px-1.5 py-0.2 rounded border ${
+                                  exam.shuffleQuestions
+                                    ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                    : 'bg-slate-100 text-slate-500 border-slate-200'
+                                }`}
+                              >
+                                Soal: {exam.shuffleQuestions ? 'Acak' : 'Urut'}
+                              </span>
+                              <span
+                                className={`px-1.5 py-0.2 rounded border ${
+                                  exam.shuffleOptions
+                                    ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                    : 'bg-slate-100 text-slate-500 border-slate-200'
+                                }`}
+                              >
+                                Opsi: {exam.shuffleOptions ? 'Acak' : 'Urut'}
+                              </span>
+                            </div>
                           </div>
                           <div className="flex justify-between">
                             <span>Peserta Selesai:</span>

@@ -27,15 +27,82 @@ interface ExamRoomProps {
   onExitExam: () => void;
 }
 
+interface DisplayOption {
+  displayKey: OptionKey; // 'A', 'B', 'C', 'D', 'E' shown to student
+  originalKey: OptionKey; // original option key
+  text: string;
+  originalScore: number;
+}
+
+interface DisplayQuestion {
+  displayNumber: number; // 1 to N shown in room
+  originalQuestion: Question;
+  text: string;
+  imageUrl?: string;
+  options: DisplayOption[];
+  explanation?: string;
+  category?: string;
+}
+
 export const ExamRoom: React.FC<ExamRoomProps> = ({
   exam,
   studentData,
   onSubmitExam,
   onExitExam,
 }) => {
+  // Generate randomized question & option list on mount if enabled in exam settings
+  const [displayQuestions] = useState<DisplayQuestion[]>(() => {
+    let qList = [...exam.questions];
+    if (exam.shuffleQuestions) {
+      // Fisher-Yates shuffle
+      for (let i = qList.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [qList[i], qList[j]] = [qList[j], qList[i]];
+      }
+    }
+
+    const standardOptionKeys: OptionKey[] = ['A', 'B', 'C', 'D', 'E'];
+
+    return qList.map((q, qIdx) => {
+      let optList = [...q.options];
+      if (exam.shuffleOptions) {
+        // Fisher-Yates shuffle for options
+        for (let i = optList.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [optList[i], optList[j]] = [optList[j], optList[i]];
+        }
+      }
+
+      const displayOptions: DisplayOption[] = optList.map((opt, optIdx) => {
+        const displayKey = standardOptionKeys[optIdx] || opt.key;
+        return {
+          displayKey,
+          originalKey: opt.key,
+          text: opt.text,
+          originalScore: q.optionScores[opt.key] ?? 0,
+        };
+      });
+
+      return {
+        displayNumber: qIdx + 1,
+        originalQuestion: q,
+        text: q.text,
+        imageUrl: q.imageUrl,
+        options: displayOptions,
+        explanation: q.explanation,
+        category: q.category,
+      };
+    });
+  });
+
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [answers, setAnswers] = useState<Record<number, OptionKey>>({});
-  const [flagged, setFlagged] = useState<number[]>([]);
+  // Map of originalQuestion.id -> selected original OptionKey (for accurate grading)
+  const [answersByQuestionId, setAnswersByQuestionId] = useState<Record<string, OptionKey>>({});
+  // Map of displayNumber -> displayKey ('A'..'E') (for visual display in current room)
+  const [displayAnswers, setDisplayAnswers] = useState<Record<number, OptionKey>>({});
+  // Array of displayNumber flagged as doubtful
+  const [flaggedDisplayNumbers, setFlaggedDisplayNumbers] = useState<number[]>([]);
+
   const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(exam.durationMinutes * 60);
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
@@ -45,8 +112,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
   const startTimeRef = useRef<string>(new Date().toISOString());
   const lastViolationTimeRef = useRef<number>(0);
-  const questions = exam.questions;
-  const currentQuestion = questions[currentIndex];
+  const currentQuestion = displayQuestions[currentIndex] || displayQuestions[0];
 
   // Timer countdown
   useEffect(() => {
@@ -98,17 +164,27 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     };
   }, []);
 
-  const handleSelectOption = (key: OptionKey) => {
-    setAnswers((prev) => ({
+  const handleSelectOption = (opt: DisplayOption) => {
+    const currentQ = displayQuestions[currentIndex];
+    if (!currentQ) return;
+
+    setAnswersByQuestionId((prev) => ({
       ...prev,
-      [currentQuestion.number]: key,
+      [currentQ.originalQuestion.id]: opt.originalKey,
+    }));
+
+    setDisplayAnswers((prev) => ({
+      ...prev,
+      [currentQ.displayNumber]: opt.displayKey,
     }));
   };
 
   const toggleFlagCurrent = () => {
-    const qNum = currentQuestion.number;
-    setFlagged((prev) =>
-      prev.includes(qNum) ? prev.filter((n) => n !== qNum) : [...prev, qNum]
+    const currentQ = displayQuestions[currentIndex];
+    if (!currentQ) return;
+    const dNum = currentQ.displayNumber;
+    setFlaggedDisplayNumbers((prev) =>
+      prev.includes(dNum) ? prev.filter((n) => n !== dNum) : [...prev, dNum]
     );
   };
 
@@ -120,36 +196,42 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
   const isLowTime = timeLeftSeconds < 300; // < 5 minutes
 
-  const answeredCount = Object.keys(answers).length;
-  const totalCount = questions.length;
+  const answeredCount = Object.keys(displayAnswers).length;
+  const totalCount = displayQuestions.length;
   const unansweredCount = totalCount - answeredCount;
-  const flaggedCount = flagged.length;
+  const flaggedCount = flaggedDisplayNumbers.length;
 
   const calculateResults = (): StudentExamSubmission => {
     let totalScoreEarned = 0;
     let maxPossibleScore = 0;
     const answersDetail: StudentAnswerDetail[] = [];
+    const finalAnswersMap: Record<number, OptionKey> = {};
 
-    questions.forEach((q) => {
-      const selected = answers[q.number] || null;
-      const qScores = q.optionScores;
+    // Synchronize 100% with master questions (original number 1..50 & original answer key)
+    exam.questions.forEach((origQ) => {
+      const selectedOriginalKey = answersByQuestionId[origQ.id] || null;
+      if (selectedOriginalKey) {
+        finalAnswersMap[origQ.number] = selectedOriginalKey;
+      }
+
+      const qScores = origQ.optionScores;
       const maxInQuestion = Math.max(...(Object.values(qScores) as number[]));
       maxPossibleScore += maxInQuestion;
 
       let scoreEarned = 0;
       let isHighest = false;
 
-      if (selected && qScores[selected] !== undefined) {
-        scoreEarned = qScores[selected];
+      if (selectedOriginalKey && qScores[selectedOriginalKey] !== undefined) {
+        scoreEarned = qScores[selectedOriginalKey];
         isHighest = scoreEarned === maxInQuestion;
       }
 
       totalScoreEarned += scoreEarned;
 
       answersDetail.push({
-        questionNumber: q.number,
-        questionId: q.id,
-        selectedOption: selected,
+        questionNumber: origQ.number,
+        questionId: origQ.id,
+        selectedOption: selectedOriginalKey,
         scoreEarned,
         maxScore: maxInQuestion,
         isHighestScore: isHighest,
@@ -165,6 +247,11 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     const endTime = new Date().toISOString();
     const durationUsed = exam.durationMinutes * 60 - timeLeftSeconds;
 
+    // Map flagged numbers back to original question numbers
+    const flaggedOriginalNumbers = displayQuestions
+      .filter((dq) => flaggedDisplayNumbers.includes(dq.displayNumber))
+      .map((dq) => dq.originalQuestion.number);
+
     return {
       id: `sub-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       examId: exam.id,
@@ -176,8 +263,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       startTime: startTimeRef.current,
       endTime,
       durationSecondsUsed: durationUsed,
-      answers,
-      flaggedQuestions: flagged,
+      answers: finalAnswersMap,
+      flaggedQuestions: flaggedOriginalNumbers,
       answersDetail,
       totalScoreEarned,
       maxPossibleScore,
@@ -288,16 +375,21 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
                 <div className="flex items-center gap-2.5">
                   <span className="bg-blue-600 text-white font-bold text-xs sm:text-sm px-3 py-1 rounded-xl shadow-xs">
-                    Soal No. {currentIndex + 1}
+                    Soal No. {currentQuestion.displayNumber}
                   </span>
                   <span className="text-xs text-slate-400">
                     dari {totalCount} soal
                   </span>
                 </div>
 
-                {/* Simple multiple choice badge */}
-                <div className="text-[11px] font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-full border border-slate-200 flex items-center gap-1">
+                {/* Anti-cheat status or multiple choice badge */}
+                <div className="text-[11px] font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-full border border-slate-200 flex items-center gap-1.5">
                   <span>Pilihan Ganda (A - E)</span>
+                  {(exam.shuffleQuestions || exam.shuffleOptions) && (
+                    <span className="bg-purple-100 text-purple-700 font-bold px-1.5 py-0.2 rounded text-[10px]">
+                      Acak
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -309,15 +401,15 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               {/* Options list */}
               <div className="space-y-3">
                 {currentQuestion.options.map((opt) => {
-                  const isSelected = answers[currentQuestion.number] === opt.key;
+                  const isSelected = displayAnswers[currentQuestion.displayNumber] === opt.displayKey;
                   return (
                     <button
-                      key={opt.key}
-                      id={`option-btn-${opt.key}`}
-                      onClick={() => handleSelectOption(opt.key)}
+                      key={opt.displayKey}
+                      id={`option-btn-${opt.displayKey}`}
+                      onClick={() => handleSelectOption(opt)}
                       className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4 cursor-pointer group ${
                         isSelected
-                          ? 'border-blue-600 bg-blue-50/50 shadow-xs text-slate-900'
+                          ? 'border-blue-600 bg-blue-50/50 shadow-xs text-slate-900 ring-1 ring-blue-500/20'
                           : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
                       }`}
                     >
@@ -329,7 +421,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                             : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
                         }`}
                       >
-                        {opt.key}
+                        {opt.displayKey}
                       </div>
 
                       {/* Option text */}
@@ -363,14 +455,14 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                 id="doubt-flag-btn"
                 onClick={toggleFlagCurrent}
                 className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer ${
-                  flagged.includes(currentQuestion.number)
+                  flaggedDisplayNumbers.includes(currentQuestion.displayNumber)
                     ? 'bg-amber-500 text-white shadow-xs'
                     : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
                 }`}
               >
                 <Flag className="w-4 h-4" />
                 <span>
-                  {flagged.includes(currentQuestion.number) ? 'Ditandai Ragu-Ragu' : 'Ragu-Ragu'}
+                  {flaggedDisplayNumbers.includes(currentQuestion.displayNumber) ? 'Ditandai Ragu-Ragu' : 'Ragu-Ragu'}
                 </span>
               </button>
 
@@ -438,11 +530,11 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
             </div>
           </div>
 
-          {/* Number Grid 1 to 50 */}
+          {/* Number Grid 1 to N */}
           <div className="grid grid-cols-5 gap-2 max-h-[380px] overflow-y-auto p-1">
-            {questions.map((q, idx) => {
-              const isAnswered = answers[q.number] !== undefined;
-              const isFlagged = flagged.includes(q.number);
+            {displayQuestions.map((q, idx) => {
+              const isAnswered = displayAnswers[q.displayNumber] !== undefined;
+              const isFlagged = flaggedDisplayNumbers.includes(q.displayNumber);
               const isCurrent = idx === currentIndex;
 
               let btnBg = 'bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200';
@@ -454,7 +546,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
               return (
                 <button
-                  key={q.id}
+                  key={q.originalQuestion.id}
                   onClick={() => {
                     setCurrentIndex(idx);
                     if (showQuestionGridMobile) setShowQuestionGridMobile(false);
@@ -463,10 +555,10 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                     isCurrent ? 'ring-2 ring-blue-500 ring-offset-2 scale-105 shadow-xs' : ''
                   }`}
                 >
-                  <span>{q.number}</span>
+                  <span>{q.displayNumber}</span>
                   {isAnswered && (
                     <span className="text-[9px] font-mono opacity-90 leading-none">
-                      {answers[q.number]}
+                      {displayAnswers[q.displayNumber]}
                     </span>
                   )}
                 </button>
