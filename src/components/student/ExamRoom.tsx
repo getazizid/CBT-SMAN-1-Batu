@@ -16,6 +16,12 @@ import {
   X
 } from 'lucide-react';
 import { Exam, OptionKey, StudentAnswerDetail, StudentExamSubmission } from '../../types';
+import {
+  clearStoredExamProgress,
+  getStoredExamProgress,
+  saveStoredActiveStudentSession,
+  saveStoredExamProgress,
+} from '../../utils/storage';
 
 interface ExamRoomProps {
   exam: Exam;
@@ -51,8 +57,15 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   onSubmitExam,
   onExitExam,
 }) => {
-  // Generate randomized question & option list on mount if enabled in exam settings
+  // Check if there is previously saved in-progress exam data
+  const initialSaved = useRef(getStoredExamProgress(exam.id, studentData.nisn)).current;
+
+  // Generate or restore randomized question & option list
   const [displayQuestions] = useState<DisplayQuestion[]>(() => {
+    if (initialSaved?.displayQuestions && Array.isArray(initialSaved.displayQuestions) && initialSaved.displayQuestions.length > 0) {
+      return initialSaved.displayQuestions;
+    }
+
     let qList = [...exam.questions];
     if (exam.shuffleQuestions) {
       // Fisher-Yates shuffle
@@ -96,24 +109,64 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     });
   });
 
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(() => initialSaved?.currentIndex ?? 0);
   // Map of originalQuestion.id -> selected original OptionKey (for accurate grading)
-  const [answersByQuestionId, setAnswersByQuestionId] = useState<Record<string, OptionKey>>({});
+  const [answersByQuestionId, setAnswersByQuestionId] = useState<Record<string, OptionKey>>(() => initialSaved?.answersByQuestionId ?? {});
   // Map of displayNumber -> displayKey ('A'..'E') (for visual display in current room)
-  const [displayAnswers, setDisplayAnswers] = useState<Record<number, OptionKey>>({});
+  const [displayAnswers, setDisplayAnswers] = useState<Record<number, OptionKey>>(() => initialSaved?.displayAnswers ?? {});
   // Array of displayNumber flagged as doubtful
-  const [flaggedDisplayNumbers, setFlaggedDisplayNumbers] = useState<number[]>([]);
+  const [flaggedDisplayNumbers, setFlaggedDisplayNumbers] = useState<number[]>(() => initialSaved?.flaggedDisplayNumbers ?? []);
 
-  const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(exam.durationMinutes * 60);
+  const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(() => initialSaved?.timeLeftSeconds ?? exam.durationMinutes * 60);
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
-  const [tabSwitchCount, setTabSwitchCount] = useState<number>(0);
+  const [tabSwitchCount, setTabSwitchCount] = useState<number>(() => initialSaved?.tabSwitchCount ?? 0);
   const [showCheatWarning, setShowCheatWarning] = useState<boolean>(false);
   const [showQuestionGridMobile, setShowQuestionGridMobile] = useState<boolean>(false);
+  const [showRestoredNotice, setShowRestoredNotice] = useState<boolean>(() => !!initialSaved);
 
-  const startTimeRef = useRef<string>(new Date().toISOString());
+  const startTimeRef = useRef<string>(initialSaved?.startTime ?? new Date().toISOString());
   const lastViolationTimeRef = useRef<number>(0);
   const currentQuestion = displayQuestions[currentIndex] || displayQuestions[0];
+
+  // Auto-save exam progress continuously to localStorage
+  useEffect(() => {
+    saveStoredExamProgress(exam.id, studentData.nisn, {
+      examId: exam.id,
+      studentNisn: studentData.nisn,
+      studentData,
+      displayQuestions,
+      answersByQuestionId,
+      displayAnswers,
+      flaggedDisplayNumbers,
+      timeLeftSeconds,
+      tabSwitchCount,
+      currentIndex,
+      startTime: startTimeRef.current,
+      lastSavedAt: new Date().toISOString(),
+    });
+  }, [
+    exam.id,
+    studentData,
+    displayQuestions,
+    answersByQuestionId,
+    displayAnswers,
+    flaggedDisplayNumbers,
+    timeLeftSeconds,
+    tabSwitchCount,
+    currentIndex,
+  ]);
+
+  // Window beforeunload protection: warn if attempting to close/refresh
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = 'Ujian sedang berlangsung! Jawaban Anda telah tersimpan otomatis.';
+      return 'Ujian sedang berlangsung! Jawaban Anda telah tersimpan otomatis.';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   // Timer countdown
   useEffect(() => {
@@ -381,11 +434,15 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   };
 
   const handleManualSubmit = () => {
+    clearStoredExamProgress(exam.id, studentData.nisn);
+    saveStoredActiveStudentSession(null);
     const submission = calculateResults();
     onSubmitExam(submission);
   };
 
   const handleAutoSubmit = () => {
+    clearStoredExamProgress(exam.id, studentData.nisn);
+    saveStoredActiveStudentSession(null);
     const submission = calculateResults();
     onSubmitExam(submission);
   };
@@ -398,6 +455,25 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
+      {/* Restored Session Notification Banner */}
+      {showRestoredNotice && (
+        <div className="bg-emerald-600 text-white px-4 py-2 text-xs font-semibold flex items-center justify-between z-30 shadow-xs animate-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-200 shrink-0" />
+            <span>
+              <strong>Sesi Pulih Otomatis:</strong> Jawaban & sisa waktu ujian Anda sebelumnya berhasil dimuat kembali secara utuh.
+            </span>
+          </div>
+          <button
+            onClick={() => setShowRestoredNotice(false)}
+            className="text-white hover:text-emerald-100 p-1 rounded-lg text-xs cursor-pointer"
+            title="Tutup Notifikasi"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Top sticky exam bar */}
       <div className="bg-white text-slate-900 px-4 sm:px-6 py-3 border-b border-slate-200 shadow-xs sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">

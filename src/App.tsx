@@ -24,6 +24,7 @@ import {
 import {
   addStudentSubmission,
   getCurrentAdminSession,
+  getStoredActiveStudentSession,
   getStoredAdminAccounts,
   getStoredEnforceWhitelist,
   getStoredExams,
@@ -31,6 +32,7 @@ import {
   getStoredSubmissions,
   resetToInitialDemoData,
   saveCurrentAdminSession,
+  saveStoredActiveStudentSession,
   saveStoredAdminAccounts,
   saveStoredEnforceWhitelist,
   saveStoredExams,
@@ -70,6 +72,17 @@ export default function App() {
     setAdminAccounts(getStoredAdminAccounts());
     setCurrentAdmin(getCurrentAdminSession());
     setEnforceWhitelist(getStoredEnforceWhitelist());
+
+    // Restore student exam session if interrupted
+    const activeSession = getStoredActiveStudentSession();
+    if (activeSession && activeSession.exam && activeSession.studentData) {
+      setStudentFlow({
+        phase: 'exam',
+        activeExam: activeSession.exam,
+        studentData: activeSession.studentData,
+        latestSubmission: null,
+      });
+    }
   }, []);
 
   // Connect Firebase & Real-time Firestore synchronization
@@ -228,6 +241,12 @@ export default function App() {
     exam: Exam,
     studentData: { name: string; nisn: string; studentClass: string }
   ) => {
+    saveStoredActiveStudentSession({
+      exam,
+      studentData,
+      startedAt: new Date().toISOString(),
+    });
+
     setStudentFlow({
       phase: 'exam',
       activeExam: exam,
@@ -238,6 +257,8 @@ export default function App() {
 
   // Student Submits Exam
   const handleExamSubmit = async (submission: StudentExamSubmission) => {
+    saveStoredActiveStudentSession(null);
+
     // 1. Save to localStorage
     addStudentSubmission(submission);
     
@@ -256,6 +277,7 @@ export default function App() {
 
   // Student Returns to Login / Home
   const handleBackToStudentHome = () => {
+    saveStoredActiveStudentSession(null);
     setStudentFlow({
       phase: 'login',
       activeExam: null,

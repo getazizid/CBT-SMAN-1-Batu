@@ -193,3 +193,61 @@ export const resetToInitialDemoData = (): {
     adminAccounts: INITIAL_ADMIN_ACCOUNTS,
   };
 };
+
+export interface ActiveStudentSession {
+  exam: Exam;
+  studentData: { name: string; nisn: string; studentClass: string };
+  startedAt: string;
+}
+
+export const getStoredActiveStudentSession = (): ActiveStudentSession | null => {
+  try {
+    const raw = localStorage.getItem('cbt_sman1batu_active_student_session');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+export const saveStoredActiveStudentSession = (session: ActiveStudentSession | null): void => {
+  try {
+    if (session) {
+      localStorage.setItem('cbt_sman1batu_active_student_session', JSON.stringify(session));
+    } else {
+      localStorage.removeItem('cbt_sman1batu_active_student_session');
+    }
+  } catch (e) {
+    console.error('Failed to save active student session in localStorage', e);
+  }
+};
+
+export const getStoredExamProgress = (examId: string, nisn: string): any | null => {
+  try {
+    const key = `cbt_sman1batu_progress_${examId}_${nisn}`;
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+export const saveStoredExamProgress = (examId: string, nisn: string, progressData: any): void => {
+  try {
+    const key = `cbt_sman1batu_progress_${examId}_${nisn}`;
+    localStorage.setItem(key, JSON.stringify(progressData));
+  } catch (e) {
+    console.error('Failed to auto-save exam progress to localStorage', e);
+  }
+};
+
+export const clearStoredExamProgress = (examId: string, nisn: string): void => {
+  try {
+    const key = `cbt_sman1batu_progress_${examId}_${nisn}`;
+    localStorage.removeItem(key);
+  } catch (e) {
+    console.error('Failed to clear exam progress in localStorage', e);
+  }
+};
+
