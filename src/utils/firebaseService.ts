@@ -37,9 +37,9 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
   try {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
     const settingsSnap = await getDoc(settingsRef);
-    const isV2Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'mpk_v2';
+    const isV3Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'mpk_v3';
 
-    if (!isV2Updated) {
+    if (!isV3Updated) {
       console.log('🔄 Memperbarui dataset MPK-OSIS SMAN 1 Batu ke Cloud Firestore...');
       const batch = writeBatch(db);
 
@@ -52,7 +52,7 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
       });
       batch.set(doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id), MPK_OSIS_50_EXAM);
 
-      // 2. Clean up old demo students and set 5 real students
+      // 2. Clean up old demo students and set exactly 5 real students
       const studentsSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
       const realStudentIds = new Set(REAL_STUDENTS_MPK_OSIS.map((s) => s.id));
       studentsSnap.forEach((d) => {
@@ -64,7 +64,7 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
         batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), student);
       });
 
-      // 3. Clean up old demo submissions and set 5 real submissions
+      // 3. Clean up old demo submissions and set exactly 5 real submissions
       const subsSnap = await getDocs(collection(db, COLLECTIONS.SUBMISSIONS));
       const realSubIds = new Set(REAL_SUBMISSIONS_MPK_OSIS.map((s) => s.id));
       subsSnap.forEach((d) => {
@@ -76,18 +76,25 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
         batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), sub);
       });
 
-      // 4. Admin accounts: only initialize if no accounts exist in Firestore yet (preserves edited passwords)
+      // 4. Admin accounts: if only demo accounts existed, harmonize to 1 primary admin account (preserves custom edits)
       const accountsSnap = await getDocs(collection(db, COLLECTIONS.ADMIN_ACCOUNTS));
       if (accountsSnap.empty) {
         INITIAL_ADMIN_ACCOUNTS.forEach((account) => {
           batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), account);
+        });
+      } else {
+        // Remove unneeded default demo accounts (adm-002, adm-003) if they were not modified
+        accountsSnap.forEach((d) => {
+          if (d.id === 'adm-002' || d.id === 'adm-003') {
+            batch.delete(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, d.id));
+          }
         });
       }
 
       batch.set(settingsRef, {
         enforceWhitelist: true,
         isInitialized: true,
-        version: 'mpk_v2',
+        version: 'mpk_v3',
         updatedAt: new Date().toISOString(),
       }, { merge: true });
 

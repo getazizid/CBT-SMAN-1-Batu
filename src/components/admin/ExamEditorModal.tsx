@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Clock,
   FileEdit,
@@ -27,21 +27,59 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
   exam,
   onSaveExam,
 }) => {
-  const [title, setTitle] = useState(exam?.title || '');
-  const [subject, setSubject] = useState(exam?.subject || '');
-  const [gradeClass, setGradeClass] = useState(exam?.gradeClass || 'Kelas XII - Semua Jurusan');
-  const [academicYear, setAcademicYear] = useState(exam?.academicYear || '2025/2026 Ganjil');
-  const [durationMinutes, setDurationMinutes] = useState(exam?.durationMinutes || 60);
-  const [token, setToken] = useState(exam?.token || 'BATU' + Math.floor(1000 + Math.random() * 9000));
-  const [passingGrade, setPassingGrade] = useState(exam?.passingGrade || 75);
-  const [teacherName, setTeacherName] = useState(exam?.teacherName || 'Guru Pengampu');
-  const [defaultOptionScores, setDefaultOptionScores] = useState<OptionScoreMap>(
-    exam?.defaultOptionScores || { A: 10, B: 5, C: 4, D: 3, E: 2 }
-  );
-  const [questions, setQuestions] = useState<Question[]>(exam?.questions || []);
-  const [isActive, setIsActive] = useState<boolean>(exam?.isActive ?? true);
-  const [showInstantScore, setShowInstantScore] = useState<boolean>(exam?.showInstantScore ?? true);
+  const [title, setTitle] = useState('');
+  const [subject, setSubject] = useState('');
+  const [gradeClass, setGradeClass] = useState('Kelas X & XI (Calon Pengurus)');
+  const [academicYear, setAcademicYear] = useState('2025/2026 Ganjil');
+  const [durationMinutes, setDurationMinutes] = useState(90);
+  const [token, setToken] = useState('OSIS2026');
+  const [passingGrade, setPassingGrade] = useState(75);
+  const [teacherName, setTeacherName] = useState('Tim Pembina OSIS & Kesiswaan SMAN 1 Batu');
+  const [defaultOptionScores, setDefaultOptionScores] = useState<OptionScoreMap>({
+    A: 10,
+    B: 8,
+    C: 6,
+    D: 4,
+    E: 2,
+  });
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [isActive, setIsActive] = useState<boolean>(true);
+  const [showInstantScore, setShowInstantScore] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'settings' | 'questions'>('settings');
+
+  // Sync state whenever exam prop or isOpen changes so existing data is always loaded
+  useEffect(() => {
+    if (exam) {
+      setTitle(exam.title || '');
+      setSubject(exam.subject || '');
+      setGradeClass(exam.gradeClass || 'Kelas X & XI (Calon Pengurus)');
+      setAcademicYear(exam.academicYear || '2025/2026 Ganjil');
+      setDurationMinutes(exam.durationMinutes || 90);
+      setToken(exam.token || 'OSIS2026');
+      setPassingGrade(exam.passingGrade || 75);
+      setTeacherName(exam.teacherName || 'Tim Pembina OSIS & Kesiswaan SMAN 1 Batu');
+      setDefaultOptionScores(
+        exam.defaultOptionScores || { A: 10, B: 8, C: 6, D: 4, E: 2 }
+      );
+      setQuestions(exam.questions ? [...exam.questions] : []);
+      setIsActive(exam.isActive ?? true);
+      setShowInstantScore(exam.showInstantScore ?? true);
+    } else {
+      setTitle('');
+      setSubject('');
+      setGradeClass('Kelas X & XI (Calon Pengurus)');
+      setAcademicYear('2025/2026 Ganjil');
+      setDurationMinutes(90);
+      setToken('BATU' + Math.floor(1000 + Math.random() * 9000));
+      setPassingGrade(75);
+      setTeacherName('Tim Pembina OSIS & Kesiswaan SMAN 1 Batu');
+      setDefaultOptionScores({ A: 10, B: 8, C: 6, D: 4, E: 2 });
+      setQuestions([]);
+      setIsActive(true);
+      setShowInstantScore(true);
+    }
+    setActiveTab('settings');
+  }, [exam, isOpen]);
 
   if (!isOpen) return null;
 

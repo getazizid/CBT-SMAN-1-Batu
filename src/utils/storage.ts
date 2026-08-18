@@ -29,7 +29,7 @@ export const INITIAL_SUBMISSIONS: StudentExamSubmission[] = REAL_SUBMISSIONS_MPK
 // 5 Data Siswa Realistis Calon Pengurus MPK OSIS
 export const INITIAL_STUDENTS: RegisteredStudent[] = REAL_STUDENTS_MPK_OSIS;
 
-// Akun Admin & Guru Bawaan Awal
+// 1 Akun Admin Utama Sistem
 export const INITIAL_ADMIN_ACCOUNTS: AdminAccount[] = [
   {
     id: 'adm-001',
@@ -38,24 +38,6 @@ export const INITIAL_ADMIN_ACCOUNTS: AdminAccount[] = [
     name: 'Administrator SMAN 1 Batu',
     role: 'Administrator',
     email: 'admin@sman1batu.sch.id',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'adm-002',
-    username: 'guru',
-    password: 'batu2025',
-    name: 'Dra. Sri Wahyuni, M.Pd.',
-    role: 'Guru Pengampu',
-    email: 'sriwahyuni@sman1batu.sch.id',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'adm-003',
-    username: 'bambang',
-    password: 'guru123',
-    name: 'Bambang Sudarmanto, S.Pd., M.Si.',
-    role: 'Guru Pengampu',
-    email: 'bambang@sman1batu.sch.id',
     createdAt: new Date().toISOString(),
   },
 ];
