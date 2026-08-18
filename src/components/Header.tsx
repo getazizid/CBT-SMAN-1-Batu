@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, LogOut, ShieldCheck, UserCheck } from 'lucide-react';
+import { Lock, LogOut, ShieldCheck, UserCheck, Cloud, CloudOff } from 'lucide-react';
 import { AdminAccount, Exam, UserRole } from '../types';
 
 interface HeaderProps {
@@ -10,6 +10,7 @@ interface HeaderProps {
   onLogoutAdmin: () => void;
   activeExam?: Exam | null;
   onResetDemo?: () => void;
+  isCloudConnected?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentAdmin,
   onOpenAdminLogin,
   onLogoutAdmin,
+  isCloudConnected = false,
 }) => {
   const handleAdminClick = () => {
     if (currentAdmin) {
@@ -48,13 +50,30 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-500 hidden sm:block">
-              Computer Based Test
+              Computer Based Test &bull; Kota Batu
             </p>
           </div>
         </div>
 
-        {/* Role Switcher & Status */}
+        {/* Right Section: Cloud Status & Role Switcher */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Cloud Connection Badge */}
+          <div className="hidden md:flex items-center">
+            {isCloudConnected ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-xs">
+                <Cloud className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Cloud Online</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200 shadow-xs">
+                <CloudOff className="w-3.5 h-3.5 text-slate-400" />
+                <span>Offline Cache</span>
+              </span>
+            )}
+          </div>
+
+          {/* Role Switcher */}
           <div className="bg-slate-100 p-1 rounded-xl border border-slate-200 flex items-center gap-1">
             <button
               id="role-student-btn"

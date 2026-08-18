@@ -20,7 +20,7 @@ export const DEFAULT_OPTION_SCORES: OptionScoreMap = {
 };
 
 // Seed initial demo exams for SMAN 1 Batu
-const INITIAL_EXAMS: Exam[] = [
+export const INITIAL_EXAMS: Exam[] = [
   {
     id: 'exam-sman1-001',
     title: 'Penilaian Sumatif Karakter & Etika Digital SMAN 1 Batu',
@@ -258,7 +258,7 @@ const INITIAL_EXAMS: Exam[] = [
 ];
 
 // Seed realistic student submissions for SMAN 1 Batu analytics
-const INITIAL_SUBMISSIONS: StudentExamSubmission[] = [
+export const INITIAL_SUBMISSIONS: StudentExamSubmission[] = [
   {
     id: 'sub-001',
     examId: 'exam-sman1-001',
