@@ -9,6 +9,8 @@ import {
   KeyRound,
   Lock,
   LogOut,
+  Maximize2,
+  Minimize2,
   ShieldAlert,
   ShieldCheck,
   Sparkles,
@@ -70,6 +72,33 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     eligibleExams[0] ||
     activeExams[0];
 
+  // Fullscreen State
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(() => !!document.fullscreenElement);
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  };
+
+  const ensureFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  };
+
   // Auto-detect student preview when typing NISN in Step 1
   useEffect(() => {
     const cleanNisn = nisnInput.trim();
@@ -111,6 +140,7 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
   const handleStudentLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    ensureFullscreen();
 
     const cleanNisn = nisnInput.trim();
     const enteredPass = passwordInput.trim();
@@ -210,6 +240,7 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     }
 
     // Token verified! Start the exam
+    ensureFullscreen();
     onStartExam(currentExam, authenticatedStudent);
   };
 
@@ -238,6 +269,44 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
           <p className="text-xs text-slate-500 mt-1">
             Sistem Ujian Terstandar Berbasis Komputer & Integritas Tinggi
           </p>
+        </div>
+
+        {/* Fullscreen Mode Activation Banner */}
+        <div className="mb-5 p-3 rounded-2xl border flex items-center justify-between gap-2 text-xs transition-colors bg-slate-50 border-slate-200">
+          <div className="flex items-center gap-2">
+            <div className={`w-2.5 h-2.5 rounded-full ${isFullscreen ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
+            <div>
+              <p className="font-bold text-slate-800 text-[11px] sm:text-xs">
+                Mode Layar Penuh: <span className={isFullscreen ? 'text-emerald-700' : 'text-amber-700'}>{isFullscreen ? 'Aktif (Fullscreen)' : 'Belum Aktif'}</span>
+              </p>
+              <p className="text-[10px] sm:text-[11px] text-slate-500">
+                {isFullscreen
+                  ? 'Siap mengikuti ujian dalam mode layar penuh.'
+                  : 'Wajib masuk mode layar penuh untuk ujian.'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${
+              isFullscreen
+                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-200'
+                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/20'
+            }`}
+          >
+            {isFullscreen ? (
+              <>
+                <Minimize2 className="w-3.5 h-3.5" />
+                <span>Keluar</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span>Aktifkan</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Step Indicator Header */}
