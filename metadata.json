@@ -1,0 +1,8 @@
+{
+  "name": "CBT SMAN 1 Batu",
+  "description": "Aplikasi ujian online (CBT) SMAN 1 Batu dengan sistem bobot nilai bertingkat per opsi jawaban, impor template Word, analitik performa guru, dan pelaporan nilai otomatis siswa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

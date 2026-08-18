@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    font-size: 17.5px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply antialiased text-slate-800 bg-slate-100 text-base;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  button, input, select, textarea {
+    @apply font-sans;
+  }
+}
+
+@media print {
+  html {
+    font-size: 15px;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  header, footer, .no-print, button {
+    display: none !important;
+  }
+}
+
+
