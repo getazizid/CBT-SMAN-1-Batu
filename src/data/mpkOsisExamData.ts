@@ -1,4 +1,4 @@
-import { Exam, RegisteredStudent } from '../types';
+import { Exam, RegisteredStudent, StudentExamSubmission } from '../types';
 
 export const REAL_STUDENTS_MPK_OSIS: RegisteredStudent[] = [
   {
@@ -894,3 +894,66 @@ export const MPK_OSIS_50_EXAM: Exam = {
     },
   ],
 };
+
+const createCandidateSubmission = (
+  id: string,
+  student: RegisteredStudent,
+  variationIndices: number[],
+  flagged: number[],
+  durationMinutes: number,
+  device: string
+): StudentExamSubmission => {
+  const answers: Record<number, 'A' | 'B' | 'C' | 'D' | 'E'> = {};
+  const answersDetail = MPK_OSIS_50_EXAM.questions.map((q) => {
+    const isVar = variationIndices.includes(q.number);
+    const selectedOption: 'A' | 'B' | 'C' | 'D' | 'E' = isVar ? 'B' : 'A';
+    answers[q.number] = selectedOption;
+    const scoreEarned = q.optionScores[selectedOption] ?? 0;
+    const maxScore = Math.max(...Object.values(q.optionScores));
+    return {
+      questionNumber: q.number,
+      questionId: q.id,
+      selectedOption,
+      scoreEarned,
+      maxScore,
+      isHighestScore: scoreEarned === maxScore,
+    };
+  });
+
+  const totalScoreEarned = answersDetail.reduce((acc, a) => acc + a.scoreEarned, 0);
+  const maxPossibleScore = answersDetail.reduce((acc, a) => acc + a.maxScore, 0);
+  const finalScoreScale100 = Math.round((totalScoreEarned / maxPossibleScore) * 100);
+
+  return {
+    id,
+    examId: MPK_OSIS_50_EXAM.id,
+    examTitle: MPK_OSIS_50_EXAM.title,
+    subject: MPK_OSIS_50_EXAM.subject,
+    studentName: student.name,
+    studentNisn: student.nisn,
+    studentClass: student.studentClass,
+    startTime: new Date(Date.now() - 1000 * 60 * (durationMinutes + 15)).toISOString(),
+    endTime: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    durationSecondsUsed: durationMinutes * 60,
+    answers,
+    flaggedQuestions: flagged,
+    answersDetail,
+    totalScoreEarned,
+    maxPossibleScore,
+    finalScoreScale100,
+    isPassed: finalScoreScale100 >= MPK_OSIS_50_EXAM.passingGrade,
+    passingGrade: MPK_OSIS_50_EXAM.passingGrade,
+    tabSwitchCount: 0,
+    submittedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    deviceInfo: device,
+  };
+};
+
+export const REAL_SUBMISSIONS_MPK_OSIS: StudentExamSubmission[] = [
+  createCandidateSubmission('sub-mpk-001', REAL_STUDENTS_MPK_OSIS[0], [6, 12, 28], [6], 72, 'Chrome / Windows 11'),
+  createCandidateSubmission('sub-mpk-002', REAL_STUDENTS_MPK_OSIS[1], [4, 18, 32, 45], [18], 68, 'Safari / macOS'),
+  createCandidateSubmission('sub-mpk-003', REAL_STUDENTS_MPK_OSIS[2], [2, 9, 15, 23, 38, 47], [9, 38], 80, 'Edge / Windows 10'),
+  createCandidateSubmission('sub-mpk-004', REAL_STUDENTS_MPK_OSIS[3], [5, 11, 20, 29, 36, 42, 49], [20], 75, 'Chrome / Android Tablet'),
+  createCandidateSubmission('sub-mpk-005', REAL_STUDENTS_MPK_OSIS[4], [7, 14, 25, 33, 40], [14], 70, 'Chrome / iOS iPad'),
+];
+

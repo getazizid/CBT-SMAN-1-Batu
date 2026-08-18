@@ -17,7 +17,7 @@ import {
   INITIAL_STUDENTS,
   INITIAL_SUBMISSIONS,
 } from './storage';
-import { MPK_OSIS_50_EXAM, REAL_STUDENTS_MPK_OSIS } from '../data/mpkOsisExamData';
+import { MPK_OSIS_50_EXAM, REAL_STUDENTS_MPK_OSIS, REAL_SUBMISSIONS_MPK_OSIS } from '../data/mpkOsisExamData';
 
 export const COLLECTIONS = {
   EXAMS: 'cbt_exams',
@@ -28,8 +28,8 @@ export const COLLECTIONS = {
 };
 
 /**
- * Seed initial demo data ONCE if the system settings flag does not exist yet.
- * Once initialized, it will never overwrite user edits or deleted data.
+ * Seed & harmonize initial data for MPK-OSIS SMAN 1 Batu.
+ * Preserves user-edited admin accounts and prevents reverting.
  */
 export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
   if (!db || !isFirebaseConfigured()) return false;
@@ -37,70 +37,66 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
   try {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
     const settingsSnap = await getDoc(settingsRef);
+    const isV2Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'mpk_v2';
 
-    // If settings document already exists, ensure MPK OSIS exam exists
-    if (settingsSnap.exists()) {
-      const mpkDocRef = doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id);
-      const mpkSnap = await getDoc(mpkDocRef);
-      if (!mpkSnap.exists()) {
-        await setDoc(mpkDocRef, MPK_OSIS_50_EXAM);
-        for (const student of REAL_STUDENTS_MPK_OSIS) {
-          const sRef = doc(db, COLLECTIONS.STUDENTS, student.id);
-          const sSnap = await getDoc(sRef);
-          if (!sSnap.exists()) {
-            await setDoc(sRef, student);
-          }
-        }
-      }
-      return true;
-    }
-
-    // Check if exams collection has any docs
-    const examsSnap = await getDocs(collection(db, COLLECTIONS.EXAMS));
-    if (examsSnap.empty) {
-      console.log('🌱 Menyiapkan data awal SMAN 1 Batu ke Cloud Firestore...');
+    if (!isV2Updated) {
+      console.log('🔄 Memperbarui dataset MPK-OSIS SMAN 1 Batu ke Cloud Firestore...');
       const batch = writeBatch(db);
 
-      INITIAL_EXAMS.forEach((exam) => {
-        const docRef = doc(db, COLLECTIONS.EXAMS, exam.id);
-        batch.set(docRef, exam);
+      // 1. Clean up old demo exams and set exactly 1 MPK OSIS 50 Exam
+      const examsSnap = await getDocs(collection(db, COLLECTIONS.EXAMS));
+      examsSnap.forEach((d) => {
+        if (d.id !== MPK_OSIS_50_EXAM.id) {
+          batch.delete(doc(db, COLLECTIONS.EXAMS, d.id));
+        }
+      });
+      batch.set(doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id), MPK_OSIS_50_EXAM);
+
+      // 2. Clean up old demo students and set 5 real students
+      const studentsSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+      const realStudentIds = new Set(REAL_STUDENTS_MPK_OSIS.map((s) => s.id));
+      studentsSnap.forEach((d) => {
+        if (!realStudentIds.has(d.id)) {
+          batch.delete(doc(db, COLLECTIONS.STUDENTS, d.id));
+        }
+      });
+      REAL_STUDENTS_MPK_OSIS.forEach((student) => {
+        batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), student);
       });
 
-      INITIAL_STUDENTS.forEach((student) => {
-        const docRef = doc(db, COLLECTIONS.STUDENTS, student.id);
-        batch.set(docRef, student);
+      // 3. Clean up old demo submissions and set 5 real submissions
+      const subsSnap = await getDocs(collection(db, COLLECTIONS.SUBMISSIONS));
+      const realSubIds = new Set(REAL_SUBMISSIONS_MPK_OSIS.map((s) => s.id));
+      subsSnap.forEach((d) => {
+        if (!realSubIds.has(d.id)) {
+          batch.delete(doc(db, COLLECTIONS.SUBMISSIONS, d.id));
+        }
+      });
+      REAL_SUBMISSIONS_MPK_OSIS.forEach((sub) => {
+        batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), sub);
       });
 
-      INITIAL_ADMIN_ACCOUNTS.forEach((account) => {
-        const docRef = doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id);
-        batch.set(docRef, account);
-      });
-
-      INITIAL_SUBMISSIONS.forEach((sub) => {
-        const docRef = doc(db, COLLECTIONS.SUBMISSIONS, sub.id);
-        batch.set(docRef, sub);
-      });
+      // 4. Admin accounts: only initialize if no accounts exist in Firestore yet (preserves edited passwords)
+      const accountsSnap = await getDocs(collection(db, COLLECTIONS.ADMIN_ACCOUNTS));
+      if (accountsSnap.empty) {
+        INITIAL_ADMIN_ACCOUNTS.forEach((account) => {
+          batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), account);
+        });
+      }
 
       batch.set(settingsRef, {
         enforceWhitelist: true,
         isInitialized: true,
-        seededAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-
-      await batch.commit();
-      console.log('✅ Data awal berhasil disimpan di Cloud Firestore!');
-    } else {
-      // Mark as initialized so it never tries to seed again
-      await setDoc(settingsRef, {
-        enforceWhitelist: true,
-        isInitialized: true,
+        version: 'mpk_v2',
         updatedAt: new Date().toISOString(),
       }, { merge: true });
+
+      await batch.commit();
+      console.log('✅ Dataset MPK-OSIS SMAN 1 Batu berhasil disinkronkan ke Cloud Firestore!');
     }
     return true;
   } catch (error) {
-    console.warn('⚠️ Gagal seeding Firestore:', error);
+    console.warn('⚠️ Gagal sinkronisasi Firestore:', error);
     return false;
   }
 };
