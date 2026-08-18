@@ -119,7 +119,7 @@ export const exportExamResultsToExcel = (
       'Total Poin': s.totalScoreEarned,
       'Maks Poin': s.maxPossibleScore,
       'Status KKM': s.isPassed ? 'TUNTAS (LULUS)' : 'REMEDIAL',
-      'Pelanggaran Tab': s.tabSwitchCount,
+      'Pelanggaran (Pindah Tab/App)': s.tabSwitchCount,
       'Waktu Pengerjaan (Menit)': Math.round(s.durationSecondsUsed / 60),
       'Waktu Submit': new Date(s.submittedAt).toLocaleString('id-ID'),
     };

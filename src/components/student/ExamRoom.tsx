@@ -8,6 +8,7 @@ import {
   Flag,
   HelpCircle,
   Maximize2,
+  Minimize2,
   Send,
   ShieldAlert,
   Type,
@@ -130,8 +131,52 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  // Anti-cheat detector: Accurately records exactly 1 violation per tab switch incident
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  };
+
   useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  // Anti-cheat detector: Accurately records exactly 1 violation per tab/app switch incident
+  useEffect(() => {
+    const playAlertSound = () => {
+      try {
+        const AudioCtx =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (AudioCtx) {
+          const ctx = new AudioCtx();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); // A5
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        }
+      } catch {
+        // Ignore audio errors if audio context is blocked
+      }
+    };
+
     const recordViolation = () => {
       const now = Date.now();
       // Debounce: prevent duplicate trigger within 1.5 seconds from simultaneous browser events
@@ -141,26 +186,70 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       lastViolationTimeRef.current = now;
       setTabSwitchCount((prev) => prev + 1);
       setShowCheatWarning(true);
+      playAlertSound();
     };
 
+    // 1. Tab switch or window minimize
     const handleVisibilityChange = () => {
-      if (document.hidden) {
+      if (document.hidden || document.visibilityState === 'hidden') {
         recordViolation();
       }
     };
 
+    // 2. Application switch, Alt+Tab, click outside browser window, or losing window focus
     const handleWindowBlur = () => {
-      if (document.hidden) {
+      recordViolation();
+    };
+
+    // 3. Prevent DevTools & inspection shortcuts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F12') {
+        e.preventDefault();
         recordViolation();
+        return;
       }
+      if (
+        e.ctrlKey &&
+        e.shiftKey &&
+        (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')
+      ) {
+        e.preventDefault();
+        recordViolation();
+        return;
+      }
+      if (
+        e.ctrlKey &&
+        (e.key === 'u' || e.key === 'U' || e.key === 'p' || e.key === 'P' || e.key === 's' || e.key === 'S')
+      ) {
+        e.preventDefault();
+        return;
+      }
+    };
+
+    // 4. Disable right-click context menu & clipboard copy/cut/paste
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+    const handleClipboard = (e: ClipboardEvent) => {
+      e.preventDefault();
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('copy', handleClipboard);
+    document.addEventListener('cut', handleClipboard);
+    document.addEventListener('paste', handleClipboard);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('copy', handleClipboard);
+      document.removeEventListener('cut', handleClipboard);
+      document.removeEventListener('paste', handleClipboard);
     };
   }, []);
 
@@ -327,6 +416,22 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
         {/* Right tools */}
         <div className="flex items-center gap-2">
+          {/* Fullscreen toggle button */}
+          <button
+            onClick={toggleFullscreen}
+            className="bg-slate-100 hover:bg-slate-200 text-slate-700 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-slate-200 text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            title={isFullscreen ? 'Keluar Mode Layar Penuh' : 'Masuk Mode Layar Penuh (Fullscreen)'}
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-3.5 h-3.5 text-blue-600" />
+            ) : (
+              <Maximize2 className="w-3.5 h-3.5 text-slate-600" />
+            )}
+            <span className="hidden sm:inline font-medium text-[11px]">
+              {isFullscreen ? 'Keluar Fullscreen' : 'Fullscreen'}
+            </span>
+          </button>
+
           {/* Font size toggle */}
           <div className="bg-slate-100 p-1 rounded-lg border border-slate-200 flex items-center gap-1 text-xs">
             <button
@@ -649,7 +754,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       {/* Anti-Cheat Alert Modal */}
       {showCheatWarning && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-rose-200">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-rose-200 animate-in fade-in zoom-in-95 duration-200">
             <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4 border border-rose-100">
               <ShieldAlert className="w-6 h-6" />
             </div>
@@ -658,21 +763,21 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               Peringatan Sistem Pengawas
             </h3>
             <p className="text-xs text-center text-slate-500 mb-4">
-              Sistem mendeteksi Anda meninggalkan jendela atau berpindah tab ujian.
+              Sistem mendeteksi Anda meninggalkan jendela ujian (berpindah tab browser atau membuka aplikasi lain).
             </p>
 
             <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 text-xs text-rose-900 mb-5 space-y-1">
               <p className="font-semibold">
                 Jumlah Pelanggaran Tercatat: <strong>{tabSwitchCount} kali</strong>
               </p>
-              <p className="text-slate-600 text-[11px]">
-                Aktivitas ini tercatat otomatis dan dilampirkan pada laporan hasil ujian yang dikirim ke guru pengampu.
+              <p className="text-slate-600 text-[11px] leading-relaxed">
+                Dilarang membuka tab lain, browser lain, maupun beralih ke aplikasi di luar ujian. Seluruh pelanggaran terekam otomatis dan dilaporkan kepada guru pengawas.
               </p>
             </div>
 
             <button
               onClick={() => setShowCheatWarning(false)}
-              className="w-full py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-sm cursor-pointer"
+              className="w-full py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-sm cursor-pointer transition-colors"
             >
               Saya Mengerti & Kembali ke Ujian
             </button>

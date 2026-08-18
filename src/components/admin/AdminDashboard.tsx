@@ -1535,7 +1535,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <td className="py-3 px-3.5 text-center">
                               {(sub.tabSwitchCount || 0) > 0 ? (
                                 <span className="bg-amber-50 text-amber-800 px-2 py-0.5 rounded-md font-semibold text-[11px] border border-amber-200">
-                                  {sub.tabSwitchCount}x Pindah Tab
+                                  {sub.tabSwitchCount}x Pindah Tab/App
                                 </span>
                               ) : (
                                 <span className="text-slate-400">0</span>

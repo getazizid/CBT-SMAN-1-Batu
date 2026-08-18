@@ -203,7 +203,7 @@ export const ExamResultReport: React.FC<ExamResultReportProps> = ({
                     <span>Integritas Pengerjaan:</span>
                   </span>
                   <span className={`font-bold ${submission.tabSwitchCount === 0 ? 'text-emerald-700' : 'text-amber-700'}`}>
-                    {submission.tabSwitchCount === 0 ? 'Tertib (0 Pelanggaran)' : `${submission.tabSwitchCount}x Pindah Tab`}
+                    {submission.tabSwitchCount === 0 ? 'Tertib (0 Pelanggaran)' : `${submission.tabSwitchCount}x Pindah Tab/App`}
                   </span>
                 </div>
 

@@ -106,8 +106,8 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                 }`}
               >
                 {submission.tabSwitchCount === 0
-                  ? 'Bersih (0 Tab Switch)'
-                  : `${submission.tabSwitchCount}x Pindah Tab`}
+                  ? 'Bersih (0 Pelanggaran)'
+                  : `${submission.tabSwitchCount}x Pindah Tab/App`}
               </span>
               <span className="text-[11px] text-slate-400 block mt-0.5">
                 {submission.deviceInfo || 'Browser'}
