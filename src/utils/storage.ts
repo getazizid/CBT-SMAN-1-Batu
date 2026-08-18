@@ -1,4 +1,5 @@
 import { AdminAccount, Exam, OptionScoreMap, RegisteredStudent, StudentExamSubmission } from '../types';
+import { MPK_OSIS_50_EXAM, REAL_STUDENTS_MPK_OSIS } from '../data/mpkOsisExamData';
 
 const STORAGE_KEYS = {
   EXAMS: 'cbt_sman1batu_exams',
@@ -21,6 +22,7 @@ export const DEFAULT_OPTION_SCORES: OptionScoreMap = {
 
 // Seed initial demo exams for SMAN 1 Batu
 export const INITIAL_EXAMS: Exam[] = [
+  MPK_OSIS_50_EXAM,
   {
     id: 'exam-sman1-001',
     title: 'Penilaian Sumatif Karakter & Etika Digital SMAN 1 Batu',
@@ -480,6 +482,7 @@ export const addStudentSubmission = (submission: StudentExamSubmission): void =>
 };
 
 export const INITIAL_STUDENTS: RegisteredStudent[] = [
+  ...REAL_STUDENTS_MPK_OSIS,
   {
     id: 'std-001',
     nisn: '0061829101',

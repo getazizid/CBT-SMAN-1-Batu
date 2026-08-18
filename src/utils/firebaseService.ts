@@ -17,6 +17,7 @@ import {
   INITIAL_STUDENTS,
   INITIAL_SUBMISSIONS,
 } from './storage';
+import { MPK_OSIS_50_EXAM, REAL_STUDENTS_MPK_OSIS } from '../data/mpkOsisExamData';
 
 export const COLLECTIONS = {
   EXAMS: 'cbt_exams',
@@ -37,8 +38,20 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
     const settingsSnap = await getDoc(settingsRef);
 
-    // If settings document already exists, the database was already initialized -> DO NOT SEED!
+    // If settings document already exists, ensure MPK OSIS exam exists
     if (settingsSnap.exists()) {
+      const mpkDocRef = doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id);
+      const mpkSnap = await getDoc(mpkDocRef);
+      if (!mpkSnap.exists()) {
+        await setDoc(mpkDocRef, MPK_OSIS_50_EXAM);
+        for (const student of REAL_STUDENTS_MPK_OSIS) {
+          const sRef = doc(db, COLLECTIONS.STUDENTS, student.id);
+          const sSnap = await getDoc(sRef);
+          if (!sSnap.exists()) {
+            await setDoc(sRef, student);
+          }
+        }
+      }
       return true;
     }
 
