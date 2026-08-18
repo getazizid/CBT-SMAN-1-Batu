@@ -471,16 +471,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               setActiveTab(item.id);
               setIsMobileDrawerOpen(false);
             }}
-            className={`w-full text-left px-3.5 py-2.5 rounded-xl flex items-center justify-between gap-3 text-xs transition-colors cursor-pointer ${
+            className={`w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center justify-between gap-3 text-xs transition-all cursor-pointer ${
               isActive
-                ? 'bg-blue-600 text-white font-semibold shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium'
             }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <Icon
                 className={`w-4 h-4 shrink-0 ${
-                  isActive ? 'text-white' : 'text-slate-400'
+                  isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'
                 }`}
               />
               <span className="truncate">{item.label}</span>
@@ -491,7 +491,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 className={`text-[11px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
                   isActive
                     ? 'bg-white/20 text-white'
-                    : 'bg-slate-100 text-slate-600'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                 }`}
               >
                 {item.badge}
@@ -509,24 +509,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {isMobileDrawerOpen && (
         <div
           onClick={() => setIsMobileDrawerOpen(false)}
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 lg:hidden"
+          className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-xs z-50 lg:hidden transition-opacity"
         />
       )}
 
       {/* Mobile Sidebar Drawer */}
       <aside
-        className={`fixed top-0 left-0 bottom-0 w-64 bg-white z-50 p-4 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden flex flex-col justify-between ${
+        className={`fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-slate-900 z-50 p-4 shadow-2xl border-r border-slate-200 dark:border-slate-800 transition-transform duration-300 ease-in-out lg:hidden flex flex-col justify-between ${
           isMobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div>
-          <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
-            <span className="font-semibold text-xs text-slate-500 uppercase tracking-wider">
+          <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <span className="font-bold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Menu Navigasi
             </span>
             <button
               onClick={() => setIsMobileDrawerOpen(false)}
-              className="p-1 text-slate-400 hover:text-slate-700 rounded-lg cursor-pointer"
+              className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -536,15 +536,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Mobile Logged In User Info */}
         {currentAdmin && (
-          <div className="pt-3 border-t border-slate-100">
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between">
               <div className="min-w-0">
-                <p className="text-xs font-bold text-slate-900 truncate">{currentAdmin.name}</p>
-                <p className="text-[11px] text-slate-500">{currentAdmin.role}</p>
+                <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{currentAdmin.name}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">{currentAdmin.role}</p>
               </div>
               <button
                 onClick={onLogoutAdmin}
-                className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg"
+                className="p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl"
                 title="Keluar / Logout"
               >
                 <LogOut className="w-4 h-4" />
@@ -558,7 +558,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <div className="flex gap-5 items-start">
         {/* Simple Desktop Left Sidebar */}
         <aside
-          className={`hidden lg:flex flex-col justify-between bg-white rounded-2xl p-3 border border-slate-200 shadow-xs transition-all duration-300 sticky top-20 shrink-0 ${
+          className={`hidden lg:flex flex-col justify-between bg-white dark:bg-slate-900 rounded-3xl p-3 border border-slate-200/90 dark:border-slate-800 shadow-sm transition-all duration-300 sticky top-20 shrink-0 ${
             isSidebarOpen ? 'w-56' : 'w-0 p-0 border-0 opacity-0 overflow-hidden pointer-events-none'
           }`}
         >
@@ -568,20 +568,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
               {/* Logged in Admin indicator */}
               {currentAdmin && (
-                <div className="mt-6 pt-3 border-t border-slate-100">
-                  <div className="px-2 py-1.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="mt-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <div className="px-2.5 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-100 dark:border-slate-700/60">
                     <div className="flex items-center justify-between">
                       <div className="min-w-0 pr-1">
-                        <p className="text-xs font-bold text-slate-900 truncate">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
                           {currentAdmin.name}
                         </p>
-                        <span className="text-[10px] text-blue-600 font-semibold block truncate">
+                        <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold block truncate">
                           {currentAdmin.role}
                         </span>
                       </div>
                       <button
                         onClick={onLogoutAdmin}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl transition-colors cursor-pointer"
                         title="Keluar / Kunci Panel Admin"
                       >
                         <LogOut className="w-4 h-4" />
@@ -597,41 +597,41 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* Main Content Area */}
         <div className="flex-1 min-w-0 space-y-4">
           {/* Top Control Bar */}
-          <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-4">
             {/* Left: Sidebar Toggle Button + Page Title */}
             <div className="flex items-center gap-3">
               {/* Desktop Toggle Button */}
               <button
                 id="toggle-sidebar-btn"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="hidden lg:flex items-center justify-center p-2 rounded-xl border border-slate-200 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer shadow-xs"
+                className="hidden lg:flex items-center justify-center p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-xs"
                 title={isSidebarOpen ? 'Sembunyikan Sidebar' : 'Tampilkan Sidebar'}
               >
                 {isSidebarOpen ? (
                   <PanelLeftClose className="w-4 h-4" />
                 ) : (
-                  <PanelLeftOpen className="w-4 h-4 text-blue-600" />
+                  <PanelLeftOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 )}
               </button>
 
               {/* Mobile Drawer Trigger Button */}
               <button
                 onClick={() => setIsMobileDrawerOpen(true)}
-                className="lg:hidden flex items-center justify-center p-2 rounded-xl border border-slate-200 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer shadow-xs"
+                className="lg:hidden flex items-center justify-center p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-xs"
                 title="Buka Menu Navigasi"
               >
                 <Menu className="w-4 h-4" />
               </button>
 
               <div>
-                <h2 className="font-bold text-base sm:text-lg text-slate-900 tracking-tight">
+                <h2 className="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white tracking-tight">
                   {activeTab === 'exams' && 'Paket Ujian'}
                   {activeTab === 'questions' && 'Editor Bank Soal'}
                   {activeTab === 'students' && 'Data Siswa & Hak Akses Login'}
                   {activeTab === 'submissions' && 'Riwayat Nilai Siswa'}
                   {activeTab === 'accounts' && 'Manajemen Akun Admin & Guru'}
                 </h2>
-                <p className="text-xs text-slate-500 hidden sm:block">
+                <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
                   {activeTab === 'exams' && 'Daftar paket ujian, token, status aktif, dan pengaturan KKM.'}
                   {activeTab === 'questions' && 'Kelola soal dan pembobotan skor opsi jawaban A - E.'}
                   {activeTab === 'students' && 'Kelola daftar siswa yang ditentukan dan berhak login ke sistem ujian CBT.'}
@@ -646,14 +646,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Select Exam Dropdown when on Exams or Questions */}
               {(activeTab === 'exams' || activeTab === 'questions') && exams.length > 0 && (
                 <div className="flex items-center gap-2 text-xs">
-                  <span className="text-slate-400 hidden md:inline">Paket:</span>
+                  <span className="text-slate-400 dark:text-slate-500 hidden md:inline">Paket:</span>
                   <select
                     value={selectedExamId}
                     onChange={(e) => setSelectedExamId(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 font-semibold text-slate-900 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none max-w-[200px] sm:max-w-xs truncate"
+                    className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-slate-900 dark:text-white rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none max-w-[200px] sm:max-w-xs truncate"
                   >
                     {exams.map((e) => (
-                      <option key={e.id} value={e.id}>
+                      <option key={e.id} value={e.id} className="dark:bg-slate-800">
                         {e.subject} ({e.questions.length} Soal &bull; Token: {e.token})
                       </option>
                     ))}
@@ -667,7 +667,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     setEditingExam(null);
                     setIsEditorOpen(true);
                   }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-1.5 cursor-pointer transition-all"
                 >
                   <Plus className="w-4 h-4" />
                   <span className="hidden sm:inline">Buat Ujian Baru</span>
@@ -677,9 +677,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {activeTab === 'questions' && (
                 <button
                   onClick={() => setIsWordImportOpen(true)}
-                  className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs"
+                  className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs"
                 >
-                  <Upload className="w-4 h-4 text-blue-600" />
+                  <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span className="hidden sm:inline">Import Word (.docx)</span>
                 </button>
               )}
@@ -688,10 +688,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsStudentBatchImportOpen(true)}
-                    className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs"
+                    className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs"
                     title="Import data siswa sekaligus dari Excel / CSV"
                   >
-                    <Upload className="w-4 h-4 text-emerald-600" />
+                    <Upload className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span className="hidden sm:inline">Import Cepat (Batch)</span>
                   </button>
 
@@ -700,7 +700,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       setEditingStudent(null);
                       setIsStudentEditorOpen(true);
                     }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-1.5 cursor-pointer transition-all"
                   >
                     <UserPlus className="w-4 h-4" />
                     <span>Tambah Siswa</span>
@@ -714,7 +714,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     setEditingAccount(null);
                     setIsAccountEditorOpen(true);
                   }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-1.5 cursor-pointer transition-all"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah Akun Baru</span>
@@ -733,65 +733,65 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   return (
                     <div
                       key={exam.id}
-                      className={`bg-white rounded-2xl p-5 border shadow-xs flex flex-col justify-between transition-all ${
+                      className={`bg-white dark:bg-slate-900 rounded-3xl p-5 border shadow-sm flex flex-col justify-between transition-all ${
                         exam.isActive
-                          ? 'border-blue-200 ring-1 ring-blue-50'
-                          : 'border-slate-200 opacity-80'
+                          ? 'border-blue-300 dark:border-blue-800/80 ring-1 ring-blue-100 dark:ring-blue-950/40'
+                          : 'border-slate-200 dark:border-slate-800 opacity-80'
                       }`}
                     >
                       <div>
                         {/* Top status */}
                         <div className="flex items-center justify-between mb-3">
                           <span
-                            className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase ${
+                            className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
                               exam.isActive
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : 'bg-slate-100 text-slate-600 border border-slate-200'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
                             }`}
                           >
                             {exam.isActive ? 'Ujian Aktif' : 'Nonaktif'}
                           </span>
 
-                          <div className="flex items-center gap-1 bg-slate-50 text-slate-800 border border-slate-200 px-2 py-0.5 rounded-md font-mono text-xs font-semibold">
-                            <Key className="w-3 h-3 text-slate-500" />
+                          <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-lg font-mono text-xs font-bold">
+                            <Key className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                             <span>{exam.token}</span>
                           </div>
                         </div>
 
-                        <h3 className="font-bold text-slate-900 text-base leading-snug mb-1">
+                        <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-snug mb-1">
                           {exam.subject}
                         </h3>
-                        <p className="text-xs text-slate-500 font-medium line-clamp-2 mb-3">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2 mb-3">
                           {exam.title}
                         </p>
 
                         {/* Metadata details */}
-                        <div className="bg-slate-50 p-3 rounded-xl space-y-1.5 text-xs text-slate-600 mb-4 border border-slate-100">
+                        <div className="bg-slate-50 dark:bg-slate-800/70 p-3.5 rounded-2xl space-y-1.5 text-xs text-slate-600 dark:text-slate-300 mb-4 border border-slate-100 dark:border-slate-700/60">
                           <div className="flex justify-between">
                             <span>Target Kelas:</span>
-                            <span className="font-semibold text-slate-800">{exam.gradeClass}</span>
+                            <span className="font-bold text-slate-800 dark:text-slate-200">{exam.gradeClass}</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Jumlah Soal:</span>
-                            <span className="font-semibold text-blue-700">{count} / 50 Butir</span>
+                            <span className="font-bold text-blue-700 dark:text-blue-400">{count} / 50 Butir</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Alokasi Durasi:</span>
-                            <span className="font-semibold text-slate-800">
+                            <span className="font-bold text-slate-800 dark:text-slate-200">
                               {exam.durationMinutes} Menit
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span>KKM Kelulusan:</span>
-                            <span className="font-semibold text-emerald-700">
+                            <span className="font-bold text-emerald-700 dark:text-emerald-400">
                               {exam.passingGrade}
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Tampil Nilai ke Siswa:</span>
                             <span
-                              className={`font-semibold ${
-                                exam.showInstantScore ? 'text-blue-700' : 'text-slate-500'
+                              className={`font-bold ${
+                                exam.showInstantScore ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
                               }`}
                             >
                               {exam.showInstantScore ? 'Ditampilkan' : 'Disembunyikan'}
@@ -799,12 +799,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </div>
                           <div className="flex justify-between items-center">
                             <span>Acak Soal / Opsi:</span>
-                            <div className="flex items-center gap-1 font-semibold text-[10px]">
+                            <div className="flex items-center gap-1 font-bold text-[10px]">
                               <span
                                 className={`px-1.5 py-0.2 rounded border ${
                                   exam.shuffleQuestions
-                                    ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                    : 'bg-slate-100 text-slate-500 border-slate-200'
+                                    ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                                 }`}
                               >
                                 Soal: {exam.shuffleQuestions ? 'Acak' : 'Urut'}
@@ -812,8 +812,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               <span
                                 className={`px-1.5 py-0.2 rounded border ${
                                   exam.shuffleOptions
-                                    ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                    : 'bg-slate-100 text-slate-500 border-slate-200'
+                                    ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                                 }`}
                               >
                                 Opsi: {exam.shuffleOptions ? 'Acak' : 'Urut'}
@@ -822,7 +822,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </div>
                           <div className="flex justify-between">
                             <span>Peserta Selesai:</span>
-                            <span className="font-semibold text-slate-800">
+                            <span className="font-bold text-slate-800 dark:text-slate-200">
                               {examSubmissions.length} Siswa
                             </span>
                           </div>
@@ -830,13 +830,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </div>
 
                       {/* Action buttons */}
-                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                         <button
                           onClick={() => handleToggleExamActive(exam.id)}
-                          className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors cursor-pointer ${
+                          className={`text-xs font-semibold px-3 py-1.5 rounded-xl border transition-colors cursor-pointer ${
                             exam.isActive
-                              ? 'border-slate-200 text-slate-700 hover:bg-slate-50'
-                              : 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                              ? 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                              : 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100'
                           }`}
                         >
                           {exam.isActive ? 'Nonaktifkan' : 'Aktifkan'}
@@ -848,7 +848,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               setSelectedExamId(exam.id);
                               setActiveTab('questions');
                             }}
-                            className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                            className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                             title="Buka Bank Soal"
                           >
                             <ListOrdered className="w-4 h-4" />
@@ -858,14 +858,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               setEditingExam(exam);
                               setIsEditorOpen(true);
                             }}
-                            className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                            className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                             title="Edit Paket Ujian & Pengaturan"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteExam(exam.id)}
-                            className="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                            className="p-2 text-slate-600 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                             title="Hapus Paket Ujian"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -883,13 +883,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {activeTab === 'questions' && currentExam && (
             <div className="space-y-5">
               {/* Quick Bobot Presets Banner */}
-              <div className="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
+              <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
                 <div>
-                  <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                    <Sliders className="w-4 h-4 text-blue-600" />
+                  <h4 className="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                    <Sliders className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     <span>Pengaturan Bobot Nilai Serentak (Semua Soal)</span>
                   </h4>
-                  <p className="text-slate-500 text-[11px] mt-0.5">
+                  <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">
                     Pilih preset untuk menerapkan nilai opsi bertingkat ke seluruh{' '}
                     {currentExam.questions.length} butir soal saat ini.
                   </p>
@@ -900,7 +900,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     onClick={() =>
                       handleApplyPresetCurrentExam({ A: 10, B: 5, C: 4, D: 3, E: 2 })
                     }
-                    className="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shadow-xs"
+                    className="bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs"
                     title="Preset: A=10, B=5, C=4, D=3, E=2"
                   >
                     10 - 5 - 4 - 3 - 2
@@ -910,7 +910,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     onClick={() =>
                       handleApplyPresetCurrentExam({ A: 5, B: 4, C: 3, D: 2, E: 1 })
                     }
-                    className="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shadow-xs"
+                    className="bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs"
                     title="Preset: A=5, B=4, C=3, D=2, E=1"
                   >
                     5 - 4 - 3 - 2 - 1
@@ -920,7 +920,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     onClick={() =>
                       handleApplyPresetCurrentExam({ A: 10, B: 0, C: 0, D: 0, E: 0 })
                     }
-                    className="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shadow-xs"
+                    className="bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs"
                     title="Hanya opsi A yang benar bernilai 10, lainnya 0"
                   >
                     Tunggal (A=10, Lain=0)
@@ -931,13 +931,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {/* Questions List */}
               <div className="space-y-4">
                 {currentExam.questions.length === 0 ? (
-                  <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-xs space-y-3">
-                    <p className="text-slate-500 text-sm">
+                  <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">
                       Belum ada butir soal pada paket ujian ini.
                     </p>
                     <button
                       onClick={() => setIsWordImportOpen(true)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
                     >
                       <Upload className="w-4 h-4" />
                       <span>Import Soal dari Word (.docx)</span>
@@ -947,15 +947,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   currentExam.questions.map((question, qIdx) => (
                     <div
                       key={question.id || `q-${qIdx}`}
-                      className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4"
+                      className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-2">
-                          <span className="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">
+                          <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-xs">
                             Soal No. {question.number || qIdx + 1}
                           </span>
                           {question.category && (
-                            <span className="text-[11px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-lg font-medium">
                               {question.category}
                             </span>
                           )}
@@ -963,7 +963,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </div>
 
                       {/* Question Text */}
-                      <p className="text-slate-900 text-sm font-medium whitespace-pre-line leading-relaxed">
+                      <p className="text-slate-900 dark:text-white text-sm font-semibold whitespace-pre-line leading-relaxed">
                         {question.text}
                       </p>
 
@@ -974,33 +974,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           return (
                             <div
                               key={opt.key}
-                              className={`p-3 rounded-xl border text-xs flex flex-col justify-between space-y-2 ${
+                              className={`p-3.5 rounded-2xl border text-xs flex flex-col justify-between space-y-2.5 transition-all ${
                                 score === 10
-                                  ? 'border-emerald-200 bg-emerald-50/50'
+                                  ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/40'
                                   : score > 0
-                                  ? 'border-blue-100 bg-blue-50/30'
-                                  : 'border-slate-200 bg-white'
+                                  ? 'border-blue-100 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/30'
+                                  : 'border-slate-200 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40'
                               }`}
                             >
                               <div className="flex items-start gap-2">
                                 <span
-                                  className={`w-5 h-5 rounded-md flex items-center justify-center font-bold text-[11px] shrink-0 ${
+                                  className={`w-5 h-5 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${
                                     score === 10
                                       ? 'bg-emerald-600 text-white'
                                       : score > 0
                                       ? 'bg-blue-600 text-white'
-                                      : 'bg-slate-200 text-slate-700'
+                                      : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                                   }`}
                                 >
                                   {opt.key}
                                 </span>
-                                <span className="text-slate-700 line-clamp-2 text-[11px]">
+                                <span className="text-slate-700 dark:text-slate-300 line-clamp-2 text-[11px] font-medium">
                                   {opt.text}
                                 </span>
                               </div>
 
-                              <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
-                                <span className="text-slate-400">Poin Bobot:</span>
+                              <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/60 text-[11px]">
+                                <span className="text-slate-400 dark:text-slate-500 font-medium">Poin Bobot:</span>
                                 <input
                                   type="number"
                                   min="0"
@@ -1025,7 +1025,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                       questions: updatedQuestions,
                                     });
                                   }}
-                                  className="w-14 text-center font-bold bg-white border border-slate-200 rounded px-1 py-0.5 focus:ring-1 focus:ring-blue-500 focus:outline-none text-slate-900"
+                                  className="w-14 text-center font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-1 py-0.5 focus:ring-1 focus:ring-blue-500 focus:outline-none text-slate-900 dark:text-white"
                                 />
                               </div>
                             </div>
@@ -1035,8 +1035,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                       {/* Explanation */}
                       {question.explanation && (
-                        <div className="p-3 bg-slate-50 rounded-xl text-xs text-slate-600 border border-slate-100">
-                          <span className="font-semibold text-slate-800">Pembahasan Guru: </span>
+                        <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl text-xs text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700/60">
+                          <span className="font-bold text-slate-800 dark:text-white">Pembahasan Guru: </span>
                           <span>{question.explanation}</span>
                         </div>
                       )}
@@ -1051,11 +1051,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {activeTab === 'students' && (
             <div className="space-y-4">
               {/* Whitelist Security Setting Card */}
-              <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3.5">
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                      enforceWhitelist ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                    className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                      enforceWhitelist
+                        ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
+                        : 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
                     }`}
                   >
                     {enforceWhitelist ? (
@@ -1065,19 +1067,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     )}
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                       <span>Restriksi Login Siswa Terdaftar (Whitelist)</span>
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                        className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
                           enforceWhitelist
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-slate-100 text-slate-600 border border-slate-200'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
                         }`}
                       >
                         {enforceWhitelist ? 'Aktif & Dibatasi' : 'Terbuka / Bebas'}
                       </span>
                     </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       {enforceWhitelist
                         ? 'Hanya siswa yang telah terdaftar dan berstatus Aktif di bawah yang diizinkan login ke dalam sistem.'
                         : 'Siswa dapat login dengan mengisi NISN dan Nama secara bebas tanpa verifikasi daftar.'}
@@ -1088,10 +1090,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => onToggleEnforceWhitelist(!enforceWhitelist)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer shadow-xs ${
+                    className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs ${
                       enforceWhitelist
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
-                        : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     {enforceWhitelist ? 'Nonaktifkan Batasan' : 'Wajibkan Siswa Terdaftar'}
@@ -1100,32 +1102,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               {/* Controls Bar & Table */}
-              <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-3 flex-1">
                     {/* Search */}
                     <div className="relative min-w-[220px]">
-                      <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                      <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-2.5" />
                       <input
                         type="text"
                         placeholder="Cari nama atau NISN siswa..."
                         value={searchRegisteredStudent}
                         onChange={(e) => setSearchRegisteredStudent(e.target.value)}
-                        className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
 
                     {/* Class Filter */}
                     <div className="flex items-center gap-1.5 text-xs">
-                      <Filter className="w-3.5 h-3.5 text-slate-400" />
+                      <Filter className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                       <select
                         value={studentClassFilter}
                         onChange={(e) => setStudentClassFilter(e.target.value)}
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       >
-                        <option value="ALL">Semua Kelas ({students.length})</option>
+                        <option value="ALL" className="dark:bg-slate-800">Semua Kelas ({students.length})</option>
                         {availableClasses.map((cls) => (
-                          <option key={cls} value={cls}>
+                          <option key={cls} value={cls} className="dark:bg-slate-800">
                             Kelas {cls}
                           </option>
                         ))}
@@ -1139,11 +1141,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         onChange={(e) =>
                           setStudentStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE')
                         }
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       >
-                        <option value="ALL">Semua Status</option>
-                        <option value="ACTIVE">Hanya Aktif</option>
-                        <option value="INACTIVE">Hanya Nonaktif</option>
+                        <option value="ALL" className="dark:bg-slate-800">Semua Status</option>
+                        <option value="ACTIVE" className="dark:bg-slate-800">Hanya Aktif</option>
+                        <option value="INACTIVE" className="dark:bg-slate-800">Hanya Nonaktif</option>
                       </select>
                     </div>
                   </div>
@@ -1154,7 +1156,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         setEditingStudent(null);
                         setIsStudentEditorOpen(true);
                       }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer transition-all"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Tambah Siswa</span>
@@ -1162,29 +1164,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                     <button
                       onClick={() => setIsStudentBatchImportOpen(true)}
-                      className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                      className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs px-3 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                       title="Import data siswa sekaligus dari Excel / Word"
                     >
-                      <Upload className="w-4 h-4 text-blue-600" />
+                      <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       <span>Import Excel</span>
                     </button>
 
                     <button
                       onClick={handleExportStudentsCSV}
-                      className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                      className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs px-3 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                       title="Download data siswa dalam format CSV / Excel"
                     >
-                      <Download className="w-4 h-4 text-emerald-600" />
+                      <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       <span className="hidden sm:inline">Ekspor CSV</span>
                     </button>
 
                     <button
                       onClick={handleDeleteAllStudents}
                       disabled={students.length === 0}
-                      className={`text-xs font-semibold px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all ${
+                      className={`text-xs font-semibold px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${
                         students.length === 0
-                          ? 'text-slate-300 border-slate-100 cursor-not-allowed'
-                          : 'text-rose-600 hover:bg-rose-50 border-rose-200 hover:border-rose-300 cursor-pointer'
+                          ? 'text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800 cursor-not-allowed'
+                          : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border-rose-200 dark:border-rose-800 hover:border-rose-300 cursor-pointer'
                       }`}
                       title="Hapus seluruh data siswa di sistem"
                     >
@@ -1194,11 +1196,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 </div>
 
-                {/* Bulk Selection Action Bar (appears when 1 or more items checked) */}
+                {/* Bulk Selection Action Bar */}
                 {selectedStudentIds.length > 0 && (
-                  <div className="bg-blue-50/90 border border-blue-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 animate-in fade-in duration-200">
-                    <div className="flex items-center gap-2 text-xs font-bold text-blue-950">
-                      <CheckSquare className="w-4 h-4 text-blue-600 shrink-0" />
+                  <div className="bg-blue-50/90 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3 animate-in fade-in duration-200">
+                    <div className="flex items-center gap-2 text-xs font-bold text-blue-950 dark:text-blue-300">
+                      <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                       <span>
                         {selectedStudentIds.length} dari {students.length} siswa dipilih
                       </span>
@@ -1207,7 +1209,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <div className="flex flex-wrap items-center gap-2">
                       <button
                         onClick={handleDeleteSelectedStudents}
-                        className="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                        className="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Hapus Terpilih ({selectedStudentIds.length})</span>
@@ -1215,7 +1217,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                       <button
                         onClick={() => handleBulkSetStudentStatus(true)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-2.5 py-1.5 rounded-lg shadow-xs flex items-center gap-1 cursor-pointer transition-all"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1 cursor-pointer transition-all"
                         title="Aktifkan status semua siswa terpilih"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
@@ -1224,7 +1226,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                       <button
                         onClick={() => handleBulkSetStudentStatus(false)}
-                        className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-2.5 py-1.5 rounded-lg shadow-xs flex items-center gap-1 cursor-pointer transition-all"
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1 cursor-pointer transition-all"
                         title="Nonaktifkan status semua siswa terpilih"
                       >
                         <ShieldAlert className="w-3.5 h-3.5" />
@@ -1233,7 +1235,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                       <button
                         onClick={() => setSelectedStudentIds([])}
-                        className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs px-2.5 py-1.5 rounded-lg cursor-pointer transition-all"
+                        className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold text-xs px-3 py-1.5 rounded-xl cursor-pointer transition-all"
                       >
                         Batal
                       </button>
@@ -1242,16 +1244,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 )}
 
                 {/* Table of Registered Students */}
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                      <tr className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
                         <th className="py-3 px-3 text-center w-10">
                           <input
                             type="checkbox"
                             checked={isAllFilteredStudentsSelected}
                             onChange={toggleSelectAllFilteredStudents}
-                            className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                            className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
                             title={isAllFilteredStudentsSelected ? 'Batal pilih semua' : 'Pilih semua yang tampil'}
                           />
                         </th>
@@ -1264,7 +1266,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3.5 text-center">Aksi</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {filteredStudents.length > 0 ? (
                         filteredStudents.map((std, idx) => {
                           const isChecked = selectedStudentIds.includes(std.id);
@@ -1272,7 +1274,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <tr
                               key={std.id}
                               className={`transition-colors ${
-                                isChecked ? 'bg-blue-50/50' : 'hover:bg-slate-50/70'
+                                isChecked ? 'bg-blue-50/60 dark:bg-blue-950/40' : 'hover:bg-slate-50/70 dark:hover:bg-slate-800/50'
                               }`}
                             >
                               <td className="py-3 px-3 text-center w-10">
@@ -1280,40 +1282,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   type="checkbox"
                                   checked={isChecked}
                                   onChange={() => toggleSelectStudent(std.id)}
-                                  className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                                  className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
                                 />
                               </td>
-                              <td className="py-3 px-3.5 text-center font-semibold text-slate-500">
+                              <td className="py-3 px-3.5 text-center font-semibold text-slate-500 dark:text-slate-400">
                                 {idx + 1}
                               </td>
-                              <td className="py-3 px-3.5 font-mono font-bold text-slate-900">
+                              <td className="py-3 px-3.5 font-mono font-bold text-slate-900 dark:text-white">
                                 {std.nisn}
                               </td>
-                              <td className="py-3 px-3.5 font-semibold text-slate-900">
+                              <td className="py-3 px-3.5 font-semibold text-slate-900 dark:text-white">
                                 {std.name}
                                 {std.notes && (
-                                  <span className="block text-[10px] text-slate-400 font-normal">
+                                  <span className="block text-[10px] text-slate-400 dark:text-slate-500 font-normal">
                                     {std.notes}
                                   </span>
                                 )}
                               </td>
-                              <td className="py-3 px-3.5 text-slate-700">{std.studentClass}</td>
-                              <td className="py-3 px-3.5 font-mono text-slate-600">
+                              <td className="py-3 px-3.5 text-slate-700 dark:text-slate-300 font-medium">{std.studentClass}</td>
+                              <td className="py-3 px-3.5 font-mono text-slate-600 dark:text-slate-400">
                                 {std.password ? (
-                                  <span className="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-semibold text-[11px]">
+                                  <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 font-semibold text-[11px] text-slate-800 dark:text-slate-200">
                                     {std.password}
                                   </span>
                                 ) : (
-                                  <span className="text-slate-400 italic">Gunakan Token</span>
+                                  <span className="text-slate-400 dark:text-slate-500 italic">Gunakan Token</span>
                                 )}
                               </td>
                               <td className="py-3 px-3.5 text-center">
                                 <button
                                   onClick={() => handleToggleStudentActive(std.id)}
-                                  className={`px-2.5 py-0.5 rounded-full font-semibold text-[10px] border cursor-pointer transition-colors ${
+                                  className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border cursor-pointer transition-colors ${
                                     std.isActive
-                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                                      : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
+                                      : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800 hover:bg-rose-100'
                                   }`}
                                   title="Klik untuk mengubah status aktif/nonaktif"
                                 >
@@ -1327,14 +1329,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                       setEditingStudent(std);
                                       setIsStudentEditorOpen(true);
                                     }}
-                                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                                    className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                                     title="Edit Data Siswa"
                                   >
                                     <Edit className="w-3.5 h-3.5" />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteStudent(std.id)}
-                                    className="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                                    className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                                     title="Hapus Siswa"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
@@ -1346,7 +1348,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         })
                       ) : (
                         <tr>
-                          <td colSpan={8} className="text-center py-8 text-slate-400">
+                          <td colSpan={8} className="text-center py-8 text-slate-400 dark:text-slate-500">
                             Tidak ada siswa yang sesuai dengan filter pencarian.
                           </td>
                         </tr>
@@ -1360,40 +1362,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* TAB 4: RIWAYAT NILAI SISWA */}
           {activeTab === 'submissions' && (
-            <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-4">
               {/* Controls Bar */}
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-3 flex-1">
                   {/* Search */}
                   <div className="relative min-w-[240px]">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-2.5" />
                     <input
                       type="text"
                       placeholder="Cari nama siswa atau NISN..."
                       value={searchStudent}
                       onChange={(e) => setSearchStudent(e.target.value)}
-                      className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                   </div>
 
                   {/* Class Filter */}
                   <div className="flex items-center gap-1.5 text-xs">
-                    <Filter className="w-3.5 h-3.5 text-slate-400" />
+                    <Filter className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                     <select
                       value={selectedClassFilter}
                       onChange={(e) => setSelectedClassFilter(e.target.value)}
-                      className="bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     >
-                      <option value="ALL">Semua Kelas</option>
+                      <option value="ALL" className="dark:bg-slate-800">Semua Kelas</option>
                       {availableClasses.map((cls) => (
-                        <option key={cls} value={cls}>
+                        <option key={cls} value={cls} className="dark:bg-slate-800">
                           Kelas {cls}
                         </option>
                       ))}
                     </select>
                   </div>
 
-                  <span className="text-xs text-slate-500 font-medium">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
                     Total: {relevantSubmissions.length} Lembar Jawaban
                   </span>
                 </div>
@@ -1402,7 +1404,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <button
                     onClick={handleDeleteAllSubmissions}
                     disabled={submissions.length === 0}
-                    className="bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200 hover:border-rose-300 font-semibold text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-700 dark:text-slate-200 hover:text-rose-600 border border-slate-200 dark:border-slate-700 hover:border-rose-300 font-semibold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Hapus seluruh data riwayat nilai siswa"
                   >
                     <Trash2 className="w-4 h-4 text-rose-500" />
@@ -1411,7 +1413,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                   <button
                     onClick={handleExportExcel}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer transition-all"
                   >
                     <FileSpreadsheet className="w-4 h-4" />
                     <span>Ekspor Excel (.xlsx)</span>
@@ -1421,12 +1423,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
               {/* Multi-select Bulk Actions Bar */}
               {selectedSubmissionIds.length > 0 && (
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 animate-in fade-in">
+                <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3 animate-in fade-in">
                   <div className="flex items-center gap-2">
                     <span className="bg-blue-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
                       {selectedSubmissionIds.length} Terpilih
                     </span>
-                    <span className="text-xs font-semibold text-blue-900">
+                    <span className="text-xs font-bold text-blue-900 dark:text-blue-300">
                       Aksi massal untuk data nilai yang ditandai:
                     </span>
                   </div>
@@ -1434,7 +1436,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handleDeleteSelectedSubmissions}
-                      className="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                      className="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                       title="Hapus seluruh riwayat nilai yang dipilih"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -1443,7 +1445,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                     <button
                       onClick={() => setSelectedSubmissionIds([])}
-                      className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs px-2.5 py-1.5 rounded-lg cursor-pointer transition-all"
+                      className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold text-xs px-3 py-1.5 rounded-xl cursor-pointer transition-all"
                     >
                       Batal
                     </button>
@@ -1452,16 +1454,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               )}
 
               {/* Submissions Table */}
-              <div className="overflow-x-auto rounded-xl border border-slate-200">
+              <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                    <tr className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
                       <th className="py-3 px-3 text-center w-10">
                         <input
                           type="checkbox"
                           checked={isAllFilteredSubmissionsSelected}
                           onChange={toggleSelectAllFilteredSubmissions}
-                          className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                          className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
                           title={isAllFilteredSubmissionsSelected ? 'Batal pilih semua' : 'Pilih semua riwayat yang tampil'}
                         />
                       </th>
@@ -1477,7 +1479,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <th className="py-3 px-3.5 text-center">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {relevantSubmissions.length > 0 ? (
                       relevantSubmissions.map((sub, idx) => {
                         const isChecked = selectedSubmissionIds.includes(sub.id);
@@ -1486,7 +1488,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <tr
                             key={sub.id}
                             className={`transition-colors ${
-                              isChecked ? 'bg-blue-50/50' : 'hover:bg-slate-50/70'
+                              isChecked ? 'bg-blue-50/60 dark:bg-blue-950/40' : 'hover:bg-slate-50/70 dark:hover:bg-slate-800/50'
                             }`}
                           >
                             <td className="py-3 px-3 text-center w-10">
@@ -1494,39 +1496,39 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => toggleSelectSubmission(sub.id)}
-                                className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                                className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
                               />
                             </td>
-                            <td className="py-3 px-3.5 text-center font-semibold text-slate-500">
+                            <td className="py-3 px-3.5 text-center font-semibold text-slate-500 dark:text-slate-400">
                               {idx + 1}
                             </td>
-                            <td className="py-3 px-3.5 font-bold text-slate-900">{sub.studentName}</td>
-                            <td className="py-3 px-3.5 font-mono text-slate-600">{sub.studentNisn}</td>
-                            <td className="py-3 px-3.5 text-slate-700 font-medium">{sub.studentClass}</td>
-                            <td className="py-3 px-3.5 text-slate-600">{sub.subject}</td>
+                            <td className="py-3 px-3.5 font-bold text-slate-900 dark:text-white">{sub.studentName}</td>
+                            <td className="py-3 px-3.5 font-mono text-slate-600 dark:text-slate-400">{sub.studentNisn}</td>
+                            <td className="py-3 px-3.5 text-slate-700 dark:text-slate-300 font-medium">{sub.studentClass}</td>
+                            <td className="py-3 px-3.5 text-slate-600 dark:text-slate-400">{sub.subject}</td>
                             <td className="py-3 px-3.5 text-center font-mono">
                               <span
-                                className={`inline-flex items-center px-2.5 py-1 rounded-lg font-bold text-xs ${
+                                className={`inline-flex items-center px-2.5 py-1 rounded-xl font-bold text-xs ${
                                   isPassed
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                    : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
                                 }`}
                               >
                                 {sub.finalScoreScale100 ?? 0}
-                                <span className="text-[10px] text-slate-400 font-normal ml-0.5">/ 100</span>
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal ml-0.5">/ 100</span>
                               </span>
                               {sub.totalScoreEarned !== undefined && (
-                                <span className="block text-[10px] text-slate-400 mt-0.5 font-sans">
+                                <span className="block text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-sans">
                                   {sub.totalScoreEarned} poin
                                 </span>
                               )}
                             </td>
                             <td className="py-3 px-3.5 text-center">
                               <span
-                                className={`px-2.5 py-0.5 rounded-full font-semibold text-[10px] border ${
+                                className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border ${
                                   isPassed
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                    : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
                                 }`}
                               >
                                 {isPassed ? 'Tuntas' : 'Remedial'}
@@ -1534,14 +1536,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             </td>
                             <td className="py-3 px-3.5 text-center">
                               {(sub.tabSwitchCount || 0) > 0 ? (
-                                <span className="bg-amber-50 text-amber-800 px-2 py-0.5 rounded-md font-semibold text-[11px] border border-amber-200">
+                                <span className="bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-md font-bold text-[11px] border border-amber-200 dark:border-amber-800">
                                   {sub.tabSwitchCount}x Pindah Tab/App
                                 </span>
                               ) : (
-                                <span className="text-slate-400">0</span>
+                                <span className="text-slate-400 dark:text-slate-500">0</span>
                               )}
                             </td>
-                            <td className="py-3 px-3.5 text-slate-500 text-[11px] whitespace-nowrap">
+                            <td className="py-3 px-3.5 text-slate-500 dark:text-slate-400 text-[11px] whitespace-nowrap">
                               {sub.submittedAt
                                 ? new Date(sub.submittedAt).toLocaleDateString('id-ID', {
                                     day: 'numeric',
@@ -1555,14 +1557,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   onClick={() => setViewingSubmission(sub)}
-                                  className="px-2.5 py-1 text-[11px] font-semibold text-blue-600 hover:bg-blue-50 rounded-lg border border-blue-200 transition-colors cursor-pointer"
+                                  className="px-2.5 py-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
                                   title="Lihat Detail Lembar Jawaban"
                                 >
                                   Detail
                                 </button>
                                 <button
                                   onClick={() => handleDeleteSubmission(sub.id)}
-                                  className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                                  className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                                   title="Hapus Riwayat Nilai Siswa Ini"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -1574,7 +1576,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       })
                     ) : (
                       <tr>
-                        <td colSpan={11} className="text-center py-8 text-slate-400">
+                        <td colSpan={11} className="text-center py-8 text-slate-400 dark:text-slate-500">
                           Tidak ada data riwayat ujian yang sesuai dengan kriteria filter.
                         </td>
                       </tr>
@@ -1589,19 +1591,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {activeTab === 'accounts' && (
             <div className="space-y-4">
               {/* Top Security Banner */}
-              <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0">
                     <KeyRound className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                       <span>Proteksi Akses Menu Admin & Guru</span>
-                      <span className="bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+                      <span className="bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">
                         Aktif
                       </span>
                     </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Hanya pengguna dengan akun guru atau administrator yang terdaftar di bawah ini yang dapat membuka dan mengelola soal ujian.
                     </p>
                   </div>
@@ -1609,29 +1611,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               {/* Accounts Table Card */}
-              <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="relative min-w-[240px] flex-1 max-w-sm">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-2.5" />
                     <input
                       type="text"
                       placeholder="Cari nama, username, atau peran..."
                       value={searchAccount}
                       onChange={(e) => setSearchAccount(e.target.value)}
-                      className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                   </div>
 
-                  <span className="text-xs text-slate-500 font-medium">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
                     Total: {adminAccounts.length} Akun Terdaftar
                   </span>
                 </div>
 
                 {/* Table */}
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                      <tr className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
                         <th className="py-3 px-3.5 text-center w-12">No</th>
                         <th className="py-3 px-3.5">Nama Lengkap Guru / Admin</th>
                         <th className="py-3 px-3.5 font-mono">Username</th>
@@ -1641,7 +1643,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3.5 text-center">Aksi</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {filteredAccounts.length > 0 ? (
                         filteredAccounts.map((acc, idx) => {
                           const isShowingPass = !!showPasswordsMap[acc.id];
@@ -1649,35 +1651,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           return (
                             <tr
                               key={acc.id}
-                              className={`hover:bg-slate-50/70 transition-colors ${
-                                isCurrentActiveUser ? 'bg-blue-50/30' : ''
+                              className={`transition-colors ${
+                                isCurrentActiveUser
+                                  ? 'bg-blue-50/50 dark:bg-blue-950/40'
+                                  : 'hover:bg-slate-50/70 dark:hover:bg-slate-800/50'
                               }`}
                             >
-                              <td className="py-3 px-3.5 text-center font-semibold text-slate-500">
+                              <td className="py-3 px-3.5 text-center font-semibold text-slate-500 dark:text-slate-400">
                                 {idx + 1}
                               </td>
-                              <td className="py-3 px-3.5 font-bold text-slate-900">
+                              <td className="py-3 px-3.5 font-bold text-slate-900 dark:text-white">
                                 <div className="flex items-center gap-2">
                                   <span>{acc.name}</span>
                                   {isCurrentActiveUser && (
-                                    <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-1.5 py-0.2 rounded">
+                                    <span className="bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
                                       Anda
                                     </span>
                                   )}
                                 </div>
                               </td>
-                              <td className="py-3 px-3.5 font-mono font-bold text-blue-700">
+                              <td className="py-3 px-3.5 font-mono font-bold text-blue-700 dark:text-blue-400">
                                 {acc.username}
                               </td>
                               <td className="py-3 px-3.5 font-mono">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-semibold text-[11px] text-slate-800">
+                                  <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 font-semibold text-[11px] text-slate-800 dark:text-slate-200">
                                     {isShowingPass ? acc.password : '••••••••'}
                                   </span>
                                   <button
                                     type="button"
                                     onClick={() => togglePasswordVisibility(acc.id)}
-                                    className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
+                                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 cursor-pointer"
                                     title={isShowingPass ? 'Sembunyikan' : 'Tampilkan Password'}
                                   >
                                     {isShowingPass ? (
@@ -1690,18 +1694,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               </td>
                               <td className="py-3 px-3.5">
                                 <span
-                                  className={`px-2 py-0.5 rounded-full font-semibold text-[10px] border ${
+                                  className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border ${
                                     acc.role === 'Administrator'
-                                      ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                      ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
                                       : acc.role === 'Proktor'
-                                      ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                      : 'bg-blue-50 text-blue-700 border-blue-200'
+                                      ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                                      : 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
                                   }`}
                                 >
                                   {acc.role}
                                 </span>
                               </td>
-                              <td className="py-3 px-3.5 text-slate-600">
+                              <td className="py-3 px-3.5 text-slate-600 dark:text-slate-400">
                                 {acc.email || '-'}
                               </td>
                               <td className="py-3 px-3.5 text-center">
@@ -1711,7 +1715,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                       setEditingAccount(acc);
                                       setIsAccountEditorOpen(true);
                                     }}
-                                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                                    className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                                     title="Edit Akun & Ubah Password"
                                   >
                                     <Edit className="w-3.5 h-3.5" />
@@ -1719,10 +1723,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   <button
                                     onClick={() => handleDeleteAccount(acc.id)}
                                     disabled={adminAccounts.length <= 1}
-                                    className={`p-1.5 rounded-lg border transition-colors ${
+                                    className={`p-1.5 rounded-xl border transition-colors ${
                                       adminAccounts.length <= 1
-                                        ? 'text-slate-300 border-slate-100 cursor-not-allowed'
-                                        : 'text-slate-600 hover:text-rose-600 hover:bg-rose-50 border-slate-200 cursor-pointer'
+                                        ? 'text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800 cursor-not-allowed'
+                                        : 'text-slate-600 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 border-slate-200 dark:border-slate-700 cursor-pointer'
                                     }`}
                                     title={
                                       adminAccounts.length <= 1
@@ -1739,7 +1743,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         })
                       ) : (
                         <tr>
-                          <td colSpan={7} className="text-center py-8 text-slate-400">
+                          <td colSpan={7} className="text-center py-8 text-slate-400 dark:text-slate-500">
                             Tidak ada akun yang sesuai dengan pencarian.
                           </td>
                         </tr>

@@ -289,7 +289,7 @@ export default function App() {
   const activePublicExam = exams.find((e) => e.isActive) || exams[0] || null;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-900 dark:text-slate-100 selection:bg-blue-600 selection:text-white transition-colors duration-200">
       {/* If taking exam, hide top header to maximize screen focus */}
       {studentFlow.phase !== 'exam' && (
         <Header
@@ -374,11 +374,16 @@ export default function App() {
 
       {/* Simplified Concise Footer (hidden during active exam and print) */}
       {studentFlow.phase !== 'exam' && (
-        <footer className="print:hidden bg-white text-slate-500 text-xs py-4 border-t border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
-            <p className="font-semibold text-slate-700">
+        <footer className="print:hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-slate-500 dark:text-slate-400 text-xs py-4 border-t border-slate-200/80 dark:border-slate-800 transition-colors duration-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+            <p className="font-semibold text-slate-700 dark:text-slate-300">
               &copy; {new Date().getFullYear()} CBT SMAN 1 Batu &bull; Created by TIM IT SMAN 1 Batu
             </p>
+            <div className="flex items-center gap-3 text-[11px] text-slate-400 dark:text-slate-500">
+              <span>Aplikasi Ujian Berstandar</span>
+              <span>&bull;</span>
+              <span className="text-blue-600 dark:text-blue-400 font-medium">v2.5 Modern</span>
+            </div>
           </div>
         </footer>
       )}

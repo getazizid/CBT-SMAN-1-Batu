@@ -9,13 +9,16 @@ import {
   HelpCircle,
   Maximize2,
   Minimize2,
+  Moon,
   Send,
   ShieldAlert,
+  Sun,
   Type,
   User,
   X
 } from 'lucide-react';
-import { Exam, OptionKey, StudentAnswerDetail, StudentExamSubmission } from '../../types';
+import { Exam, OptionKey, Question, StudentAnswerDetail, StudentExamSubmission } from '../../types';
+import { useTheme } from '../../context/ThemeContext';
 import {
   clearStoredExamProgress,
   getStoredExamProgress,
@@ -57,6 +60,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   onSubmitExam,
   onExitExam,
 }) => {
+  const { theme, toggleTheme } = useTheme();
   // Check if there is previously saved in-progress exam data
   const initialSaved = useRef(getStoredExamProgress(exam.id, studentData.nisn)).current;
 
@@ -454,10 +458,10 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
       {/* Restored Session Notification Banner */}
       {showRestoredNotice && (
-        <div className="bg-emerald-600 text-white px-4 py-2 text-xs font-semibold flex items-center justify-between z-30 shadow-xs animate-in slide-in-from-top-2 duration-200">
+        <div className="bg-emerald-600 dark:bg-emerald-700 text-white px-4 py-2.5 text-xs font-semibold flex items-center justify-between z-30 shadow-xs animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-200 shrink-0" />
             <span>
@@ -475,17 +479,17 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       )}
 
       {/* Top sticky exam bar */}
-      <div className="bg-white text-slate-900 px-4 sm:px-6 py-3 border-b border-slate-200 shadow-xs sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-slate-900 dark:text-slate-100 px-4 sm:px-6 py-3 border-b border-slate-200/80 dark:border-slate-800 shadow-xs sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 transition-colors duration-200">
         <div className="flex items-center gap-3">
-          <div className="bg-blue-50 border border-blue-200 text-blue-700 font-bold px-2.5 py-1 rounded-lg text-xs">
+          <div className="bg-blue-50 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-bold px-2.5 py-1 rounded-xl text-xs">
             CBT ROOM
           </div>
           <div>
-            <h2 className="font-bold text-sm sm:text-base text-slate-900 truncate max-w-[200px] sm:max-w-md">
+            <h2 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white truncate max-w-[200px] sm:max-w-md">
               {exam.subject}
             </h2>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <span className="font-medium text-slate-700">{studentData.name}</span>
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <span className="font-semibold text-slate-700 dark:text-slate-200">{studentData.name}</span>
               <span>&bull;</span>
               <span>{studentData.studentClass}</span>
             </div>
@@ -494,53 +498,79 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
         {/* Center: Timer */}
         <div
-          className={`flex items-center gap-2 px-4 py-1.5 rounded-xl font-mono text-sm sm:text-base font-bold transition-colors ${
+          className={`flex items-center gap-2 px-4 py-1.5 rounded-2xl font-mono text-sm sm:text-base font-bold transition-all ${
             isLowTime
-              ? 'bg-rose-600 text-white animate-pulse shadow-xs'
-              : 'bg-slate-100 text-slate-800 border border-slate-200'
+              ? 'bg-rose-600 text-white animate-pulse shadow-md'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-xs'
           }`}
         >
-          <Clock className={`w-4 h-4 ${isLowTime ? 'text-white' : 'text-slate-500'}`} />
+          <Clock className={`w-4 h-4 ${isLowTime ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
           <span>Sisa Waktu: {formatTimer(timeLeftSeconds)}</span>
         </div>
 
         {/* Right tools */}
         <div className="flex items-center gap-2">
+          {/* Light / Dark Mode Toggle in Exam Room */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-xs"
+            title={theme === 'dark' ? 'Beralih ke Mode Terang (Light Mode)' : 'Beralih ke Mode Gelap (Dark Mode)'}
+            aria-label="Toggle Theme"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-slate-700" />
+            )}
+          </button>
+
           {/* Fullscreen toggle button */}
           <button
             onClick={toggleFullscreen}
-            className="bg-slate-100 hover:bg-slate-200 text-slate-700 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-slate-200 text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
             title={isFullscreen ? 'Keluar Mode Layar Penuh' : 'Masuk Mode Layar Penuh (Fullscreen)'}
           >
             {isFullscreen ? (
-              <Minimize2 className="w-3.5 h-3.5 text-blue-600" />
+              <Minimize2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             ) : (
-              <Maximize2 className="w-3.5 h-3.5 text-slate-600" />
+              <Maximize2 className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
             )}
-            <span className="hidden sm:inline font-medium text-[11px]">
+            <span className="hidden sm:inline font-semibold text-[11px]">
               {isFullscreen ? 'Keluar Fullscreen' : 'Fullscreen'}
             </span>
           </button>
 
           {/* Font size toggle */}
-          <div className="bg-slate-100 p-1 rounded-lg border border-slate-200 flex items-center gap-1 text-xs">
+          <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1 text-xs">
             <button
               onClick={() => setFontSize('sm')}
-              className={`px-2 py-0.5 rounded cursor-pointer ${fontSize === 'sm' ? 'bg-white text-blue-700 font-bold shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`px-2 py-0.5 rounded-lg cursor-pointer transition-all ${
+                fontSize === 'sm'
+                  ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
               title="Ukuran Font Kecil"
             >
               A-
             </button>
             <button
               onClick={() => setFontSize('md')}
-              className={`px-2 py-0.5 rounded cursor-pointer ${fontSize === 'md' ? 'bg-white text-blue-700 font-bold shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`px-2 py-0.5 rounded-lg cursor-pointer transition-all ${
+                fontSize === 'md'
+                  ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
               title="Ukuran Font Normal"
             >
               A
             </button>
             <button
               onClick={() => setFontSize('lg')}
-              className={`px-2 py-0.5 rounded cursor-pointer ${fontSize === 'lg' ? 'bg-white text-blue-700 font-bold shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`px-2 py-0.5 rounded-lg cursor-pointer transition-all ${
+                fontSize === 'lg'
+                  ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
               title="Ukuran Font Besar"
             >
               A+
@@ -550,7 +580,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
           {/* Mobile Question Grid Toggle Button */}
           <button
             onClick={() => setShowQuestionGridMobile(!showQuestionGridMobile)}
-            className="lg:hidden bg-white hover:bg-slate-50 text-slate-800 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 flex items-center gap-1.5 shadow-xs"
+            className="lg:hidden bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 shadow-xs"
           >
             <span>Daftar Soal</span>
             <span className="bg-blue-600 text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">
@@ -562,7 +592,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
       {/* Persistent Fullscreen Enforcement Warning Bar (if exited) */}
       {!isFullscreen && (
-        <div className="bg-rose-600 text-white px-4 py-2 text-xs font-semibold flex items-center justify-between z-20 sticky top-[57px] shadow-md animate-pulse">
+        <div className="bg-rose-600 text-white px-4 py-2.5 text-xs font-semibold flex items-center justify-between z-20 sticky top-[57px] shadow-md animate-pulse">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-300 shrink-0" />
             <span>
@@ -571,7 +601,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
           </div>
           <button
             onClick={enforceFullscreen}
-            className="bg-white text-rose-700 hover:bg-rose-50 px-3 py-1 rounded-lg text-xs font-bold shrink-0 flex items-center gap-1 shadow-xs cursor-pointer transition-all"
+            className="bg-white text-rose-700 hover:bg-rose-50 px-3.5 py-1 rounded-xl text-xs font-extrabold shrink-0 flex items-center gap-1.5 shadow-xs cursor-pointer transition-all"
           >
             <Maximize2 className="w-3.5 h-3.5" />
             <span>Aktifkan Fullscreen</span>
@@ -583,24 +613,24 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       <div className="max-w-7xl mx-auto w-full p-4 sm:p-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Question Panel (Left - 8/12) */}
         <div className="lg:col-span-8 space-y-4">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xs border border-slate-200 min-h-[500px] flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-200/90 dark:border-slate-800 min-h-[500px] flex flex-col justify-between transition-colors duration-200">
             <div>
               {/* Question Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
                 <div className="flex items-center gap-2.5">
                   <span className="bg-blue-600 text-white font-bold text-xs sm:text-sm px-3 py-1 rounded-xl shadow-xs">
                     Soal No. {currentQuestion.displayNumber}
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
                     dari {totalCount} soal
                   </span>
                 </div>
 
                 {/* Anti-cheat status or multiple choice badge */}
-                <div className="text-[11px] font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-full border border-slate-200 flex items-center gap-1.5">
+                <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
                   <span>Pilihan Ganda (A - E)</span>
                   {(exam.shuffleQuestions || exam.shuffleOptions) && (
-                    <span className="bg-purple-100 text-purple-700 font-bold px-1.5 py-0.2 rounded text-[10px]">
+                    <span className="bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold px-1.5 py-0.2 rounded text-[10px]">
                       Acak
                     </span>
                   )}
@@ -608,7 +638,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               </div>
 
               {/* Question Text */}
-              <div className={`text-slate-900 font-medium ${getFontSizeClass()} mb-8 whitespace-pre-line select-none`}>
+              <div className={`text-slate-900 dark:text-slate-100 font-medium ${getFontSizeClass()} mb-8 whitespace-pre-line select-none leading-relaxed`}>
                 {currentQuestion.text}
               </div>
 
@@ -621,25 +651,25 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                       key={opt.displayKey}
                       id={`option-btn-${opt.displayKey}`}
                       onClick={() => handleSelectOption(opt)}
-                      className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4 cursor-pointer group ${
+                      className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-4 cursor-pointer group ${
                         isSelected
-                          ? 'border-blue-600 bg-blue-50/50 shadow-xs text-slate-900 ring-1 ring-blue-500/20'
-                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
+                          ? 'border-blue-600 dark:border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 shadow-xs text-slate-900 dark:text-white ring-2 ring-blue-500/20'
+                          : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-800/80'
                       }`}
                     >
                       {/* Option Key Badge */}
                       <div
-                        className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${
+                        className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${
                           isSelected
                             ? 'bg-blue-600 text-white shadow-xs'
-                            : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'
                         }`}
                       >
                         {opt.displayKey}
                       </div>
 
                       {/* Option text */}
-                      <div className="flex-1 text-slate-800 text-base sm:text-lg font-normal pt-0.5 select-none leading-relaxed">
+                      <div className="flex-1 text-slate-800 dark:text-slate-200 text-base sm:text-lg font-normal pt-0.5 select-none leading-relaxed">
                         {opt.text}
                       </div>
                     </button>
@@ -649,15 +679,15 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
             </div>
 
             {/* Bottom Action Controls */}
-            <div className="pt-6 mt-8 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <div className="pt-6 mt-8 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
               {/* Prev Button */}
               <button
                 onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
                 disabled={currentIndex === 0}
                 className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer ${
                   currentIndex === 0
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
-                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-xs'
+                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed border border-slate-200 dark:border-slate-800'
+                    : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-xs'
                 }`}
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -671,7 +701,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                 className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer ${
                   flaggedDisplayNumbers.includes(currentQuestion.displayNumber)
                     ? 'bg-amber-500 text-white shadow-xs'
-                    : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
+                    : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 hover:bg-amber-100 dark:hover:bg-amber-900/50'
                 }`}
               >
                 <Flag className="w-4 h-4" />
@@ -693,7 +723,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                 <button
                   id="finish-exam-btn"
                   onClick={() => setShowSubmitModal(true)}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Selesai & Kumpulkan</span>
@@ -705,16 +735,16 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
         {/* Sidebar Question Grid (Right - 4/12) */}
         <div
-          className={`lg:col-span-4 bg-white rounded-2xl p-5 shadow-xs border border-slate-200 ${
-            showQuestionGridMobile ? 'fixed inset-4 z-40 overflow-y-auto block' : 'hidden lg:block'
+          className={`lg:col-span-4 bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-xs border border-slate-200/90 dark:border-slate-800 transition-colors duration-200 ${
+            showQuestionGridMobile ? 'fixed inset-4 z-40 overflow-y-auto block bg-white dark:bg-slate-900' : 'hidden lg:block'
           }`}
         >
           {showQuestionGridMobile && (
-            <div className="flex justify-between items-center pb-3 mb-3 border-b border-slate-100 lg:hidden">
-              <h3 className="font-bold text-slate-800 text-sm">Nomor Soal</h3>
+            <div className="flex justify-between items-center pb-3 mb-3 border-b border-slate-100 dark:border-slate-800 lg:hidden">
+              <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm">Nomor Soal</h3>
               <button
                 onClick={() => setShowQuestionGridMobile(false)}
-                className="p-1 rounded-lg text-slate-500 hover:bg-slate-100"
+                className="p-1 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -722,25 +752,25 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
           )}
 
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-slate-900 text-sm">Navigasi Soal</h3>
-            <span className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200/80 px-2 py-0.5 rounded-full">
+            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">Navigasi Soal</h3>
+            <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/70 border border-blue-200/80 dark:border-blue-800/80 px-2.5 py-0.5 rounded-full">
               {answeredCount}/{totalCount} Terisi
             </span>
           </div>
 
           {/* Status legend */}
-          <div className="grid grid-cols-3 gap-2 text-[11px] mb-4 pb-3 border-b border-slate-100">
+          <div className="grid grid-cols-3 gap-2 text-[11px] mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <span className="text-slate-600">Terjawab</span>
+              <span className="text-slate-600 dark:text-slate-400">Terjawab</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-              <span className="text-slate-600">Ragu-ragu</span>
+              <span className="text-slate-600 dark:text-slate-400">Ragu-ragu</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-              <span className="text-slate-600">Kosong</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+              <span className="text-slate-600 dark:text-slate-400">Kosong</span>
             </div>
           </div>
 
@@ -751,7 +781,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               const isFlagged = flaggedDisplayNumbers.includes(q.displayNumber);
               const isCurrent = idx === currentIndex;
 
-              let btnBg = 'bg-slate-50 text-slate-600 hover:bg-slate-100 border-slate-200';
+              let btnBg = 'bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700/80';
               if (isFlagged) {
                 btnBg = 'bg-amber-500 text-white font-bold border-amber-600 shadow-xs';
               } else if (isAnswered) {
@@ -766,7 +796,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                     if (showQuestionGridMobile) setShowQuestionGridMobile(false);
                   }}
                   className={`h-10 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center relative cursor-pointer ${btnBg} ${
-                    isCurrent ? 'ring-2 ring-blue-500 ring-offset-2 scale-105 shadow-xs' : ''
+                    isCurrent ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900 scale-105 shadow-xs' : ''
                   }`}
                 >
                   <span>{q.displayNumber}</span>
@@ -781,10 +811,10 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
           </div>
 
           {/* Submit Big Button in Grid */}
-          <div className="pt-5 mt-4 border-t border-slate-100">
+          <div className="pt-5 mt-4 border-t border-slate-100 dark:border-slate-800">
             <button
               onClick={() => setShowSubmitModal(true)}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+              className="w-full bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold py-3 px-4 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer border border-slate-800 dark:border-slate-700"
             >
               <Send className="w-4 h-4 text-emerald-400" />
               <span>Konfirmasi Pengumpulan</span>
@@ -795,46 +825,46 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
       {/* Confirmation Submit Modal */}
       {showSubmitModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-            <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 border border-blue-100">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-4 border border-blue-100 dark:border-blue-900">
               <CheckCircle2 className="w-6 h-6" />
             </div>
 
-            <h3 className="text-lg font-bold text-center text-slate-900 mb-1">
+            <h3 className="text-lg font-bold text-center text-slate-900 dark:text-white mb-1">
               Konfirmasi Selesai Ujian
             </h3>
-            <p className="text-xs text-center text-slate-500 mb-6">
+            <p className="text-xs text-center text-slate-500 dark:text-slate-400 mb-6">
               Apakah Anda yakin ingin mengakhiri dan mengumpulkan lembar jawaban ujian ini?
             </p>
 
             {/* Summary card */}
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-6 space-y-2 text-xs">
+            <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 mb-6 space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-500">Total Soal:</span>
-                <span className="font-bold text-slate-800">{totalCount} Soal</span>
+                <span className="text-slate-500 dark:text-slate-400">Total Soal:</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{totalCount} Soal</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Sudah Dijawab:</span>
-                <span className="font-bold text-emerald-700">{answeredCount} Soal</span>
+                <span className="text-slate-500 dark:text-slate-400">Sudah Dijawab:</span>
+                <span className="font-bold text-emerald-700 dark:text-emerald-400">{answeredCount} Soal</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Belum Dijawab:</span>
-                <span className={`font-bold ${unansweredCount > 0 ? 'text-rose-600' : 'text-slate-800'}`}>
+                <span className="text-slate-500 dark:text-slate-400">Belum Dijawab:</span>
+                <span className={`font-bold ${unansweredCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-800 dark:text-slate-200'}`}>
                   {unansweredCount} Soal
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Status Ragu-Ragu:</span>
-                <span className={`font-bold ${flaggedCount > 0 ? 'text-amber-600' : 'text-slate-800'}`}>
+                <span className="text-slate-500 dark:text-slate-400">Status Ragu-Ragu:</span>
+                <span className={`font-bold ${flaggedCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-800 dark:text-slate-200'}`}>
                   {flaggedCount} Soal
                 </span>
               </div>
             </div>
 
             {unansweredCount > 0 && (
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs mb-6 flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-2xl text-amber-800 dark:text-amber-300 text-xs mb-6 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <span>
                   Masih ada <strong>{unansweredCount} soal</strong> yang belum Anda jawab. Jawaban kosong bernilai 0 poin.
                 </span>
@@ -844,14 +874,14 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="w-full py-2.5 px-4 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-colors cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Cek Kembali
               </button>
               <button
                 id="confirm-final-submit-btn"
                 onClick={handleManualSubmit}
-                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-sm transition-all cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-sm transition-all cursor-pointer"
               >
                 Ya, Kumpulkan
               </button>
@@ -862,27 +892,27 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
       {/* Anti-Cheat Alert Modal */}
       {showCheatWarning && (
-        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-rose-200 animate-in fade-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4 border border-rose-100">
+        <div className="fixed inset-0 bg-slate-900/70 dark:bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-200 dark:border-rose-900 animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-4 border border-rose-100 dark:border-rose-900">
               <ShieldAlert className="w-6 h-6" />
             </div>
 
-            <h3 className="text-lg font-bold text-center text-slate-900 mb-1">
+            <h3 className="text-lg font-bold text-center text-slate-900 dark:text-white mb-1">
               Peringatan Sistem Pengawas
             </h3>
-            <p className="text-xs text-center text-slate-500 mb-4">
+            <p className="text-xs text-center text-slate-500 dark:text-slate-400 mb-4">
               Sistem mendeteksi Anda meninggalkan jendela ujian (berpindah tab, membuka aplikasi lain, atau keluar dari Mode Layar Penuh/Fullscreen).
             </p>
 
-            <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 text-xs text-rose-900 mb-5 space-y-1.5">
-              <p className="font-semibold text-rose-800 flex items-center justify-between">
+            <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-2xl p-3.5 text-xs text-rose-900 dark:text-rose-200 mb-5 space-y-1.5">
+              <p className="font-semibold text-rose-800 dark:text-rose-300 flex items-center justify-between">
                 <span>Jumlah Pelanggaran:</span>
                 <span className="bg-rose-600 text-white px-2 py-0.5 rounded-md font-bold text-xs">
                   {tabSwitchCount} Kali
                 </span>
               </p>
-              <p className="text-slate-600 text-[11px] leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
                 Ujian mewajibkan tampilan <strong>Layar Penuh (Fullscreen)</strong>. Dilarang membuka tab browser lain, aplikasi lain, maupun klik di luar layar ujian. Seluruh pelanggaran terekam otomatis dan dilaporkan kepada proktor/guru pengawas.
               </p>
             </div>

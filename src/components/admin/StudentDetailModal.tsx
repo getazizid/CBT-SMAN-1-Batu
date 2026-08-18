@@ -22,19 +22,19 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-colors duration-200">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200/90 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-900 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center font-bold">
               <User className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base">
+              <h3 className="font-extrabold text-slate-900 dark:text-white text-base">
                 Lembar Hasil Ujian Siswa
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {submission.studentName} &bull; {submission.studentClass} ({submission.studentNisn})
               </p>
             </div>
@@ -43,14 +43,14 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+              className="bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors border border-slate-800 dark:border-slate-700"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Cetak Hasil</span>
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+              className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -61,55 +61,55 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {/* Summary KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-              <span className="text-slate-500 block mb-1">Nilai Akhir (0-100)</span>
-              <span className="text-2xl font-bold text-blue-700">
+            <div className="bg-slate-50 dark:bg-slate-800/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+              <span className="text-slate-500 dark:text-slate-400 block mb-1">Nilai Akhir (0-100)</span>
+              <span className="text-2xl font-extrabold text-blue-700 dark:text-blue-400">
                 {submission.finalScoreScale100}
               </span>
-              <span className="text-[11px] text-slate-400 block mt-0.5">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">
                 {submission.totalScoreEarned} / {submission.maxPossibleScore} total poin
               </span>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-              <span className="text-slate-500 block mb-1">Status Kelulusan</span>
+            <div className="bg-slate-50 dark:bg-slate-800/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+              <span className="text-slate-500 dark:text-slate-400 block mb-1">Status Kelulusan</span>
               <span
-                className={`text-xs font-semibold inline-block px-2 py-0.5 rounded-full ${
+                className={`text-xs font-bold inline-block px-2.5 py-0.5 rounded-full ${
                   submission.isPassed
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    : 'bg-rose-50 text-rose-700 border border-rose-200'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                    : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
                 }`}
               >
                 {submission.isPassed ? 'TUNTAS (LULUS)' : 'REMEDIAL'}
               </span>
-              <span className="text-[11px] text-slate-400 block mt-1">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-1">
                 KKM Target: {submission.passingGrade}
               </span>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-              <span className="text-slate-500 block mb-1">Waktu Pengerjaan</span>
-              <span className="text-sm font-semibold text-slate-800 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
+            <div className="bg-slate-50 dark:bg-slate-800/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+              <span className="text-slate-500 dark:text-slate-400 block mb-1">Waktu Pengerjaan</span>
+              <span className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                 <span>{Math.round(submission.durationSecondsUsed / 60)} Menit</span>
               </span>
-              <span className="text-[11px] text-slate-400 block mt-0.5">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">
                 {new Date(submission.submittedAt).toLocaleTimeString('id-ID')}
               </span>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-              <span className="text-slate-500 block mb-1">Integritas CBT</span>
+            <div className="bg-slate-50 dark:bg-slate-800/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+              <span className="text-slate-500 dark:text-slate-400 block mb-1">Integritas CBT</span>
               <span
-                className={`text-sm font-semibold ${
-                  submission.tabSwitchCount === 0 ? 'text-emerald-700' : 'text-amber-700'
+                className={`text-sm font-bold ${
+                  submission.tabSwitchCount === 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'
                 }`}
               >
                 {submission.tabSwitchCount === 0
                   ? 'Bersih (0 Pelanggaran)'
                   : `${submission.tabSwitchCount}x Pindah Tab/App`}
               </span>
-              <span className="text-[11px] text-slate-400 block mt-0.5">
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 block mt-0.5">
                 {submission.deviceInfo || 'Browser'}
               </span>
             </div>
@@ -117,14 +117,14 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
 
           {/* Detailed Question by Question Table */}
           <div>
-            <h4 className="font-semibold text-slate-900 text-xs uppercase tracking-wider mb-3">
+            <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider mb-3">
               Rincian Jawaban & Poin Tiap Butir Soal
             </h4>
 
-            <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-700">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                  <tr className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
                     <th className="py-2.5 px-3 w-10 text-center">No</th>
                     <th className="py-2.5 px-3">Potongan Pertanyaan</th>
                     <th className="py-2.5 px-3 text-center w-24">Pilihan Siswa</th>
@@ -132,43 +132,43 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                     <th className="py-2.5 px-3 w-40">Detail Bobot Soal</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {exam?.questions.map((q) => {
                     const selected = submission.answers[q.number] || null;
                     const score = selected ? (q.optionScores[selected] ?? 0) : 0;
                     const maxScore = Math.max(...(Object.values(q.optionScores) as number[]));
 
                     return (
-                      <tr key={q.id} className="hover:bg-slate-50/60">
-                        <td className="py-2.5 px-3 font-semibold text-center text-slate-600">
+                      <tr key={q.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/50">
+                        <td className="py-2.5 px-3 font-semibold text-center text-slate-600 dark:text-slate-400">
                           {q.number}
                         </td>
                         <td className="py-2.5 px-3">
-                          <p className="text-slate-800 font-medium line-clamp-1">{q.text}</p>
+                          <p className="text-slate-800 dark:text-slate-200 font-medium line-clamp-1">{q.text}</p>
                         </td>
                         <td className="py-2.5 px-3 text-center">
                           {selected ? (
-                            <span className="font-mono font-bold bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200">
+                            <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
                               {selected}
                             </span>
                           ) : (
-                            <span className="text-rose-500 font-semibold">Kosong</span>
+                            <span className="text-rose-500 dark:text-rose-400 font-semibold">Kosong</span>
                           )}
                         </td>
-                        <td className="py-2.5 px-3 text-center font-semibold">
+                        <td className="py-2.5 px-3 text-center font-bold">
                           <span
                             className={
                               score === maxScore
-                                ? 'text-emerald-700'
+                                ? 'text-emerald-700 dark:text-emerald-400'
                                 : score > 0
-                                ? 'text-blue-600'
-                                : 'text-rose-600'
+                                ? 'text-blue-600 dark:text-blue-400'
+                                : 'text-rose-600 dark:text-rose-400'
                             }
                           >
                             +{score} poin
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-[10px] text-slate-500 font-mono">
+                        <td className="py-2.5 px-3 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                           {Object.entries(q.optionScores)
                             .map(([k, val]) => `${k}:${val}p`)
                             .join(' ')}
@@ -177,7 +177,7 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                     );
                   }) || (
                     <tr>
-                      <td colSpan={5} className="text-center py-4 text-slate-400">
+                      <td colSpan={5} className="text-center py-4 text-slate-400 dark:text-slate-500">
                         Tidak ada data butir soal.
                       </td>
                     </tr>
@@ -189,10 +189,10 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-white border-t border-slate-100 flex justify-end">
+        <div className="px-6 py-3 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl cursor-pointer transition-colors"
+            className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold text-xs rounded-xl cursor-pointer transition-colors"
           >
             Tutup
           </button>

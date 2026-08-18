@@ -238,19 +238,19 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-colors duration-200">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200/90 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-150">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-900 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white flex items-center justify-center font-bold">
               <FileEdit className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-base">
+              <h3 className="font-extrabold text-slate-900 dark:text-white text-base">
                 {exam ? 'Edit Paket Ujian & Bobot Nilai' : 'Buat Paket Ujian Baru'}
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Pengaturan umum, alokasi waktu, token, dan bobot opsi (A/B/C/D/E)
               </p>
             </div>
@@ -258,21 +258,21 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab switcher */}
-        <div className="px-6 pt-3 bg-slate-50/50 border-b border-slate-200 flex gap-2">
+        <div className="px-6 pt-3 bg-slate-50/50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800 flex gap-2">
           <button
             type="button"
             onClick={() => setActiveTab('settings')}
             className={`px-4 py-2 text-xs font-semibold rounded-t-xl transition-all cursor-pointer ${
               activeTab === 'settings'
-                ? 'bg-white text-blue-600 border-t border-x border-slate-200 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-t border-x border-slate-200 dark:border-slate-700 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             1. Pengaturan Ujian & Token
@@ -282,12 +282,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
             onClick={() => setActiveTab('questions')}
             className={`px-4 py-2 text-xs font-semibold rounded-t-xl transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'questions'
-                ? 'bg-white text-blue-600 border-t border-x border-slate-200 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-t border-x border-slate-200 dark:border-slate-700 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <span>2. Editor Soal & Bobot Opsi</span>
-            <span className="bg-blue-50 text-blue-700 text-[10px] px-1.5 py-0.2 rounded-full font-bold">
+            <span className="bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-[10px] px-2 py-0.5 rounded-full font-bold">
               {questions.length} / 50
             </span>
           </button>
@@ -299,7 +299,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
             <div className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                     Judul Ujian / Asesmen
                   </label>
                   <input
@@ -308,12 +308,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Contoh: Penilaian Sumatif Akhir Semester Karakter"
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                     Mata Pelajaran
                   </label>
                   <input
@@ -322,24 +322,24 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     onChange={(e) => setSubject(e.target.value)}
                     placeholder="Contoh: Pendidikan Karakter & Literasi"
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
-              {/* Target Classes Selection Box (Checkboxes for 36 classes) */}
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+              {/* Target Classes Selection Box */}
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase">
+                    <label className="block text-xs font-bold text-slate-900 dark:text-white uppercase">
                       Target Kelas Peserta Ujian (Centangan)
                     </label>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Centang kelas yang berhak mengikuti paket ujian ini. Hanya siswa dari kelas terpilih yang dapat mengakses ujian.
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="bg-blue-100 text-blue-800 text-[11px] font-bold px-2.5 py-1 rounded-full border border-blue-200">
+                    <span className="bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 text-[11px] font-bold px-2.5 py-1 rounded-full border border-blue-200 dark:border-blue-800">
                       {selectedClasses.length === ALL_SCHOOL_CLASSES.length
                         ? 'Semua 36 Kelas Terpilih'
                         : `${selectedClasses.length} / 36 Kelas Terpilih`}
@@ -347,35 +347,35 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     <button
                       type="button"
                       onClick={handleSelectAllClasses}
-                      className="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold rounded-lg border border-slate-200 shadow-xs cursor-pointer"
+                      className="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs cursor-pointer"
                     >
                       Pilih Semua
                     </button>
                     <button
                       type="button"
                       onClick={handleSelectGradeX}
-                      className="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold rounded-lg border border-slate-200 shadow-xs cursor-pointer"
+                      className="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs cursor-pointer"
                     >
                       + Semua X
                     </button>
                     <button
                       type="button"
                       onClick={handleSelectGradeXI}
-                      className="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold rounded-lg border border-slate-200 shadow-xs cursor-pointer"
+                      className="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs cursor-pointer"
                     >
                       + Semua XI
                     </button>
                     <button
                       type="button"
                       onClick={handleSelectGradeXII}
-                      className="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 text-[11px] font-semibold rounded-lg border border-slate-200 shadow-xs cursor-pointer"
+                      className="px-2 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs cursor-pointer"
                     >
                       + Semua XII
                     </button>
                     <button
                       type="button"
                       onClick={handleClearClasses}
-                      className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold rounded-lg border border-rose-200 shadow-xs cursor-pointer"
+                      className="px-2 py-1 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 text-[11px] font-semibold rounded-lg border border-rose-200 dark:border-rose-800 shadow-xs cursor-pointer"
                     >
                       Reset
                     </button>
@@ -385,7 +385,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 <div className="space-y-3 pt-2">
                   {/* Tingkat X */}
                   <div>
-                    <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
                       Tingkat Kelas X (X-1 s/d X-12):
                     </span>
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5">
@@ -399,12 +399,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                             className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
                               isChecked
                                 ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                                : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                             }`}
                           >
                             <span>{cls}</span>
                             <span className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] font-bold ${
-                              isChecked ? 'bg-white text-blue-600' : 'border border-slate-300'
+                              isChecked ? 'bg-white text-blue-600' : 'border border-slate-300 dark:border-slate-600'
                             }`}>
                               {isChecked ? '✓' : ''}
                             </span>
@@ -416,7 +416,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
 
                   {/* Tingkat XI */}
                   <div>
-                    <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
                       Tingkat Kelas XI (XI-1 s/d XI-12):
                     </span>
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5">
@@ -430,12 +430,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                             className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
                               isChecked
                                 ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                                : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                             }`}
                           >
                             <span>{cls}</span>
                             <span className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] font-bold ${
-                              isChecked ? 'bg-white text-blue-600' : 'border border-slate-300'
+                              isChecked ? 'bg-white text-blue-600' : 'border border-slate-300 dark:border-slate-600'
                             }`}>
                               {isChecked ? '✓' : ''}
                             </span>
@@ -447,7 +447,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
 
                   {/* Tingkat XII */}
                   <div>
-                    <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
                       Tingkat Kelas XII (XII-1 s/d XII-12):
                     </span>
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1.5">
@@ -461,12 +461,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                             className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center justify-between gap-1.5 cursor-pointer ${
                               isChecked
                                 ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                                : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                             }`}
                           >
                             <span>{cls}</span>
                             <span className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[9px] font-bold ${
-                              isChecked ? 'bg-white text-blue-600' : 'border border-slate-300'
+                              isChecked ? 'bg-white text-blue-600' : 'border border-slate-300 dark:border-slate-600'
                             }`}>
                               {isChecked ? '✓' : ''}
                             </span>
@@ -480,7 +480,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                     Durasi Pengerjaan (Menit)
                   </label>
                   <input
@@ -489,12 +489,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     max={300}
                     value={durationMinutes}
                     onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                     KKM (Passing Grade)
                   </label>
                   <input
@@ -503,14 +503,14 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     max={100}
                     value={passingGrade}
                     onChange={(e) => setPassingGrade(Number(e.target.value))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                     Token Masuk Ujian
                   </label>
                   <div className="flex gap-2">
@@ -518,12 +518,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                       type="text"
                       value={token}
                       onChange={(e) => setToken(e.target.value.toUpperCase())}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-mono font-semibold uppercase tracking-wider focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                      className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-mono font-bold uppercase tracking-wider focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setToken('BATU' + Math.floor(1000 + Math.random() * 9000))}
-                      className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                      className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
                     >
                       Acak
                     </button>
@@ -531,24 +531,24 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                     Guru Pengampu
                   </label>
                   <input
                     type="text"
                     value={teacherName}
                     onChange={(e) => setTeacherName(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Default Preset Weight Card */}
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
-                    <Sliders className="w-4 h-4 text-blue-600" />
-                    <h4 className="font-semibold text-slate-900 text-xs uppercase">
+                    <Sliders className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase">
                       Preset Bobot Nilai Bawaan (Opsi A - E)
                     </h4>
                   </div>
@@ -556,28 +556,28 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleApplyPresetToAll({ A: 10, B: 5, C: 4, D: 3, E: 2 })}
-                      className="bg-white hover:bg-slate-100 text-blue-600 border border-slate-200 text-[10px] font-semibold px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                      className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg transition-colors cursor-pointer"
                     >
                       Set A:10, B:5, C:4, D:3, E:2
                     </button>
                     <button
                       type="button"
                       onClick={() => handleApplyPresetToAll({ A: 10, B: 0, C: 0, D: 0, E: 0 })}
-                      className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-semibold px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                      className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg transition-colors cursor-pointer"
                     >
                       Set Standar (A:10, Lain:0)
                     </button>
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   Nilai ini akan otomatis diterapkan saat Anda menambahkan butir soal baru, atau tekan tombol preset di atas untuk mengubah seluruh soal seketika.
                 </p>
 
                 <div className="grid grid-cols-5 gap-2 pt-1">
                   {(['A', 'B', 'C', 'D', 'E'] as OptionKey[]).map((k) => (
-                    <div key={k} className="bg-white p-2 rounded-xl border border-slate-200 text-center">
-                      <span className="text-[11px] font-semibold text-slate-900 block">Opsi {k}</span>
+                    <div key={k} className="bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-center">
+                      <span className="text-[11px] font-bold text-slate-900 dark:text-white block">Opsi {k}</span>
                       <input
                         type="number"
                         value={defaultOptionScores[k]}
@@ -587,7 +587,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                             [k]: Number(e.target.value),
                           })
                         }
-                        className="w-full text-center font-bold text-blue-600 text-xs mt-1 border border-slate-200 rounded-lg py-1 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                        className="w-full text-center font-bold text-blue-600 dark:text-blue-400 text-xs mt-1 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-lg py-1 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                       />
                     </div>
                   ))}
@@ -595,16 +595,16 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
               </div>
 
               {/* Randomization / Anti-Cheat Section */}
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+                  <div className="w-7 h-7 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center font-bold">
                     <Shuffle className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-slate-900 text-xs uppercase tracking-wide">
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wide">
                       Pengacakan Soal & Pilihan Jawaban (Anti-Mencontek)
                     </h4>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Hasil akhir, penilaian, dan analisis butir soal tetap 100% tersinkronisasi akurat dengan kunci jawaban master.
                     </p>
                   </div>
@@ -614,10 +614,10 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                   {/* Shuffle Questions Toggle Card */}
                   <div
                     onClick={() => setShuffleQuestions(!shuffleQuestions)}
-                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
                       shuffleQuestions
-                        ? 'bg-purple-50/70 border-purple-300 text-purple-950 shadow-xs'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                        ? 'bg-purple-50/80 dark:bg-purple-950/40 border-purple-300 dark:border-purple-800 text-purple-950 dark:text-purple-200 shadow-xs'
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300'
                     }`}
                   >
                     <input
@@ -628,15 +628,15 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                       className="w-4 h-4 text-purple-600 rounded cursor-pointer mt-0.5"
                     />
                     <div>
-                      <label htmlFor="shuffle-questions-toggle" className="text-xs font-bold text-slate-900 cursor-pointer flex items-center gap-1.5">
+                      <label htmlFor="shuffle-questions-toggle" className="text-xs font-bold text-slate-900 dark:text-white cursor-pointer flex items-center gap-1.5">
                         <span>Acak Urutan Soal</span>
                         {shuffleQuestions && (
-                          <span className="bg-purple-100 text-purple-700 text-[10px] font-semibold px-1.5 py-0.2 rounded">
+                          <span className="bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 text-[10px] font-semibold px-1.5 py-0.2 rounded">
                             Aktif
                           </span>
                         )}
                       </label>
-                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
                         Setiap siswa menerima urutan butir soal yang berbeda secara acak saat ujian berlangsung.
                       </p>
                     </div>
@@ -645,10 +645,10 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                   {/* Shuffle Options Toggle Card */}
                   <div
                     onClick={() => setShuffleOptions(!shuffleOptions)}
-                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
                       shuffleOptions
-                        ? 'bg-purple-50/70 border-purple-300 text-purple-950 shadow-xs'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                        ? 'bg-purple-50/80 dark:bg-purple-950/40 border-purple-300 dark:border-purple-800 text-purple-950 dark:text-purple-200 shadow-xs'
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300'
                     }`}
                   >
                     <input
@@ -659,15 +659,15 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                       className="w-4 h-4 text-purple-600 rounded cursor-pointer mt-0.5"
                     />
                     <div>
-                      <label htmlFor="shuffle-options-toggle" className="text-xs font-bold text-slate-900 cursor-pointer flex items-center gap-1.5">
+                      <label htmlFor="shuffle-options-toggle" className="text-xs font-bold text-slate-900 dark:text-white cursor-pointer flex items-center gap-1.5">
                         <span>Acak Pilihan Opsi (A-E)</span>
                         {shuffleOptions && (
-                          <span className="bg-purple-100 text-purple-700 text-[10px] font-semibold px-1.5 py-0.2 rounded">
+                          <span className="bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 text-[10px] font-semibold px-1.5 py-0.2 rounded">
                             Aktif
                           </span>
                         )}
                       </label>
-                      <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
                         Pilihan ganda A, B, C, D, E pada setiap soal diacak secara dinamis bagi setiap peserta.
                       </p>
                     </div>
@@ -685,7 +685,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     onChange={(e) => setIsActive(e.target.checked)}
                     className="w-4 h-4 text-blue-600 rounded cursor-pointer"
                   />
-                  <label htmlFor="active-toggle" className="text-xs font-semibold text-slate-800 cursor-pointer">
+                  <label htmlFor="active-toggle" className="text-xs font-semibold text-slate-800 dark:text-slate-200 cursor-pointer">
                     Aktifkan Paket Ujian Ini untuk Diakses Siswa di Halaman Depan
                   </label>
                 </div>
@@ -699,10 +699,10 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     className="w-4 h-4 text-blue-600 rounded cursor-pointer mt-0.5"
                   />
                   <div>
-                    <label htmlFor="instant-score-toggle" className="text-xs font-semibold text-slate-800 cursor-pointer">
+                    <label htmlFor="instant-score-toggle" className="text-xs font-semibold text-slate-800 dark:text-slate-200 cursor-pointer">
                       Tampilkan Nilai ke Siswa Setelah Selesai Mengerjakan Ujian
                     </label>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
                       Jika dinonaktifkan, siswa tidak akan melihat angka nilai atau status kelulusan, melainkan hanya tanda terima konfirmasi bahwa ujian telah berhasil dikirim.
                     </p>
                   </div>
@@ -714,10 +714,10 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-slate-900 text-sm">
+                  <h4 className="font-extrabold text-slate-900 dark:text-white text-sm">
                     Daftar Butir Soal ({questions.length} / 50)
                   </h4>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Setiap opsi memiliki pengaturan nilai bobot tersendiri.
                   </p>
                 </div>
@@ -725,7 +725,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 <button
                   type="button"
                   onClick={handleAddQuestion}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah Soal Baru</span>
@@ -733,12 +733,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
               </div>
 
               {questions.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                  <p className="text-xs text-slate-500 mb-3">Belum ada soal pada paket ini.</p>
+                <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/40 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Belum ada soal pada paket ini.</p>
                   <button
                     type="button"
                     onClick={handleAddQuestion}
-                    className="bg-blue-600 text-white font-semibold text-xs px-4 py-2 rounded-xl"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl"
                   >
                     Tambah Soal Pertama
                   </button>
@@ -748,17 +748,17 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                   {questions.map((q, qIdx) => (
                     <div
                       key={q.id || qIdx}
-                      className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4 relative"
+                      className="bg-white dark:bg-slate-850 rounded-3xl p-5 border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-4 relative"
                     >
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <span className="font-semibold text-xs text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <span className="font-bold text-xs text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-xl border border-blue-100 dark:border-blue-900">
                           Nomor {q.number}
                         </span>
 
                         <button
                           type="button"
                           onClick={() => handleRemoveQuestion(qIdx)}
-                          className="text-rose-500 hover:text-rose-700 p-1 rounded-lg hover:bg-rose-50 text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                          className="text-rose-500 dark:text-rose-400 hover:text-rose-700 p-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/50 text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           <span>Hapus</span>
@@ -767,20 +767,20 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
 
                       {/* Question text */}
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">
+                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                           Teks Pertanyaan
                         </label>
                         <textarea
                           rows={3}
                           value={q.text}
                           onChange={(e) => handleUpdateQuestion(qIdx, 'text', e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl p-3 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                       </div>
 
                       {/* Options & Weight Editor */}
                       <div className="space-y-2">
-                        <label className="block text-[11px] font-semibold text-slate-700 uppercase">
+                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase">
                           Opsi Jawaban & Bobot Nilai Poin
                         </label>
 
@@ -789,7 +789,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                           const optScore = q.optionScores[optKey] ?? 0;
                           return (
                             <div key={optKey} className="flex items-center gap-2">
-                              <span className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-semibold text-xs flex items-center justify-center shrink-0">
+                              <span className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center shrink-0">
                                 {optKey}
                               </span>
 
@@ -798,16 +798,16 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                                 value={currentOpt?.text || ''}
                                 onChange={(e) => handleUpdateOptionText(qIdx, optKey, e.target.value)}
                                 placeholder={`Teks pilihan opsi ${optKey}...`}
-                                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="flex-1 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                               />
 
-                              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1 shrink-0">
-                                <span className="text-[10px] font-medium text-slate-500">Nilai:</span>
+                              <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1 shrink-0">
+                                <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Nilai:</span>
                                 <input
                                   type="number"
                                   value={optScore}
                                   onChange={(e) => handleUpdateOptionScore(qIdx, optKey, Number(e.target.value))}
-                                  className="w-12 text-center font-bold text-xs text-blue-700 focus:outline-none"
+                                  className="w-12 text-center font-bold text-xs text-blue-700 dark:text-blue-400 bg-transparent focus:outline-none"
                                 />
                                 <span className="text-[10px] text-slate-400">p</span>
                               </div>
@@ -818,7 +818,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
 
                       {/* Explanation */}
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-700 uppercase mb-1">
+                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
                           Pembahasan / Penjelasan Soal (Opsional)
                         </label>
                         <input
@@ -826,7 +826,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                           value={q.explanation || ''}
                           onChange={(e) => handleUpdateQuestion(qIdx, 'explanation', e.target.value)}
                           placeholder="Penjelasan materi untuk ditampilkan di laporan nilai siswa..."
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                       </div>
                     </div>
@@ -837,18 +837,18 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
           )}
 
           {/* Footer Action */}
-          <div className="pt-4 border-t border-slate-200 flex justify-between items-center">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 -mx-6 -mb-6 p-6 rounded-b-3xl">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
             >
               Batal
             </button>
 
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs flex items-center gap-2 cursor-pointer transition-colors"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-2 cursor-pointer transition-all"
             >
               <Save className="w-4 h-4" />
               <span>Simpan Pengaturan Ujian</span>
