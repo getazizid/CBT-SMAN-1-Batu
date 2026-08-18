@@ -50,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-500 hidden sm:block">
-              Computer Based Test &bull; Kota Batu
+              Computer Based Test
             </p>
           </div>
         </div>
@@ -78,11 +78,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="role-student-btn"
               onClick={() => onRoleChange('student')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                currentRole === 'student'
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${currentRole === 'student'
                   ? 'bg-white text-blue-700 shadow-xs font-bold border border-slate-200/80'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-              }`}
+                }`}
             >
               <UserCheck className="w-4 h-4" />
               <span>Ruang Siswa</span>
@@ -91,11 +90,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="role-admin-btn"
               onClick={handleAdminClick}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                currentRole === 'admin'
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${currentRole === 'admin'
                   ? 'bg-blue-600 text-white shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-              }`}
+                }`}
             >
               {currentAdmin ? (
                 <ShieldCheck className="w-4 h-4" />

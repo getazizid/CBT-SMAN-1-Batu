@@ -356,7 +356,7 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 text-center sm:text-left">
             <div className="flex items-center gap-2">
               <p className="font-semibold text-slate-700">
-                &copy; {new Date().getFullYear()} CBT SMAN 1 Batu &bull; Sistem Asesmen Nilai Pilihan Ganda
+                &copy; {new Date().getFullYear()} CBT SMAN 1 Batu &bull; Created by TIM IT SMAN 1 Batu
               </p>
             </div>
             <div className="flex items-center gap-2 text-[11px]">

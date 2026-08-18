@@ -112,9 +112,7 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
 
     if (!isTokenMatch && !isStudentPassMatch) {
       setErrorMsg(
-        `Password / Token Ujian tidak sesuai! (Gunakan token ujian: ${currentExam.token}${
-          foundStudent?.password ? ' atau PIN akun Anda' : ''
-        })`
+        'Password / Token Ujian tidak sesuai! Silakan periksa kembali atau tanyakan kepada proktor/pengawas ujian.'
       );
       return;
     }
@@ -269,19 +267,9 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
 
           {/* Password / Token */}
           <div>
-            <div className="flex justify-between items-center mb-1.5">
-              <label className="block text-xs font-semibold text-slate-700">
-                Password / Token Ujian
-              </label>
-              {currentExam && (
-                <span
-                  onClick={() => setPasswordToken(currentExam.token)}
-                  className="text-[11px] text-blue-600 font-medium cursor-pointer hover:underline"
-                >
-                  Token: <strong>{currentExam.token}</strong>
-                </span>
-              )}
-            </div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              Password / Token Ujian
+            </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <Lock className="w-4 h-4" />
