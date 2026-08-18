@@ -79,15 +79,15 @@ export default function App() {
       return;
     }
 
-    // Seed dummy data if Firestore is freshly created and empty
+    // Seed dummy data once ONLY if freshly created database
     seedInitialFirestoreDataIfEmpty().then((seeded) => {
       if (seeded) setIsCloudConnected(true);
     });
 
-    // Realtime Subscriptions
+    // Realtime Subscriptions directly from Firestore
     const unsubExams = subscribeToExams(
       (remoteExams) => {
-        if (remoteExams && remoteExams.length > 0) {
+        if (remoteExams) {
           setExams(remoteExams);
           saveStoredExams(remoteExams);
           setIsCloudConnected(true);
@@ -109,7 +109,7 @@ export default function App() {
 
     const unsubStudents = subscribeToStudents(
       (remoteStudents) => {
-        if (remoteStudents && remoteStudents.length > 0) {
+        if (remoteStudents) {
           setStudents(remoteStudents);
           saveStoredStudents(remoteStudents);
           setIsCloudConnected(true);
@@ -120,7 +120,7 @@ export default function App() {
 
     const unsubAdminAccounts = subscribeToAdminAccounts(
       (remoteAccounts) => {
-        if (remoteAccounts && remoteAccounts.length > 0) {
+        if (remoteAccounts) {
           setAdminAccounts(remoteAccounts);
           saveStoredAdminAccounts(remoteAccounts);
           setIsCloudConnected(true);
@@ -144,28 +144,28 @@ export default function App() {
     };
   }, []);
 
-  const handleUpdateExams = (updated: Exam[]) => {
+  const handleUpdateExams = async (updated: Exam[]) => {
     setExams(updated);
     saveStoredExams(updated);
-    syncAllExamsToFirestore(updated);
+    await syncAllExamsToFirestore(updated);
   };
 
-  const handleUpdateSubmissions = (updated: StudentExamSubmission[]) => {
+  const handleUpdateSubmissions = async (updated: StudentExamSubmission[]) => {
     setSubmissions(updated);
     saveStoredSubmissions(updated);
-    syncAllSubmissionsToFirestore(updated);
+    await syncAllSubmissionsToFirestore(updated);
   };
 
-  const handleUpdateStudents = (updated: RegisteredStudent[]) => {
+  const handleUpdateStudents = async (updated: RegisteredStudent[]) => {
     setStudents(updated);
     saveStoredStudents(updated);
-    syncAllStudentsToFirestore(updated);
+    await syncAllStudentsToFirestore(updated);
   };
 
-  const handleUpdateAdminAccounts = (updated: AdminAccount[]) => {
+  const handleUpdateAdminAccounts = async (updated: AdminAccount[]) => {
     setAdminAccounts(updated);
     saveStoredAdminAccounts(updated);
-    syncAllAdminAccountsToFirestore(updated);
+    await syncAllAdminAccountsToFirestore(updated);
 
     // If current logged-in user was updated
     if (currentAdmin) {
@@ -177,10 +177,10 @@ export default function App() {
     }
   };
 
-  const handleToggleEnforceWhitelist = (enforce: boolean) => {
+  const handleToggleEnforceWhitelist = async (enforce: boolean) => {
     setEnforceWhitelist(enforce);
     saveStoredEnforceWhitelist(enforce);
-    saveSettingsToFirestore({ enforceWhitelist: enforce });
+    await saveSettingsToFirestore({ enforceWhitelist: enforce });
   };
 
   const handleAdminLoginSuccess = (account: AdminAccount) => {
@@ -196,7 +196,7 @@ export default function App() {
     handleBackToStudentHome();
   };
 
-  const handleResetDemoData = () => {
+  const handleResetDemoData = async () => {
     if (confirm('Reset ulang data ujian, siswa, akun & nilai ke pengaturan awal contoh SMAN 1 Batu? (Data di Cloud Firestore juga akan disinkronkan)')) {
       const reset = resetToInitialDemoData();
       setExams(reset.exams);
@@ -215,11 +215,11 @@ export default function App() {
       });
 
       // Sync reset to Firestore
-      syncAllExamsToFirestore(reset.exams);
-      syncAllSubmissionsToFirestore(reset.submissions);
-      syncAllStudentsToFirestore(reset.students);
-      syncAllAdminAccountsToFirestore(reset.adminAccounts);
-      saveSettingsToFirestore({ enforceWhitelist: true });
+      await syncAllExamsToFirestore(reset.exams);
+      await syncAllSubmissionsToFirestore(reset.submissions);
+      await syncAllStudentsToFirestore(reset.students);
+      await syncAllAdminAccountsToFirestore(reset.adminAccounts);
+      await saveSettingsToFirestore({ enforceWhitelist: true });
     }
   };
 
@@ -237,12 +237,12 @@ export default function App() {
   };
 
   // Student Submits Exam
-  const handleExamSubmit = (submission: StudentExamSubmission) => {
+  const handleExamSubmit = async (submission: StudentExamSubmission) => {
     // 1. Save to localStorage
     addStudentSubmission(submission);
     
     // 2. Save directly to Cloud Firestore in real-time
-    saveSubmissionToFirestore(submission);
+    await saveSubmissionToFirestore(submission);
 
     const updatedSubmissions = [submission, ...submissions];
     setSubmissions(updatedSubmissions);

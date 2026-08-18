@@ -4,6 +4,7 @@ import {
   setDoc,
   deleteDoc,
   getDocs,
+  getDoc,
   onSnapshot,
   writeBatch,
   Unsubscribe,
@@ -26,47 +27,67 @@ export const COLLECTIONS = {
 };
 
 /**
- * Seed initial dummy / demo data to Firestore if collections are empty.
+ * Seed initial demo data ONCE if the system settings flag does not exist yet.
+ * Once initialized, it will never overwrite user edits or deleted data.
  */
 export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
   if (!db || !isFirebaseConfigured()) return false;
 
   try {
+    const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
+    const settingsSnap = await getDoc(settingsRef);
+
+    // If settings document already exists, the database was already initialized -> DO NOT SEED!
+    if (settingsSnap.exists()) {
+      return true;
+    }
+
+    // Check if exams collection has any docs
     const examsSnap = await getDocs(collection(db, COLLECTIONS.EXAMS));
     if (examsSnap.empty) {
-      console.log('🌱 Menginisialisasi data awal SMAN 1 Batu ke Firebase Firestore...');
+      console.log('🌱 Menyiapkan data awal SMAN 1 Batu ke Cloud Firestore...');
       const batch = writeBatch(db);
-      
+
       INITIAL_EXAMS.forEach((exam) => {
         const docRef = doc(db, COLLECTIONS.EXAMS, exam.id);
         batch.set(docRef, exam);
       });
-      
+
       INITIAL_STUDENTS.forEach((student) => {
         const docRef = doc(db, COLLECTIONS.STUDENTS, student.id);
         batch.set(docRef, student);
       });
-      
+
       INITIAL_ADMIN_ACCOUNTS.forEach((account) => {
         const docRef = doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id);
         batch.set(docRef, account);
       });
-      
+
       INITIAL_SUBMISSIONS.forEach((sub) => {
         const docRef = doc(db, COLLECTIONS.SUBMISSIONS, sub.id);
         batch.set(docRef, sub);
       });
-      
-      const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
-      batch.set(settingsRef, { enforceWhitelist: true, updatedAt: new Date().toISOString() });
+
+      batch.set(settingsRef, {
+        enforceWhitelist: true,
+        isInitialized: true,
+        seededAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
 
       await batch.commit();
-      console.log('✅ Data awal berhasil tersimpan di Firebase Firestore!');
-      return true;
+      console.log('✅ Data awal berhasil disimpan di Cloud Firestore!');
+    } else {
+      // Mark as initialized so it never tries to seed again
+      await setDoc(settingsRef, {
+        enforceWhitelist: true,
+        isInitialized: true,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
     }
     return true;
   } catch (error) {
-    console.warn('⚠️ Gagal seeding Firestore (periksa Firestore Security Rules di Firebase Console):', error);
+    console.warn('⚠️ Gagal seeding Firestore:', error);
     return false;
   }
 };
@@ -86,11 +107,14 @@ export const subscribeToExams = (
       colRef,
       (snapshot) => {
         const list: Exam[] = [];
-        snapshot.forEach((d) => list.push(d.data() as Exam));
-        if (list.length > 0) {
-          list.sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
-          onUpdate(list);
-        }
+        snapshot.forEach((d) => {
+          const data = d.data() as Exam;
+          if (data && data.id) {
+            list.push(data);
+          }
+        });
+        list.sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
+        onUpdate(list);
       },
       (err) => {
         console.warn('Firestore Exams subscription error:', err);
@@ -115,10 +139,22 @@ export const saveExamToFirestore = async (exam: Exam): Promise<void> => {
 export const syncAllExamsToFirestore = async (exams: Exam[]): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
+    const existingSnap = await getDocs(collection(db, COLLECTIONS.EXAMS));
+    const currentIds = new Set(exams.map((e) => e.id));
     const batch = writeBatch(db);
+
+    // Delete exams that were removed
+    existingSnap.forEach((d) => {
+      if (!currentIds.has(d.id)) {
+        batch.delete(doc(db, COLLECTIONS.EXAMS, d.id));
+      }
+    });
+
+    // Save/update all current exams
     exams.forEach((exam) => {
       batch.set(doc(db, COLLECTIONS.EXAMS, exam.id), exam);
     });
+
     await batch.commit();
   } catch (err) {
     console.error('Error syncing all exams to Firestore:', err);
@@ -149,11 +185,14 @@ export const subscribeToSubmissions = (
       colRef,
       (snapshot) => {
         const list: StudentExamSubmission[] = [];
-        snapshot.forEach((d) => list.push(d.data() as StudentExamSubmission));
-        if (list.length > 0) {
-          list.sort((a, b) => new Date(b.submittedAt || '').getTime() - new Date(a.submittedAt || '').getTime());
-          onUpdate(list);
-        }
+        snapshot.forEach((d) => {
+          const data = d.data() as StudentExamSubmission;
+          if (data && data.id) {
+            list.push(data);
+          }
+        });
+        list.sort((a, b) => new Date(b.submittedAt || '').getTime() - new Date(a.submittedAt || '').getTime());
+        onUpdate(list);
       },
       (err) => {
         console.warn('Firestore Submissions subscription error:', err);
@@ -178,10 +217,20 @@ export const saveSubmissionToFirestore = async (submission: StudentExamSubmissio
 export const syncAllSubmissionsToFirestore = async (submissions: StudentExamSubmission[]): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
+    const existingSnap = await getDocs(collection(db, COLLECTIONS.SUBMISSIONS));
+    const currentIds = new Set(submissions.map((s) => s.id));
     const batch = writeBatch(db);
+
+    existingSnap.forEach((d) => {
+      if (!currentIds.has(d.id)) {
+        batch.delete(doc(db, COLLECTIONS.SUBMISSIONS, d.id));
+      }
+    });
+
     submissions.forEach((sub) => {
       batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), sub);
     });
+
     await batch.commit();
   } catch (err) {
     console.error('Error syncing submissions to Firestore:', err);
@@ -212,11 +261,14 @@ export const subscribeToStudents = (
       colRef,
       (snapshot) => {
         const list: RegisteredStudent[] = [];
-        snapshot.forEach((d) => list.push(d.data() as RegisteredStudent));
-        if (list.length > 0) {
-          list.sort((a, b) => (a.studentClass || '').localeCompare(b.studentClass || '') || (a.name || '').localeCompare(b.name || ''));
-          onUpdate(list);
-        }
+        snapshot.forEach((d) => {
+          const data = d.data() as RegisteredStudent;
+          if (data && data.id) {
+            list.push(data);
+          }
+        });
+        list.sort((a, b) => (a.studentClass || '').localeCompare(b.studentClass || '') || (a.name || '').localeCompare(b.name || ''));
+        onUpdate(list);
       },
       (err) => {
         console.warn('Firestore Students subscription error:', err);
@@ -241,13 +293,23 @@ export const saveStudentToFirestore = async (student: RegisteredStudent): Promis
 export const syncAllStudentsToFirestore = async (students: RegisteredStudent[]): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
+    const existingSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+    const currentIds = new Set(students.map((s) => s.id));
     const batch = writeBatch(db);
+
+    existingSnap.forEach((d) => {
+      if (!currentIds.has(d.id)) {
+        batch.delete(doc(db, COLLECTIONS.STUDENTS, d.id));
+      }
+    });
+
     students.forEach((s) => {
       batch.set(doc(db, COLLECTIONS.STUDENTS, s.id), s);
     });
+
     await batch.commit();
   } catch (err) {
-    console.error('Error batch saving students to Firestore:', err);
+    console.error('Error syncing all students to Firestore:', err);
   }
 };
 
@@ -275,10 +337,13 @@ export const subscribeToAdminAccounts = (
       colRef,
       (snapshot) => {
         const list: AdminAccount[] = [];
-        snapshot.forEach((d) => list.push(d.data() as AdminAccount));
-        if (list.length > 0) {
-          onUpdate(list);
-        }
+        snapshot.forEach((d) => {
+          const data = d.data() as AdminAccount;
+          if (data && data.id) {
+            list.push(data);
+          }
+        });
+        onUpdate(list);
       },
       (err) => {
         console.warn('Firestore Admin Accounts subscription error:', err);
@@ -303,13 +368,23 @@ export const saveAdminAccountToFirestore = async (account: AdminAccount): Promis
 export const syncAllAdminAccountsToFirestore = async (accounts: AdminAccount[]): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
+    const existingSnap = await getDocs(collection(db, COLLECTIONS.ADMIN_ACCOUNTS));
+    const currentIds = new Set(accounts.map((a) => a.id));
     const batch = writeBatch(db);
+
+    existingSnap.forEach((d) => {
+      if (!currentIds.has(d.id)) {
+        batch.delete(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, d.id));
+      }
+    });
+
     accounts.forEach((acc) => {
       batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, acc.id), acc);
     });
+
     await batch.commit();
   } catch (err) {
-    console.error('Error syncing admin accounts to Firestore:', err);
+    console.error('Error syncing all admin accounts to Firestore:', err);
   }
 };
 
@@ -357,8 +432,9 @@ export const saveSettingsToFirestore = async (settings: { enforceWhitelist: bool
   try {
     await setDoc(doc(db, COLLECTIONS.SETTINGS, 'general'), {
       ...settings,
+      isInitialized: true,
       updatedAt: new Date().toISOString(),
-    });
+    }, { merge: true });
   } catch (err) {
     console.error('Error saving settings to Firestore:', err);
   }
