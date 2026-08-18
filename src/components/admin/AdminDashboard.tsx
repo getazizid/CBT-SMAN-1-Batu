@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   BookOpen,
   CheckCircle2,
+  CheckSquare,
   Download,
   Edit,
   Eye,
@@ -86,10 +87,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [searchStudent, setSearchStudent] = useState('');
   const [selectedClassFilter, setSelectedClassFilter] = useState('ALL');
 
-  // Student management filters
+  // Student management filters & multi-select
   const [searchRegisteredStudent, setSearchRegisteredStudent] = useState('');
   const [studentClassFilter, setStudentClassFilter] = useState('ALL');
   const [studentStatusFilter, setStudentStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
 
   // Account management state
   const [searchAccount, setSearchAccount] = useState('');
@@ -230,7 +232,68 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (confirm('Hapus siswa ini dari daftar peserta ujian terverifikasi?')) {
       const updated = students.filter((s) => s.id !== studentId);
       onUpdateStudents(updated);
+      setSelectedStudentIds((prev) => prev.filter((id) => id !== studentId));
     }
+  };
+
+  const isAllFilteredStudentsSelected =
+    filteredStudents.length > 0 &&
+    filteredStudents.every((s) => selectedStudentIds.includes(s.id));
+
+  const toggleSelectAllFilteredStudents = () => {
+    if (isAllFilteredStudentsSelected) {
+      const filteredIdSet = new Set(filteredStudents.map((s) => s.id));
+      setSelectedStudentIds((prev) => prev.filter((id) => !filteredIdSet.has(id)));
+    } else {
+      const combined = Array.from(
+        new Set([...selectedStudentIds, ...filteredStudents.map((s) => s.id)])
+      );
+      setSelectedStudentIds(combined);
+    }
+  };
+
+  const toggleSelectStudent = (id: string) => {
+    setSelectedStudentIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleDeleteSelectedStudents = () => {
+    if (selectedStudentIds.length === 0) return;
+    if (
+      confirm(
+        `Hapus ${selectedStudentIds.length} data siswa yang dipilih secara permanen dari sistem dan Cloud Firestore?`
+      )
+    ) {
+      const toDeleteSet = new Set(selectedStudentIds);
+      const updated = students.filter((s) => !toDeleteSet.has(s.id));
+      onUpdateStudents(updated);
+      setSelectedStudentIds([]);
+    }
+  };
+
+  const handleDeleteAllStudents = () => {
+    if (students.length === 0) {
+      alert('Belum ada data siswa untuk dihapus.');
+      return;
+    }
+    if (
+      confirm(
+        `⚠️ PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA (${students.length}) data siswa?\n\nTindakan ini akan menghapus seluruh data siswa dari sistem dan Cloud Firestore.`
+      )
+    ) {
+      onUpdateStudents([]);
+      setSelectedStudentIds([]);
+    }
+  };
+
+  const handleBulkSetStudentStatus = (isActive: boolean) => {
+    if (selectedStudentIds.length === 0) return;
+    const toUpdateSet = new Set(selectedStudentIds);
+    const updated = students.map((s) =>
+      toUpdateSet.has(s.id) ? { ...s, isActive } : s
+    );
+    onUpdateStudents(updated);
   };
 
   const handleExportStudentsCSV = () => {
@@ -990,23 +1053,113 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingStudent(null);
+                        setIsStudentEditorOpen(true);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Tambah Siswa</span>
+                    </button>
+
+                    <button
+                      onClick={() => setIsStudentBatchImportOpen(true)}
+                      className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                      title="Import data siswa sekaligus dari Excel / Word"
+                    >
+                      <Upload className="w-4 h-4 text-blue-600" />
+                      <span>Import Excel</span>
+                    </button>
+
                     <button
                       onClick={handleExportStudentsCSV}
                       className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-xs px-3 py-1.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                       title="Download data siswa dalam format CSV / Excel"
                     >
-                      <Download className="w-4 h-4 text-blue-600" />
+                      <Download className="w-4 h-4 text-emerald-600" />
                       <span className="hidden sm:inline">Ekspor CSV</span>
+                    </button>
+
+                    <button
+                      onClick={handleDeleteAllStudents}
+                      disabled={students.length === 0}
+                      className={`text-xs font-semibold px-3 py-1.5 rounded-xl border flex items-center gap-1.5 transition-all ${
+                        students.length === 0
+                          ? 'text-slate-300 border-slate-100 cursor-not-allowed'
+                          : 'text-rose-600 hover:bg-rose-50 border-rose-200 hover:border-rose-300 cursor-pointer'
+                      }`}
+                      title="Hapus seluruh data siswa di sistem"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>Hapus All</span>
                     </button>
                   </div>
                 </div>
+
+                {/* Bulk Selection Action Bar (appears when 1 or more items checked) */}
+                {selectedStudentIds.length > 0 && (
+                  <div className="bg-blue-50/90 border border-blue-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 animate-in fade-in duration-200">
+                    <div className="flex items-center gap-2 text-xs font-bold text-blue-950">
+                      <CheckSquare className="w-4 h-4 text-blue-600 shrink-0" />
+                      <span>
+                        {selectedStudentIds.length} dari {students.length} siswa dipilih
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={handleDeleteSelectedStudents}
+                        className="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Hapus Terpilih ({selectedStudentIds.length})</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleBulkSetStudentStatus(true)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-2.5 py-1.5 rounded-lg shadow-xs flex items-center gap-1 cursor-pointer transition-all"
+                        title="Aktifkan status semua siswa terpilih"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Set Aktif</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleBulkSetStudentStatus(false)}
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-2.5 py-1.5 rounded-lg shadow-xs flex items-center gap-1 cursor-pointer transition-all"
+                        title="Nonaktifkan status semua siswa terpilih"
+                      >
+                        <ShieldAlert className="w-3.5 h-3.5" />
+                        <span>Set Nonaktif</span>
+                      </button>
+
+                      <button
+                        onClick={() => setSelectedStudentIds([])}
+                        className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs px-2.5 py-1.5 rounded-lg cursor-pointer transition-all"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Table of Registered Students */}
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
                       <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                        <th className="py-3 px-3 text-center w-10">
+                          <input
+                            type="checkbox"
+                            checked={isAllFilteredStudentsSelected}
+                            onChange={toggleSelectAllFilteredStudents}
+                            className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                            title={isAllFilteredStudentsSelected ? 'Batal pilih semua' : 'Pilih semua yang tampil'}
+                          />
+                        </th>
                         <th className="py-3 px-3.5 text-center w-12">No</th>
                         <th className="py-3 px-3.5 font-mono">NISN (Username)</th>
                         <th className="py-3 px-3.5">Nama Lengkap Siswa</th>
@@ -1018,71 +1171,87 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {filteredStudents.length > 0 ? (
-                        filteredStudents.map((std, idx) => (
-                          <tr key={std.id} className="hover:bg-slate-50/70 transition-colors">
-                            <td className="py-3 px-3.5 text-center font-semibold text-slate-500">
-                              {idx + 1}
-                            </td>
-                            <td className="py-3 px-3.5 font-mono font-bold text-slate-900">
-                              {std.nisn}
-                            </td>
-                            <td className="py-3 px-3.5 font-semibold text-slate-900">
-                              {std.name}
-                              {std.notes && (
-                                <span className="block text-[10px] text-slate-400 font-normal">
-                                  {std.notes}
-                                </span>
-                              )}
-                            </td>
-                            <td className="py-3 px-3.5 text-slate-700">{std.studentClass}</td>
-                            <td className="py-3 px-3.5 font-mono text-slate-600">
-                              {std.password ? (
-                                <span className="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-semibold text-[11px]">
-                                  {std.password}
-                                </span>
-                              ) : (
-                                <span className="text-slate-400 italic">Gunakan Token</span>
-                              )}
-                            </td>
-                            <td className="py-3 px-3.5 text-center">
-                              <button
-                                onClick={() => handleToggleStudentActive(std.id)}
-                                className={`px-2.5 py-0.5 rounded-full font-semibold text-[10px] border cursor-pointer transition-colors ${
-                                  std.isActive
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                                    : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
-                                }`}
-                                title="Klik untuk mengubah status aktif/nonaktif"
-                              >
-                                {std.isActive ? 'Diizinkan (Aktif)' : 'Diblokir (Nonaktif)'}
-                              </button>
-                            </td>
-                            <td className="py-3 px-3.5 text-center">
-                              <div className="flex items-center justify-center gap-1.5">
+                        filteredStudents.map((std, idx) => {
+                          const isChecked = selectedStudentIds.includes(std.id);
+                          return (
+                            <tr
+                              key={std.id}
+                              className={`transition-colors ${
+                                isChecked ? 'bg-blue-50/50' : 'hover:bg-slate-50/70'
+                              }`}
+                            >
+                              <td className="py-3 px-3 text-center w-10">
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() => toggleSelectStudent(std.id)}
+                                  className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                                />
+                              </td>
+                              <td className="py-3 px-3.5 text-center font-semibold text-slate-500">
+                                {idx + 1}
+                              </td>
+                              <td className="py-3 px-3.5 font-mono font-bold text-slate-900">
+                                {std.nisn}
+                              </td>
+                              <td className="py-3 px-3.5 font-semibold text-slate-900">
+                                {std.name}
+                                {std.notes && (
+                                  <span className="block text-[10px] text-slate-400 font-normal">
+                                    {std.notes}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3 px-3.5 text-slate-700">{std.studentClass}</td>
+                              <td className="py-3 px-3.5 font-mono text-slate-600">
+                                {std.password ? (
+                                  <span className="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-semibold text-[11px]">
+                                    {std.password}
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-400 italic">Gunakan Token</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-3.5 text-center">
                                 <button
-                                  onClick={() => {
-                                    setEditingStudent(std);
-                                    setIsStudentEditorOpen(true);
-                                  }}
-                                  className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
-                                  title="Edit Data Siswa"
+                                  onClick={() => handleToggleStudentActive(std.id)}
+                                  className={`px-2.5 py-0.5 rounded-full font-semibold text-[10px] border cursor-pointer transition-colors ${
+                                    std.isActive
+                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                      : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                                  }`}
+                                  title="Klik untuk mengubah status aktif/nonaktif"
                                 >
-                                  <Edit className="w-3.5 h-3.5" />
+                                  {std.isActive ? 'Diizinkan (Aktif)' : 'Diblokir (Nonaktif)'}
                                 </button>
-                                <button
-                                  onClick={() => handleDeleteStudent(std.id)}
-                                  className="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
-                                  title="Hapus Siswa"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
+                              </td>
+                              <td className="py-3 px-3.5 text-center">
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button
+                                    onClick={() => {
+                                      setEditingStudent(std);
+                                      setIsStudentEditorOpen(true);
+                                    }}
+                                    className="p-1.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                                    title="Edit Data Siswa"
+                                  >
+                                    <Edit className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteStudent(std.id)}
+                                    className="p-1.5 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                                    title="Hapus Siswa"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
                       ) : (
                         <tr>
-                          <td colSpan={7} className="text-center py-8 text-slate-400">
+                          <td colSpan={8} className="text-center py-8 text-slate-400">
                             Tidak ada siswa yang sesuai dengan filter pencarian.
                           </td>
                         </tr>
