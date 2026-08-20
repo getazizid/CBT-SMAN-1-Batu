@@ -629,8 +629,21 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       <div className="max-w-7xl mx-auto w-full p-4 sm:p-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Question Panel (Left - 8/12) */}
         <div className="lg:col-span-8 space-y-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-200/90 dark:border-slate-800 min-h-[500px] flex flex-col justify-between transition-colors duration-200">
-            <div>
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-200/90 dark:border-slate-800 min-h-[500px] flex flex-col justify-between transition-colors duration-200 relative overflow-hidden">
+            {/* Dynamic Student Security Watermark (Anti-Leak / Anti-Record Identity Stamping) */}
+            <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-[0.03] dark:opacity-[0.05] flex flex-col justify-around rotate-[-12deg] z-0">
+              <div className="whitespace-nowrap text-[11px] font-mono font-bold tracking-widest text-slate-900 dark:text-white">
+                {studentData.nisn} &bull; {studentData.name} &bull; CBT SMAN 1 BATU &bull; {studentData.nisn} &bull; {studentData.name}
+              </div>
+              <div className="whitespace-nowrap text-[11px] font-mono font-bold tracking-widest text-slate-900 dark:text-white">
+                CBT SMAN 1 BATU &bull; {studentData.nisn} &bull; {studentData.name} &bull; {studentData.studentClass}
+              </div>
+              <div className="whitespace-nowrap text-[11px] font-mono font-bold tracking-widest text-slate-900 dark:text-white">
+                {studentData.name} &bull; {studentData.nisn} &bull; CBT SMAN 1 BATU &bull; {studentData.studentClass}
+              </div>
+            </div>
+
+            <div className="relative z-10">
               {/* Question Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
                 <div className="flex items-center gap-2.5">
