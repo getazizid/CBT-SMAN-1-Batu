@@ -25,6 +25,13 @@ import {
   saveStoredActiveStudentSession,
   saveStoredExamProgress,
 } from '../../utils/storage';
+import {
+  exitAppFullscreen,
+  isCurrentlyFullscreen,
+  isFullscreenSupported,
+  isIOSDevice,
+  requestAppFullscreen,
+} from '../../utils/deviceHelper';
 
 interface ExamRoomProps {
   exam: Exam;
@@ -114,14 +121,25 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   });
 
   const [currentIndex, setCurrentIndex] = useState<number>(() => initialSaved?.currentIndex ?? 0);
+  
+  // Student display answers: key = displayNumber (1..N), value = displayOptionKey ('A'..'E')
+  const [displayAnswers, setDisplayAnswers] = useState<{ [displayNumber: number]: OptionKey }>(
+    () => initialSaved?.displayAnswers || {}
+  );
   // Map of originalQuestion.id -> selected original OptionKey (for accurate grading)
   const [answersByQuestionId, setAnswersByQuestionId] = useState<Record<string, OptionKey>>(() => initialSaved?.answersByQuestionId ?? {});
-  // Map of displayNumber -> displayKey ('A'..'E') (for visual display in current room)
-  const [displayAnswers, setDisplayAnswers] = useState<Record<number, OptionKey>>(() => initialSaved?.displayAnswers ?? {});
-  // Array of displayNumber flagged as doubtful
+
+  // Flagged/Doubtful questions
   const [flaggedDisplayNumbers, setFlaggedDisplayNumbers] = useState<number[]>(() => initialSaved?.flaggedDisplayNumbers ?? []);
 
-  const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(() => initialSaved?.timeLeftSeconds ?? exam.durationMinutes * 60);
+  // Time remaining in seconds
+  const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(() => {
+    if (typeof initialSaved?.timeLeftSeconds === 'number' && initialSaved.timeLeftSeconds > 0) {
+      return initialSaved.timeLeftSeconds;
+    }
+    return exam.durationMinutes * 60;
+  });
+
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
   const [tabSwitchCount, setTabSwitchCount] = useState<number>(() => initialSaved?.tabSwitchCount ?? 0);
@@ -161,12 +179,12 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     currentIndex,
   ]);
 
-  // Window beforeunload protection: warn if attempting to close/refresh
+  // Window beforeunload protection
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue = 'Ujian sedang berlangsung! Jawaban Anda telah tersimpan otomatis.';
-      return 'Ujian sedang berlangsung! Jawaban Anda telah tersimpan otomatis.';
+      e.returnValue = 'Ujian sedang berlangsung!';
+      return 'Ujian sedang berlangsung!';
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -188,43 +206,37 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(() => !!document.fullscreenElement);
+  const fsSupported = isFullscreenSupported();
+  const isIOS = isIOSDevice();
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(() => 
+    fsSupported ? isCurrentlyFullscreen() : true
+  );
 
   const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+    if (!fsSupported) return;
+    if (!isCurrentlyFullscreen()) {
+      requestAppFullscreen();
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      }
+      exitAppFullscreen();
     }
   };
 
-  const enforceFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
-  };
-
-  // Anti-cheat detector & Fullscreen enforcer: Accurately records exactly 1 violation per incident
+  // Anti-cheat detector & Fullscreen enforcer
   useEffect(() => {
-    // Attempt fullscreen immediately upon entering exam room
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+    if (fsSupported && !isCurrentlyFullscreen()) {
+      requestAppFullscreen();
     }
 
     const playAlertSound = () => {
       try {
-        const AudioCtx =
-          window.AudioContext ||
-          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
         if (AudioCtx) {
           const ctx = new AudioCtx();
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); // A5
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
           gain.gain.setValueAtTime(0.25, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
           osc.connect(gain);
@@ -232,97 +244,76 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
           osc.start();
           osc.stop(ctx.currentTime + 0.35);
         }
-      } catch {
-        // Ignore audio errors if audio context is blocked
-      }
+      } catch {}
     };
 
     const recordViolation = () => {
       const now = Date.now();
-      // Debounce: prevent duplicate trigger within 1.5 seconds from simultaneous browser events
-      if (now - lastViolationTimeRef.current < 1500) {
-        return;
-      }
+      if (now - lastViolationTimeRef.current < 1500) return;
       lastViolationTimeRef.current = now;
       setTabSwitchCount((prev) => prev + 1);
       setShowCheatWarning(true);
       playAlertSound();
     };
 
-    // 1. Fullscreen change: if fullscreen is exited/lost, record violation
     const handleFullscreenChange = () => {
-      const isFs = !!document.fullscreenElement;
+      if (!fsSupported) return;
+      const isFs = isCurrentlyFullscreen();
       setIsFullscreen(isFs);
-      if (!isFs) {
-        recordViolation();
-      }
+      if (!isFs) recordViolation();
     };
 
-    // 2. Tab switch or window minimize
     const handleVisibilityChange = () => {
-      if (document.hidden || document.visibilityState === 'hidden') {
-        recordViolation();
-      }
+      if (document.hidden || document.visibilityState === 'hidden') recordViolation();
     };
 
-    // 3. Application switch, Alt+Tab, click outside browser window, or losing window focus
+    const handlePageHide = () => recordViolation();
+
     const handleWindowBlur = () => {
-      recordViolation();
+      if (isIOS) {
+        if (document.hidden || document.visibilityState === 'hidden') recordViolation();
+      } else {
+        recordViolation();
+      }
     };
 
-    // 4. Prevent DevTools & inspection shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'F12') {
+      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
         e.preventDefault();
         recordViolation();
-        return;
-      }
-      if (
-        e.ctrlKey &&
-        e.shiftKey &&
-        (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')
-      ) {
-        e.preventDefault();
-        recordViolation();
-        return;
-      }
-      if (
-        e.ctrlKey &&
-        (e.key === 'u' || e.key === 'U' || e.key === 'p' || e.key === 'P' || e.key === 's' || e.key === 'S')
-      ) {
-        e.preventDefault();
-        return;
       }
     };
 
-    // 5. Disable right-click context menu & clipboard copy/cut/paste
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-    };
-    const handleClipboard = (e: ClipboardEvent) => {
-      e.preventDefault();
-    };
+    const preventDefault = (e: Event) => e.preventDefault();
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    if (fsSupported) {
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+      document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    }
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', handlePageHide);
     window.addEventListener('blur', handleWindowBlur);
     window.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('copy', handleClipboard);
-    document.addEventListener('cut', handleClipboard);
-    document.addEventListener('paste', handleClipboard);
+    document.addEventListener('contextmenu', preventDefault);
+    document.addEventListener('copy', preventDefault);
+    document.addEventListener('cut', preventDefault);
+    document.addEventListener('paste', preventDefault);
 
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      if (fsSupported) {
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      }
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', handlePageHide);
       window.removeEventListener('blur', handleWindowBlur);
       window.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('copy', handleClipboard);
-      document.removeEventListener('cut', handleClipboard);
-      document.removeEventListener('paste', handleClipboard);
+      document.removeEventListener('contextmenu', preventDefault);
+      document.removeEventListener('copy', preventDefault);
+      document.removeEventListener('cut', preventDefault);
+      document.removeEventListener('paste', preventDefault);
     };
-  }, []);
+  }, [fsSupported, isIOS]);
 
   const handleSelectOption = (opt: DisplayOption) => {
     const currentQ = displayQuestions[currentIndex];
@@ -498,11 +489,10 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
         {/* Center: Timer */}
         <div
-          className={`flex items-center gap-2 px-4 py-1.5 rounded-2xl font-mono text-sm sm:text-base font-bold transition-all ${
-            isLowTime
+          className={`flex items-center gap-2 px-4 py-1.5 rounded-2xl font-mono text-sm sm:text-base font-bold transition-all ${isLowTime
               ? 'bg-rose-600 text-white animate-pulse shadow-md'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-xs'
-          }`}
+            }`}
         >
           <Clock className={`w-4 h-4 ${isLowTime ? 'text-white' : 'text-blue-600 dark:text-blue-400'}`} />
           <span>Sisa Waktu: {formatTimer(timeLeftSeconds)}</span>
@@ -544,33 +534,30 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
           <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1 text-xs">
             <button
               onClick={() => setFontSize('sm')}
-              className={`px-2 py-0.5 rounded-lg cursor-pointer transition-all ${
-                fontSize === 'sm'
+              className={`px-2 py-0.5 rounded-lg cursor-pointer transition-all ${fontSize === 'sm'
                   ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
+                }`}
               title="Ukuran Font Kecil"
             >
               A-
             </button>
             <button
               onClick={() => setFontSize('md')}
-              className={`px-2 py-0.5 rounded-lg cursor-pointer transition-all ${
-                fontSize === 'md'
+              className={`px-2 py-0.5 rounded-lg cursor-pointer transition-all ${fontSize === 'md'
                   ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
+                }`}
               title="Ukuran Font Normal"
             >
               A
             </button>
             <button
               onClick={() => setFontSize('lg')}
-              className={`px-2 py-0.5 rounded-lg cursor-pointer transition-all ${
-                fontSize === 'lg'
+              className={`px-2 py-0.5 rounded-lg cursor-pointer transition-all ${fontSize === 'lg'
                   ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
+                }`}
               title="Ukuran Font Besar"
             >
               A+
@@ -651,19 +638,17 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                       key={opt.displayKey}
                       id={`option-btn-${opt.displayKey}`}
                       onClick={() => handleSelectOption(opt)}
-                      className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-4 cursor-pointer group ${
-                        isSelected
+                      className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-4 cursor-pointer group ${isSelected
                           ? 'border-blue-600 dark:border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 shadow-xs text-slate-900 dark:text-white ring-2 ring-blue-500/20'
                           : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-800/80'
-                      }`}
+                        }`}
                     >
                       {/* Option Key Badge */}
                       <div
-                        className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${
-                          isSelected
+                        className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${isSelected
                             ? 'bg-blue-600 text-white shadow-xs'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'
-                        }`}
+                          }`}
                       >
                         {opt.displayKey}
                       </div>
@@ -684,11 +669,10 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               <button
                 onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
                 disabled={currentIndex === 0}
-                className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer ${
-                  currentIndex === 0
+                className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer ${currentIndex === 0
                     ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed border border-slate-200 dark:border-slate-800'
                     : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-xs'
-                }`}
+                  }`}
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Sebelumnya</span>
@@ -698,11 +682,10 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               <button
                 id="doubt-flag-btn"
                 onClick={toggleFlagCurrent}
-                className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer ${
-                  flaggedDisplayNumbers.includes(currentQuestion.displayNumber)
+                className={`px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer ${flaggedDisplayNumbers.includes(currentQuestion.displayNumber)
                     ? 'bg-amber-500 text-white shadow-xs'
                     : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 hover:bg-amber-100 dark:hover:bg-amber-900/50'
-                }`}
+                  }`}
               >
                 <Flag className="w-4 h-4" />
                 <span>
@@ -735,9 +718,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
         {/* Sidebar Question Grid (Right - 4/12) */}
         <div
-          className={`lg:col-span-4 bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-xs border border-slate-200/90 dark:border-slate-800 transition-colors duration-200 ${
-            showQuestionGridMobile ? 'fixed inset-4 z-40 overflow-y-auto block bg-white dark:bg-slate-900' : 'hidden lg:block'
-          }`}
+          className={`lg:col-span-4 bg-white dark:bg-slate-900 rounded-3xl p-5 shadow-xs border border-slate-200/90 dark:border-slate-800 transition-colors duration-200 ${showQuestionGridMobile ? 'fixed inset-4 z-40 overflow-y-auto block bg-white dark:bg-slate-900' : 'hidden lg:block'
+            }`}
         >
           {showQuestionGridMobile && (
             <div className="flex justify-between items-center pb-3 mb-3 border-b border-slate-100 dark:border-slate-800 lg:hidden">
@@ -795,9 +777,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                     setCurrentIndex(idx);
                     if (showQuestionGridMobile) setShowQuestionGridMobile(false);
                   }}
-                  className={`h-10 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center relative cursor-pointer ${btnBg} ${
-                    isCurrent ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900 scale-105 shadow-xs' : ''
-                  }`}
+                  className={`h-10 rounded-xl text-xs font-bold transition-all border flex flex-col items-center justify-center relative cursor-pointer ${btnBg} ${isCurrent ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900 scale-105 shadow-xs' : ''
+                    }`}
                 >
                   <span>{q.displayNumber}</span>
                   {isAnswered && (

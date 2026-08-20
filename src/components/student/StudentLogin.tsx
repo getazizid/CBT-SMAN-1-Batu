@@ -18,6 +18,19 @@ import {
 } from 'lucide-react';
 import { Exam, RegisteredStudent } from '../../types';
 import { ALL_SCHOOL_CLASSES, isStudentClassEligible } from '../../utils/constants';
+import { getStoredStudents } from '../../utils/storage';
+import {
+  exitAppFullscreen,
+  isCurrentlyFullscreen,
+  isFullscreenSupported,
+  isIOSDevice,
+  requestAppFullscreen,
+} from '../../utils/deviceHelper';
+
+// Helper to strip invisible characters, non-breaking spaces, and trim
+const sanitizeText = (val: string): string => {
+  return val.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+};
 
 interface StudentLoginProps {
   exams: Exam[];
@@ -73,42 +86,60 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     activeExams[0];
 
   // Fullscreen State
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(() => !!document.fullscreenElement);
+  const fsSupported = isFullscreenSupported();
+  const isIOS = isIOSDevice();
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(() => 
+    fsSupported ? isCurrentlyFullscreen() : true
+  );
 
   useEffect(() => {
+    if (!fsSupported) return;
     const handleFsChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      setIsFullscreen(isCurrentlyFullscreen());
     };
     document.addEventListener('fullscreenchange', handleFsChange);
-    return () => document.removeEventListener('fullscreenchange', handleFsChange);
-  }, []);
+    document.addEventListener('webkitfullscreenchange', handleFsChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFsChange);
+      document.removeEventListener('webkitfullscreenchange', handleFsChange);
+    };
+  }, [fsSupported]);
 
   const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+    if (!fsSupported) return;
+    if (!isCurrentlyFullscreen()) {
+      requestAppFullscreen();
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      }
+      exitAppFullscreen();
     }
   };
 
   const ensureFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+    if (!fsSupported) return;
+    if (!isCurrentlyFullscreen()) {
+      requestAppFullscreen();
     }
+  };
+
+  // Helper to get students list with local storage fallback
+  const getEffectiveStudents = (): RegisteredStudent[] => {
+    if (registeredStudents && registeredStudents.length > 0) {
+      return registeredStudents;
+    }
+    return getStoredStudents();
   };
 
   // Auto-detect student preview when typing NISN in Step 1
   useEffect(() => {
-    const cleanNisn = nisnInput.trim();
+    const cleanNisn = sanitizeText(nisnInput);
     if (!cleanNisn) {
       setMatchedStudentPreview(null);
       return;
     }
 
-    const found = registeredStudents.find(
-      (s) => s.nisn.toLowerCase() === cleanNisn.toLowerCase()
+    const studentList = getEffectiveStudents();
+    const found = studentList.find(
+      (s) => sanitizeText(s.nisn).toLowerCase() === cleanNisn.toLowerCase()
     );
 
     if (found) {
@@ -142,8 +173,8 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     setErrorMsg('');
     ensureFullscreen();
 
-    const cleanNisn = nisnInput.trim();
-    const enteredPass = passwordInput.trim();
+    const cleanNisn = sanitizeText(nisnInput);
+    const enteredPass = sanitizeText(passwordInput);
 
     if (!cleanNisn) {
       setErrorMsg('Harap masukkan NISN / Username siswa.');
@@ -155,8 +186,9 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
       return;
     }
 
-    const found = registeredStudents.find(
-      (s) => s.nisn.toLowerCase() === cleanNisn.toLowerCase()
+    const studentList = getEffectiveStudents();
+    const found = studentList.find(
+      (s) => sanitizeText(s.nisn).toLowerCase() === cleanNisn.toLowerCase()
     );
 
     if (enforceWhitelist) {
@@ -175,11 +207,11 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
       }
 
       // Check student's registered password
-      const registeredPassword = found.password ? found.password.trim() : '';
+      const registeredPassword = found.password ? sanitizeText(found.password) : '';
       if (registeredPassword) {
-        if (enteredPass.toLowerCase() !== registeredPassword.toLowerCase()) {
+        if (enteredPass.toLowerCase() !== registeredPassword.toLowerCase() && enteredPass !== registeredPassword) {
           setErrorMsg(
-            'Password akun siswa tidak sesuai! Pastikan Anda memasukkan password akun yang terdaftar di data siswa.'
+            'Password akun siswa tidak sesuai! Pastikan Anda masukkan password akun yang terdaftar di data siswa.'
           );
           return;
         }
@@ -274,11 +306,10 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
         </div>
 
         {/* Fullscreen Mode Activation Banner */}
-        <div className={`mb-5 p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs transition-colors ${
-          isFullscreen
+        <div className={`mb-5 p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs transition-colors ${isFullscreen
             ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/80'
             : 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/80'
-        }`}>
+          }`}>
           <div className="flex items-center gap-2.5">
             <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isFullscreen ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
             <div>
@@ -298,11 +329,10 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
           <button
             type="button"
             onClick={toggleFullscreen}
-            className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${
-              isFullscreen
+            className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${isFullscreen
                 ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800 border border-emerald-200 dark:border-emerald-700'
                 : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
-            }`}
+              }`}
           >
             {isFullscreen ? (
               <>
@@ -321,18 +351,16 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
         {/* Step Indicator Header */}
         <div className="mb-6 bg-slate-100/80 dark:bg-slate-800/80 p-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between text-xs font-semibold">
           <div
-            className={`flex-1 text-center py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-              step === 'login'
+            className={`flex-1 text-center py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${step === 'login'
                 ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-xs font-bold'
                 : 'text-emerald-700 dark:text-emerald-400 font-medium'
-            }`}
+              }`}
           >
             <span
-              className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${
-                step === 'login'
+              className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${step === 'login'
                   ? 'bg-blue-600 text-white'
                   : 'bg-emerald-600 text-white'
-              }`}
+                }`}
             >
               {step === 'login' ? '1' : '✓'}
             </span>
@@ -342,18 +370,16 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
           <div className="text-slate-300 dark:text-slate-600 px-1">&rarr;</div>
 
           <div
-            className={`flex-1 text-center py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-              step === 'exam_token'
+            className={`flex-1 text-center py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${step === 'exam_token'
                 ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-xs font-bold'
                 : 'text-slate-400 dark:text-slate-500 font-medium'
-            }`}
+              }`}
           >
             <span
-              className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${
-                step === 'exam_token'
+              className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${step === 'exam_token'
                   ? 'bg-blue-600 text-white'
                   : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-              }`}
+                }`}
             >
               2
             </span>
@@ -394,7 +420,11 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
                   value={nisnInput}
                   onChange={(e) => setNisnInput(e.target.value)}
                   required
-                  autoFocus
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  autoComplete="username"
+                  inputMode="text"
                   className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl pl-10 pr-3.5 py-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none font-mono font-semibold transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
@@ -402,11 +432,10 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
               {/* Matched student real-time indicator */}
               {matchedStudentPreview && (
                 <div
-                  className={`mt-2 px-3 py-2 rounded-xl text-xs flex items-center justify-between border transition-all ${
-                    matchedStudentPreview.isActive
+                  className={`mt-2 px-3 py-2 rounded-xl text-xs flex items-center justify-between border transition-all ${matchedStudentPreview.isActive
                       ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
                       : 'bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-800'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     {matchedStudentPreview.isActive ? (
@@ -448,6 +477,10 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
                   value={passwordInput}
                   onChange={(e) => setPasswordInput(e.target.value)}
                   required
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  autoComplete="current-password"
                   className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl pl-10 pr-3.5 py-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
@@ -615,7 +648,10 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
                   value={tokenInput}
                   onChange={(e) => setTokenInput(e.target.value.toUpperCase())}
                   required
-                  autoFocus
+                  autoCapitalize="characters"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  autoComplete="off"
                   className="w-full bg-white dark:bg-slate-800 border-2 border-amber-300 dark:border-amber-700 text-amber-950 dark:text-amber-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none font-mono uppercase font-extrabold tracking-widest text-center shadow-xs transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:font-normal placeholder:tracking-normal placeholder:text-xs"
                 />
               </div>
