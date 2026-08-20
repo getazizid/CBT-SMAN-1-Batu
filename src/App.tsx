@@ -75,13 +75,21 @@ export default function App() {
 
     // Restore student exam session if interrupted
     const activeSession = getStoredActiveStudentSession();
-    if (activeSession && activeSession.exam && activeSession.studentData) {
-      setStudentFlow({
-        phase: 'exam',
-        activeExam: activeSession.exam,
-        studentData: activeSession.studentData,
-        latestSubmission: null,
-      });
+    if (activeSession && activeSession.studentData) {
+      const storedExamsList = getStoredExams();
+      const matchedExam =
+        storedExamsList.find((e) => e.id === activeSession.exam?.id) ||
+        activeSession.exam ||
+        (storedExamsList.length > 0 ? storedExamsList[0] : null);
+
+      if (matchedExam && Array.isArray(matchedExam.questions) && matchedExam.questions.length > 0) {
+        setStudentFlow({
+          phase: 'exam',
+          activeExam: matchedExam,
+          studentData: activeSession.studentData,
+          latestSubmission: null,
+        });
+      }
     }
   }, []);
 

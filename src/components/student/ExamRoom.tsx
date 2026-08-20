@@ -20,6 +20,7 @@ import {
 import { Exam, OptionKey, Question, StudentAnswerDetail, StudentExamSubmission } from '../../types';
 import { useTheme } from '../../context/ThemeContext';
 import {
+  INITIAL_EXAMS,
   clearStoredExamProgress,
   getStoredExamProgress,
   saveStoredActiveStudentSession,
@@ -73,12 +74,21 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
   // Generate or restore randomized question & option list
   const [displayQuestions] = useState<DisplayQuestion[]>(() => {
-    if (initialSaved?.displayQuestions && Array.isArray(initialSaved.displayQuestions) && initialSaved.displayQuestions.length > 0) {
+    if (
+      initialSaved?.displayQuestions &&
+      Array.isArray(initialSaved.displayQuestions) &&
+      initialSaved.displayQuestions.length > 0
+    ) {
       return initialSaved.displayQuestions;
     }
 
-    let qList = [...exam.questions];
-    if (exam.shuffleQuestions) {
+    const rawQuestions =
+      exam && Array.isArray(exam.questions) && exam.questions.length > 0
+        ? exam.questions
+        : INITIAL_EXAMS[0]?.questions || [];
+
+    let qList = [...rawQuestions];
+    if (exam?.shuffleQuestions) {
       // Fisher-Yates shuffle
       for (let i = qList.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -89,8 +99,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     const standardOptionKeys: OptionKey[] = ['A', 'B', 'C', 'D', 'E'];
 
     return qList.map((q, qIdx) => {
-      let optList = [...q.options];
-      if (exam.shuffleOptions) {
+      let optList = Array.isArray(q.options) ? [...q.options] : [];
+      if (exam?.shuffleOptions && optList.length > 0) {
         // Fisher-Yates shuffle for options
         for (let i = optList.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -104,7 +114,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
           displayKey,
           originalKey: opt.key,
           text: opt.text,
-          originalScore: q.optionScores[opt.key] ?? 0,
+          originalScore: q.optionScores?.[opt.key] ?? 0,
         };
       });
 
@@ -137,7 +147,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     if (typeof initialSaved?.timeLeftSeconds === 'number' && initialSaved.timeLeftSeconds > 0) {
       return initialSaved.timeLeftSeconds;
     }
-    return exam.durationMinutes * 60;
+    return (exam?.durationMinutes || 60) * 60;
   });
 
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
@@ -149,7 +159,12 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
   const startTimeRef = useRef<string>(initialSaved?.startTime ?? new Date().toISOString());
   const lastViolationTimeRef = useRef<number>(0);
-  const currentQuestion = displayQuestions[currentIndex] || displayQuestions[0];
+  const currentQuestion = displayQuestions[currentIndex] || displayQuestions[0] || {
+    displayNumber: 1,
+    originalQuestion: { id: 'fallback', number: 1, text: '', options: [], optionScores: {} },
+    text: 'Memuat data soal...',
+    options: [],
+  };
 
   // Auto-save exam progress continuously to localStorage
   useEffect(() => {
@@ -221,6 +236,11 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     }
   };
 
+  const enforceFullscreen = () => {
+    if (!fsSupported) return;
+    requestAppFullscreen();
+  };
+
   // Anti-cheat detector & Fullscreen enforcer
   useEffect(() => {
     if (fsSupported && !isCurrentlyFullscreen()) {
@@ -229,9 +249,13 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
     const playAlertSound = () => {
       try {
+        if (typeof window === 'undefined') return;
         const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
         if (AudioCtx) {
           const ctx = new AudioCtx();
+          if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+          }
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
           osc.type = 'sine';
@@ -359,14 +383,19 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     const finalAnswersMap: Record<number, OptionKey> = {};
 
     // Synchronize 100% with master questions (original number 1..50 & original answer key)
-    exam.questions.forEach((origQ) => {
+    const masterQuestions =
+      exam && Array.isArray(exam.questions) && exam.questions.length > 0
+        ? exam.questions
+        : INITIAL_EXAMS[0]?.questions || [];
+
+    masterQuestions.forEach((origQ) => {
       const selectedOriginalKey = answersByQuestionId[origQ.id] || null;
       if (selectedOriginalKey) {
         finalAnswersMap[origQ.number] = selectedOriginalKey;
       }
 
-      const qScores = origQ.optionScores;
-      const maxInQuestion = Math.max(...(Object.values(qScores) as number[]));
+      const qScores = origQ.optionScores || {};
+      const maxInQuestion = Math.max(...(Object.values(qScores) as number[]), 0);
       maxPossibleScore += maxInQuestion;
 
       let scoreEarned = 0;
