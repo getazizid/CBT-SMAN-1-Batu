@@ -152,8 +152,20 @@ export default function App() {
           });
           merged.sort((a, b) => new Date(b.submittedAt || '').getTime() - new Date(a.submittedAt || '').getTime());
 
-          setSubmissions(merged);
-          saveStoredSubmissions(merged);
+          // Deduplikasi: Jika seorang siswa memiliki riwayat ganda untuk paket ujian yang sama, pertahankan yang terbaik / terbaru
+          const deduplicated: StudentExamSubmission[] = [];
+          const seenKeys = new Set<string>();
+          for (const sub of merged) {
+            const normExamId = sub.examId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+            const key = `${sub.studentNisn.trim()}_${normExamId}`;
+            if (!seenKeys.has(key)) {
+              seenKeys.add(key);
+              deduplicated.push(sub);
+            }
+          }
+
+          setSubmissions(deduplicated);
+          saveStoredSubmissions(deduplicated);
           setIsCloudConnected(true);
         }
       },

@@ -159,20 +159,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const currentExam = exams.find((e) => e.id === selectedExamId) || exams[0];
 
-  // Filtered submissions (mendukung filter Semua Paket dan backward compatibility ID lama)
-  const relevantSubmissions = submissions.filter((s) => {
-    const matchExam =
-      submissionExamFilter === 'ALL'
-        ? true
-        : s.examId === submissionExamFilter ||
-          ((submissionExamFilter === 'exam-ct-inf-x-30' || submissionExamFilter === 'exam-ct-informatika-30') &&
-           (s.examId === 'exam-ct-inf-x-30' || s.examId === 'exam-ct-informatika-30'));
-    const matchSearch =
-      s.studentName.toLowerCase().includes(searchStudent.toLowerCase()) ||
-      s.studentNisn.includes(searchStudent);
-    const matchClass = selectedClassFilter === 'ALL' || s.studentClass === selectedClassFilter;
-    return matchExam && matchSearch && matchClass;
-  });
+  // Filtered submissions (mendukung filter Semua Paket, backward compatibility ID lama, dan deduplikasi 1 siswa 1 baris)
+  const relevantSubmissions = React.useMemo(() => {
+    const list = submissions.filter((s) => {
+      const matchExam =
+        submissionExamFilter === 'ALL'
+          ? true
+          : s.examId === submissionExamFilter ||
+            ((submissionExamFilter === 'exam-ct-inf-x-30' || submissionExamFilter === 'exam-ct-informatika-30') &&
+             (s.examId === 'exam-ct-inf-x-30' || s.examId === 'exam-ct-informatika-30'));
+      const matchSearch =
+        s.studentName.toLowerCase().includes(searchStudent.toLowerCase()) ||
+        s.studentNisn.includes(searchStudent);
+      const matchClass = selectedClassFilter === 'ALL' || s.studentClass === selectedClassFilter;
+      return matchExam && matchSearch && matchClass;
+    });
+
+    // Pastikan satu siswa hanya tampil 1 kali per ujian (ambil skor terbaik atau kiriman terbaru)
+    const seen = new Set<string>();
+    const uniqueList: StudentExamSubmission[] = [];
+    for (const sub of list) {
+      const normExamId = sub.examId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+      const key = `${sub.studentNisn.trim()}_${normExamId}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueList.push(sub);
+      }
+    }
+    return uniqueList;
+  }, [submissions, submissionExamFilter, searchStudent, selectedClassFilter]);
 
   // Filtered registered students
   const filteredStudents = students.filter((std) => {
