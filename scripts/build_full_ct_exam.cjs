@@ -92,7 +92,7 @@ const updatedQuestions = rawExam.questions.map((q, idx) => {
         key: letter,
         text: dOpt.text,
       });
-      newOptionScores[letter] = originalDistractorScores[distractorIdx] || 2;
+      newOptionScores[letter] = 0; // Bobot dinonaktifkan: hanya 1 jawaban benar yang bernilai poin
       distractorIdx++;
     }
   }
@@ -112,7 +112,10 @@ const updatedQuestions = rawExam.questions.map((q, idx) => {
 // Update the exam object
 const updatedExam = {
   ...rawExam,
-  createdAt: '2026-10-05T12:15:00.000Z',
+  gradeClass: 'Semua Kelas X (X-1 s/d X-12)',
+  defaultOptionScores: { A: 10, B: 0, C: 0, D: 0, E: 0 },
+  useWeightedScoring: false, // User explicitly requested unweighted single correct answer
+  createdAt: '2026-10-05T12:30:00.000Z',
   questions: updatedQuestions,
 };
 
@@ -181,6 +184,7 @@ export const STUDENTS_KELAS_X: RegisteredStudent[] = [
  * Berdasarkan Materi Resmi "Materi_CT_Informatika_SMAN_1_Batu.pdf"
  * Penyusun: Abdul Aziz., S.Kom., Gr
  * Distribusi Kunci Jawaban Seimbang A-E (masing-masing 6 butir)
+ * Metode Penilaian: Standar 1 Jawaban Benar (Bobot Nonaktif, hanya kunci bernilai 10)
  */
 export const CT_INFORMATIKA_30_EXAM: Exam = {
   id: '${updatedExam.id}',
@@ -193,6 +197,7 @@ export const CT_INFORMATIKA_30_EXAM: Exam = {
   passingGrade: ${updatedExam.passingGrade},
   teacherName: '${updatedExam.teacherName}',
   defaultOptionScores: ${JSON.stringify(updatedExam.defaultOptionScores)},
+  useWeightedScoring: false,
   shuffleQuestions: ${updatedExam.shuffleQuestions},
   shuffleOptions: ${updatedExam.shuffleOptions},
   showInstantScore: ${updatedExam.showInstantScore},

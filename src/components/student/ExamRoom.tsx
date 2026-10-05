@@ -873,24 +873,39 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
         ? exam.questions
         : INITIAL_EXAMS[0]?.questions || [];
 
+    const isWeighted = exam.useWeightedScoring !== false;
+
     masterQuestions.forEach((origQ) => {
       const selectedOriginalKey = answersByQuestionId[origQ.id] || null;
       if (selectedOriginalKey) {
         finalAnswersMap[origQ.number] = selectedOriginalKey;
       }
 
-      const qScores = origQ.optionScores || {};
-      const maxInQuestion = Math.max(...(Object.values(qScores) as number[]), 0);
-      maxPossibleScore += maxInQuestion;
-
       let scoreEarned = 0;
+      let maxInQuestion = 10;
       let isHighest = false;
 
-      if (selectedOriginalKey && qScores[selectedOriginalKey] !== undefined) {
-        scoreEarned = qScores[selectedOriginalKey];
-        isHighest = scoreEarned === maxInQuestion;
+      if (isWeighted) {
+        const qScores = origQ.optionScores || {};
+        maxInQuestion = Math.max(...(Object.values(qScores) as number[]), 0) || 10;
+        if (selectedOriginalKey && qScores[selectedOriginalKey] !== undefined) {
+          scoreEarned = qScores[selectedOriginalKey];
+          isHighest = scoreEarned === maxInQuestion;
+        }
+      } else {
+        // Mode Standar 1 Jawaban Benar (Bobot Nonaktif)
+        const correctKey = origQ.correctOption || 'A';
+        maxInQuestion = 10;
+        if (selectedOriginalKey && selectedOriginalKey === correctKey) {
+          scoreEarned = maxInQuestion;
+          isHighest = true;
+        } else {
+          scoreEarned = 0;
+          isHighest = false;
+        }
       }
 
+      maxPossibleScore += maxInQuestion;
       totalScoreEarned += scoreEarned;
 
       answersDetail.push({

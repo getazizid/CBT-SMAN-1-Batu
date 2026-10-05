@@ -13,7 +13,8 @@ import {
   Info,
   Shuffle,
   Lock,
-  ShieldAlert
+  ShieldAlert,
+  CheckCircle2,
 } from 'lucide-react';
 import { Exam, OptionKey, OptionScoreMap, Question, QuestionOption } from '../../types';
 import {
@@ -47,6 +48,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
   const [token, setToken] = useState('OSIS2026');
   const [passingGrade, setPassingGrade] = useState(75);
   const [teacherName, setTeacherName] = useState('Tim Pembina OSIS & Kesiswaan SMAN 1 Batu');
+  const [useWeightedScoring, setUseWeightedScoring] = useState<boolean>(false);
   const [defaultOptionScores, setDefaultOptionScores] = useState<OptionScoreMap>({
     A: 10,
     B: 8,
@@ -90,6 +92,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setDefaultOptionScores(
         exam.defaultOptionScores || { A: 10, B: 8, C: 6, D: 4, E: 2 }
       );
+      setUseWeightedScoring(exam.useWeightedScoring ?? false);
       setQuestions(exam.questions ? [...exam.questions] : []);
       setIsActive(exam.isActive ?? true);
       setShowInstantScore(exam.showInstantScore ?? true);
@@ -106,7 +109,8 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setToken('BATU' + Math.floor(1000 + Math.random() * 9000));
       setPassingGrade(75);
       setTeacherName('Tim Pembina OSIS & Kesiswaan SMAN 1 Batu');
-      setDefaultOptionScores({ A: 10, B: 8, C: 6, D: 4, E: 2 });
+      setDefaultOptionScores({ A: 10, B: 0, C: 0, D: 0, E: 0 });
+      setUseWeightedScoring(false);
       setQuestions([]);
       setIsActive(true);
       setShowInstantScore(true);
@@ -191,6 +195,25 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
     setQuestions(updated);
   };
 
+  const handleSetQuestionCorrectOption = (qIndex: number, optKey: OptionKey) => {
+    const updated = [...questions];
+    const q = updated[qIndex];
+    if (!q) return;
+    const newScores: OptionScoreMap = {
+      A: optKey === 'A' ? 10 : 0,
+      B: optKey === 'B' ? 10 : 0,
+      C: optKey === 'C' ? 10 : 0,
+      D: optKey === 'D' ? 10 : 0,
+      E: optKey === 'E' ? 10 : 0,
+    };
+    updated[qIndex] = {
+      ...q,
+      correctOption: optKey,
+      optionScores: newScores,
+    };
+    setQuestions(updated);
+  };
+
   const toggleClass = (cls: string) => {
     setSelectedClasses((prev) =>
       prev.includes(cls) ? prev.filter((c) => c !== cls) : [...prev, cls]
@@ -255,6 +278,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       isActive,
       blockEarlyExit,
       disallowMultipleAttempts,
+      useWeightedScoring,
       createdAt: exam?.createdAt || new Date().toISOString(),
     };
 
@@ -568,55 +592,139 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 </div>
               </div>
 
-              {/* Default Preset Weight Card */}
-              <div className="bg-slate-50 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <Sliders className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase">
-                      Preset Bobot Nilai Bawaan (Opsi A - E)
+              {/* Scoring Mode & Option Weights Setting */}
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold ${
+                    !useWeightedScoring
+                      ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300'
+                      : 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300'
+                  }`}>
+                    <Sliders className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wide">
+                      Pengaturan Bobot Pada Jawaban
                     </h4>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handleApplyPresetToAll({ A: 10, B: 5, C: 4, D: 3, E: 2 })}
-                      className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg transition-colors cursor-pointer"
-                    >
-                      Set A:10, B:5, C:4, D:3, E:2
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleApplyPresetToAll({ A: 10, B: 0, C: 0, D: 0, E: 0 })}
-                      className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg transition-colors cursor-pointer"
-                    >
-                      Set Standar (A:10, Lain:0)
-                    </button>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Tentukan apakah penilaian menggunakan 1 kunci jawaban benar (tanpa bobot opsi) atau pembobotan nilai per opsi.
+                    </p>
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Nilai ini akan otomatis diterapkan saat Anda menambahkan butir soal baru, atau tekan tombol preset di atas untuk mengubah seluruh soal seketika.
-                </p>
-
-                <div className="grid grid-cols-5 gap-2 pt-1">
-                  {(['A', 'B', 'C', 'D', 'E'] as OptionKey[]).map((k) => (
-                    <div key={k} className="bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-center">
-                      <span className="text-[11px] font-bold text-slate-900 dark:text-white block">Opsi {k}</span>
-                      <input
-                        type="number"
-                        value={defaultOptionScores[k]}
-                        onChange={(e) =>
-                          setDefaultOptionScores({
-                            ...defaultOptionScores,
-                            [k]: Number(e.target.value),
-                          })
-                        }
-                        className="w-full text-center font-bold text-blue-600 dark:text-blue-400 text-xs mt-1 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-lg py-1 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                      />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* Option 1: 1 Jawaban Benar (Nonaktif Bobot) */}
+                  <div
+                    onClick={() => {
+                      setUseWeightedScoring(false);
+                      handleApplyPresetToAll({ A: 10, B: 0, C: 0, D: 0, E: 0 });
+                    }}
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                      !useWeightedScoring
+                        ? 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-400 dark:border-blue-700 text-blue-950 dark:text-blue-200 shadow-xs ring-1 ring-blue-500/20'
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="weighted-scoring-mode"
+                      id="mode-single-correct"
+                      checked={!useWeightedScoring}
+                      onChange={() => {
+                        setUseWeightedScoring(false);
+                        handleApplyPresetToAll({ A: 10, B: 0, C: 0, D: 0, E: 0 });
+                      }}
+                      className="w-4 h-4 text-blue-600 cursor-pointer mt-0.5"
+                    />
+                    <div>
+                      <label htmlFor="mode-single-correct" className="text-xs font-bold text-slate-900 dark:text-white cursor-pointer flex items-center gap-1.5">
+                        <span>Tidak Aktif Bobot (1 Jawaban Benar)</span>
+                        {!useWeightedScoring && (
+                          <span className="bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[10px] font-semibold px-1.5 py-0.2 rounded">
+                            Aktif
+                          </span>
+                        )}
+                      </label>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                        Standar pilihan ganda: Hanya 1 jawaban benar (100% poin), opsi salah lainnya bernilai 0. Cocok untuk ujian Informatika & mata pelajaran umum.
+                      </p>
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Option 2: Bobot Bertingkat */}
+                  <div
+                    onClick={() => setUseWeightedScoring(true)}
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                      useWeightedScoring
+                        ? 'bg-purple-50/80 dark:bg-purple-950/40 border-purple-400 dark:border-purple-700 text-purple-950 dark:text-purple-200 shadow-xs ring-1 ring-purple-500/20'
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="weighted-scoring-mode"
+                      id="mode-weighted"
+                      checked={useWeightedScoring}
+                      onChange={() => setUseWeightedScoring(true)}
+                      className="w-4 h-4 text-purple-600 cursor-pointer mt-0.5"
+                    />
+                    <div>
+                      <label htmlFor="mode-weighted" className="text-xs font-bold text-slate-900 dark:text-white cursor-pointer flex items-center gap-1.5">
+                        <span>Aktifkan Bobot Poin Per Opsi</span>
+                        {useWeightedScoring && (
+                          <span className="bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 text-[10px] font-semibold px-1.5 py-0.2 rounded">
+                            Aktif
+                          </span>
+                        )}
+                      </label>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                        Skor bertingkat: Tiap opsi A–E memiliki bobot poin tersendiri (misal 10, 8, 6, 4, 2). Cocok untuk asesmen psikologi, minat bakat, atau OSIS.
+                      </p>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Show Option Score Inputs only when useWeightedScoring is true */}
+                {useWeightedScoring ? (
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Preset Bobot Bawaan:</span>
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleApplyPresetToAll({ A: 10, B: 5, C: 4, D: 3, E: 2 })}
+                          className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 text-[10px] font-semibold px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                        >
+                          Set A:10, B:5, C:4, D:3, E:2
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-5 gap-2 pt-1">
+                      {(['A', 'B', 'C', 'D', 'E'] as OptionKey[]).map((k) => (
+                        <div key={k} className="bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-center">
+                          <span className="text-[11px] font-bold text-slate-900 dark:text-white block">Opsi {k}</span>
+                          <input
+                            type="number"
+                            value={defaultOptionScores[k]}
+                            onChange={(e) =>
+                              setDefaultOptionScores({
+                                ...defaultOptionScores,
+                                [k]: Number(e.target.value),
+                              })
+                            }
+                            className="w-full text-center font-bold text-purple-600 dark:text-purple-400 text-xs mt-1 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-lg py-1 focus:ring-1 focus:ring-purple-500 focus:outline-none"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Mode 1 Jawaban Benar aktif: Penilaian otomatis menggunakan kunci jawaban master (jawaban benar = 100%, lainnya = 0).</span>
+                  </div>
+                )}
               </div>
 
               {/* Randomization / Anti-Cheat Section */}
@@ -872,18 +980,41 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                         />
                       </div>
 
-                      {/* Options & Weight Editor */}
+                      {/* Options & Weight / Key Editor */}
                       <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase">
-                          Opsi Jawaban & Bobot Nilai Poin
-                        </label>
+                        <div className="flex items-center justify-between">
+                          <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase">
+                            {useWeightedScoring
+                              ? 'Opsi Jawaban & Bobot Nilai Poin Tiap Opsi'
+                              : 'Opsi Jawaban & Pilihan Kunci Jawaban Benar'}
+                          </label>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            !useWeightedScoring
+                              ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300'
+                              : 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300'
+                          }`}>
+                            {!useWeightedScoring ? 'Mode: 1 Jawaban Benar' : 'Mode: Bobot Bertingkat'}
+                          </span>
+                        </div>
 
                         {(['A', 'B', 'C', 'D', 'E'] as OptionKey[]).map((optKey) => {
                           const currentOpt = q.options.find((o) => o.key === optKey);
                           const optScore = q.optionScores[optKey] ?? 0;
+                          const isCorrect = q.correctOption === optKey;
                           return (
-                            <div key={optKey} className="flex items-center gap-2">
-                              <span className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center shrink-0">
+                            <div
+                              key={optKey}
+                              className={`flex items-center gap-2 p-1.5 rounded-2xl border transition-all ${
+                                !useWeightedScoring && isCorrect
+                                  ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/40 dark:bg-emerald-950/30'
+                                  : 'border-transparent'
+                              }`}
+                            >
+                              <span className={`w-7 h-7 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 ${
+                                !useWeightedScoring && isCorrect
+                                  ? 'bg-emerald-600 text-white shadow-xs'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                              }`}>
                                 {optKey}
                               </span>
 
@@ -895,16 +1026,32 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                                 className="flex-1 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                               />
 
-                              <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1 shrink-0">
-                                <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Nilai:</span>
-                                <input
-                                  type="number"
-                                  value={optScore}
-                                  onChange={(e) => handleUpdateOptionScore(qIdx, optKey, Number(e.target.value))}
-                                  className="w-12 text-center font-bold text-xs text-blue-700 dark:text-blue-400 bg-transparent focus:outline-none"
-                                />
-                                <span className="text-[10px] text-slate-400">p</span>
-                              </div>
+                              {useWeightedScoring ? (
+                                <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1 shrink-0">
+                                  <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">Nilai:</span>
+                                  <input
+                                    type="number"
+                                    value={optScore}
+                                    onChange={(e) => handleUpdateOptionScore(qIdx, optKey, Number(e.target.value))}
+                                    className="w-12 text-center font-bold text-xs text-blue-700 dark:text-blue-400 bg-transparent focus:outline-none"
+                                  />
+                                  <span className="text-[10px] text-slate-400">p</span>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetQuestionCorrectOption(qIdx, optKey)}
+                                  className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all flex items-center gap-1 cursor-pointer ${
+                                    isCorrect
+                                      ? 'bg-emerald-600 text-white shadow-xs ring-1 ring-emerald-500'
+                                      : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                                  }`}
+                                  title={isCorrect ? 'Opsi ini adalah kunci jawaban benar' : 'Klik untuk jadikan opsi ini sebagai kunci jawaban'}
+                                >
+                                  {isCorrect && <CheckCircle2 className="w-3.5 h-3.5" />}
+                                  <span>{isCorrect ? 'Kunci Benar' : 'Pilih Kunci'}</span>
+                                </button>
+                              )}
                             </div>
                           );
                         })}

@@ -38,6 +38,7 @@ import {
 import {
   AdminAccount,
   Exam,
+  OptionKey,
   OptionScoreMap,
   Question,
   RegisteredStudent,
@@ -307,6 +308,58 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     };
     handleSaveExam(updatedExam);
   };
+
+  const handleSetCorrectOption = (questionId: string, optKey: OptionKey) => {
+    if (!currentExam) return;
+    const updatedQuestions = currentExam.questions.map((q) => {
+      if (q.id === questionId) {
+        return {
+          ...q,
+          correctOption: optKey,
+          optionScores: {
+            A: optKey === 'A' ? 10 : 0,
+            B: optKey === 'B' ? 10 : 0,
+            C: optKey === 'C' ? 10 : 0,
+            D: optKey === 'D' ? 10 : 0,
+            E: optKey === 'E' ? 10 : 0,
+          },
+        };
+      }
+      return q;
+    });
+    handleSaveExam({
+      ...currentExam,
+      questions: updatedQuestions,
+    });
+  };
+
+  const handleToggleCurrentExamWeightedScoring = (enableWeighted: boolean) => {
+    if (!currentExam) return;
+    let updatedQuestions = currentExam.questions;
+    if (!enableWeighted) {
+      updatedQuestions = currentExam.questions.map((q) => {
+        const correctKey = q.correctOption || 'A';
+        return {
+          ...q,
+          correctOption: correctKey,
+          optionScores: {
+            A: correctKey === 'A' ? 10 : 0,
+            B: correctKey === 'B' ? 10 : 0,
+            C: correctKey === 'C' ? 10 : 0,
+            D: correctKey === 'D' ? 10 : 0,
+            E: correctKey === 'E' ? 10 : 0,
+          },
+        };
+      });
+    }
+    const updatedExam: Exam = {
+      ...currentExam,
+      useWeightedScoring: enableWeighted,
+      questions: updatedQuestions,
+    };
+    handleSaveExam(updatedExam);
+  };
+
 
   const handleApplyPresetCurrentExam = (preset: OptionScoreMap) => {
     if (!currentExam) return;
@@ -1031,6 +1084,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               <ShieldAlert className="w-3 h-3" />
                               <span>{exam.disallowMultipleAttempts !== false ? '1x Pengerjaan' : 'Boleh Ulang'}</span>
                             </button>
+
+                            {/* Badge Bobot / 1 Jawaban Benar */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newWeighted = exam.useWeightedScoring === false;
+                                const updated = exams.map((e) =>
+                                  e.id === exam.id ? { ...e, useWeightedScoring: newWeighted } : e
+                                );
+                                onUpdateExams(updated);
+                              }}
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 transition-colors cursor-pointer border ${
+                                exam.useWeightedScoring === false
+                                  ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+                                  : 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                              }`}
+                              title={
+                                exam.useWeightedScoring === false
+                                  ? 'Mode: 1 Jawaban Benar (Hanya opsi kunci bernilai 100%, opsi lain 0). Klik untuk aktifkan bobot opsi bertingkat.'
+                                  : 'Mode: Bobot Opsi Bertingkat (Setiap opsi A-E memiliki poin). Klik untuk ubah ke 1 jawaban benar.'
+                              }
+                            >
+                              <Sliders className="w-3 h-3" />
+                              <span>{exam.useWeightedScoring === false ? '1 Jawaban Benar' : 'Bobot Opsi'}</span>
+                            </button>
                           </div>
 
                           <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-lg font-mono text-xs font-bold shrink-0">
@@ -1174,50 +1252,82 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* TAB 2: EDITOR BANK SOAL */}
           {activeTab === 'questions' && currentExam && (
             <div className="space-y-5">
-              {/* Quick Bobot Presets Banner */}
+              {/* Quick Bobot Presets / Scoring Mode Banner */}
               <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
-                <div>
-                  <h4 className="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2">
-                    <Sliders className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span>Pengaturan Bobot Nilai Serentak (Semua Soal)</span>
-                  </h4>
-                  <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">
-                    Pilih preset untuk menerapkan nilai opsi bertingkat ke seluruh{' '}
-                    {currentExam.questions.length} butir soal saat ini.
-                  </p>
-                </div>
+                {currentExam.useWeightedScoring === false ? (
+                  <>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-300/70 dark:border-emerald-800">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Bobot Jawaban: TIDAK AKTIF (1 Jawaban Benar)
+                        </span>
+                        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                          (Standar CBT 100% Poin)
+                        </span>
+                      </div>
+                      <p className="text-slate-500 dark:text-slate-400 text-[11px]">
+                        Hanya 1 opsi kunci yang mendapat nilai penuh (100%), pilihan lain bernilai 0. Klik tombol <strong>Pilih Kunci</strong> pada butir soal di bawah untuk mengubah kunci jawaban.
+                      </p>
+                    </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() =>
-                      handleApplyPresetCurrentExam({ A: 10, B: 5, C: 4, D: 3, E: 2 })
-                    }
-                    className="bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs"
-                    title="Preset: A=10, B=5, C=4, D=3, E=2"
-                  >
-                    10 - 5 - 4 - 3 - 2
-                  </button>
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => handleToggleCurrentExamWeightedScoring(true)}
+                        className="bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/50 hover:text-blue-600 dark:hover:text-blue-400 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-blue-300 px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
+                        title="Ubah sistem penilaian ke sistem bobot nilai bertingkat"
+                      >
+                        <Sliders className="w-3.5 h-3.5" />
+                        <span>Aktifkan Bobot Poin</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-300/70 dark:border-amber-800">
+                          <Sliders className="w-3.5 h-3.5" />
+                          Bobot Jawaban: AKTIF (Nilai Bertingkat)
+                        </span>
+                      </div>
+                      <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-1">
+                        Pilih preset nilai opsi untuk menerapkan ke semua butir soal, atau nonaktifkan bobot untuk kembali ke 1 pilihan benar standar.
+                      </p>
+                    </div>
 
-                  <button
-                    onClick={() =>
-                      handleApplyPresetCurrentExam({ A: 5, B: 4, C: 3, D: 2, E: 1 })
-                    }
-                    className="bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs"
-                    title="Preset: A=5, B=4, C=3, D=2, E=1"
-                  >
-                    5 - 4 - 3 - 2 - 1
-                  </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() =>
+                          handleApplyPresetCurrentExam({ A: 10, B: 5, C: 4, D: 3, E: 2 })
+                        }
+                        className="bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs"
+                        title="Preset: A=10, B=5, C=4, D=3, E=2"
+                      >
+                        10 - 5 - 4 - 3 - 2
+                      </button>
 
-                  <button
-                    onClick={() =>
-                      handleApplyPresetCurrentExam({ A: 10, B: 0, C: 0, D: 0, E: 0 })
-                    }
-                    className="bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs"
-                    title="Hanya opsi A yang benar bernilai 10, lainnya 0"
-                  >
-                    Tunggal (A=10, Lain=0)
-                  </button>
-                </div>
+                      <button
+                        onClick={() =>
+                          handleApplyPresetCurrentExam({ A: 5, B: 4, C: 3, D: 2, E: 1 })
+                        }
+                        className="bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs"
+                        title="Preset: A=5, B=4, C=3, D=2, E=1"
+                      >
+                        5 - 4 - 3 - 2 - 1
+                      </button>
+
+                      <button
+                        onClick={() => handleToggleCurrentExamWeightedScoring(false)}
+                        className="bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
+                        title="Nonaktifkan bobot dan gunakan sistem 1 jawaban benar (100% poin)"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Nonaktifkan Bobot (1 Jawaban Benar)</span>
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Quick Question Number Jump Strip */}
@@ -1326,7 +1436,65 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         {/* Options & Weights Table */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-2">
                           {question.options.map((opt) => {
+                            const isWeighted = currentExam.useWeightedScoring !== false;
+                            const isCorrect = (question.correctOption || 'A') === opt.key;
                             const score = question.optionScores[opt.key] ?? 0;
+
+                            if (!isWeighted) {
+                              return (
+                                <div
+                                  key={opt.key}
+                                  className={`p-3.5 rounded-2xl border text-xs flex flex-col justify-between space-y-2.5 transition-all ${
+                                    isCorrect
+                                      ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/70 dark:bg-emerald-950/40 ring-1 ring-emerald-400/50'
+                                      : 'border-slate-200 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40 hover:border-slate-300'
+                                  }`}
+                                >
+                                  <div className="flex items-start gap-2">
+                                    <span
+                                      className={`w-5 h-5 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${
+                                        isCorrect
+                                          ? 'bg-emerald-600 text-white shadow-xs'
+                                          : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                      }`}
+                                    >
+                                      {opt.key}
+                                    </span>
+                                    <span
+                                      className={`line-clamp-2 text-[11px] font-medium ${
+                                        isCorrect
+                                          ? 'text-emerald-950 dark:text-emerald-200 font-semibold'
+                                          : 'text-slate-700 dark:text-slate-300'
+                                      }`}
+                                    >
+                                      {opt.text}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/60 text-[11px]">
+                                    {isCorrect ? (
+                                      <span className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/90 dark:bg-emerald-900/60 px-2 py-0.5 rounded-md text-[10px]">
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        Kunci Benar (100%)
+                                      </span>
+                                    ) : (
+                                      <div className="flex items-center justify-between w-full">
+                                        <span className="text-slate-400 dark:text-slate-500 text-[10px]">Salah (0 poin)</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleSetCorrectOption(question.id, opt.key)}
+                                          className="px-2 py-0.5 rounded-md font-bold text-[10px] text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
+                                          title={`Jadikan Opsi ${opt.key} sebagai kunci jawaban benar`}
+                                        >
+                                          Pilih Kunci
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            }
+
                             return (
                               <div
                                 key={opt.key}

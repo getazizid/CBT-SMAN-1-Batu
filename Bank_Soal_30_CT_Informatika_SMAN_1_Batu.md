@@ -24,11 +24,11 @@ Pada tahun 2006, Jeannette M. Wing mempublikasikan karya ilmiah seminal berjudul
 
 Berdasarkan pemaparan mendalam di atas, manakah kesimpulan yang paling tepat mengenai hakikat sejati dari Berpikir Komputasional (CT) dalam konteks pembelajaran abad ke-21?
 
-**A.** Keahlian teknis tingkat lanjut untuk menghafal sintaks bahasa pemrograman dan merakit perangkat keras komputer secara mekanis.
+**A.** Keterampilan mengoperasikan berbagai aplikasi komersial perkantoran dan multimedia untuk meningkatkan kecepatan mengetik.
 
-**B.** Keterampilan mengoperasikan berbagai aplikasi komersial perkantoran dan multimedia untuk meningkatkan kecepatan mengetik.
+**B.** Sebuah kerangka kerja berpikir pemecahan masalah (problem solving) yang menyusun representasi solusi secara logis agar dapat dieksekusi oleh agen pemroses informasi, baik manusia maupun komputer.
 
-**C.** Sebuah kerangka kerja berpikir pemecahan masalah (problem solving) yang menyusun representasi solusi secara logis agar dapat dieksekusi oleh agen pemroses informasi, baik manusia maupun komputer.
+**C.** Keahlian teknis tingkat lanjut untuk menghafal sintaks bahasa pemrograman dan merakit perangkat keras komputer secara mekanis.
 
 **D.** Metode berpikir yang mewajibkan manusia bertindak seperti robot biner guna mengeliminasi seluruh emosi dalam pengambilan keputusan.
 
@@ -68,13 +68,13 @@ Otak manusia memiliki kapasitas memori kerja (working memory) yang terbatas. Ket
 
 Manakah di antara skenario berikut yang mencerminkan penerapan Dekomposisi yang paling tepat dan profesional menurut prinsip Berpikir Komputasional?
 
-**A.** Membagi bantuan sembako kepada seluruh warga secara merata tanpa memeriksa apakah mereka terdampak langsung oleh banjir atau tidak.
+**A.** Mengelompokkan data industri di bantaran sungai semata-mata berdasarkan warna cat pagar dan tahun berdirinya bangunan pabrik.
 
-**B.** Mengelompokkan data industri di bantaran sungai semata-mata berdasarkan warna cat pagar dan tahun berdirinya bangunan pabrik.
+**B.** Menginstruksikan satu orang ahli untuk menyelesaikan seluruh penyelidikan krisis hulu-hilir sendirian secara bersamaan.
 
-**C.** Menginstruksikan satu orang ahli untuk menyelesaikan seluruh penyelidikan krisis hulu-hilir sendirian secara bersamaan.
+**C.** Memecah penanganan krisis banjir lumpur beracun kota ke dalam tiga fokus investigasi spesifik: hidrologi/cuaca, evaluasi tata guna lahan hulu, dan uji kimia limbah sedimen.
 
-**D.** Memecah penanganan krisis banjir lumpur beracun kota ke dalam tiga fokus investigasi spesifik: hidrologi/cuaca, evaluasi tata guna lahan hulu, dan uji kimia limbah sedimen.
+**D.** Membagi bantuan sembako kepada seluruh warga secara merata tanpa memeriksa apakah mereka terdampak langsung oleh banjir atau tidak.
 
 **E.** Menghentikan seluruh operasional transportasi perkotaan secara mendadak tanpa menganalisis titik simpul kemacetan yang kritis.
 
@@ -90,9 +90,9 @@ Dalam materi pembelajaran CT Informatika Kelas X SMAN 1 Batu, dicontohkan seoran
 
 Prinsip komputasional apakah yang mendasari proses kognitif dokter tersebut, dan mengapa hal itu sangat krusial dalam pemecahan masalah?
 
-**A.** Dekomposisi; dokter membagi tubuh pasien ke dalam organ-organ terpisah sebelum mendengarkan keluhan demam pasien.
+**A.** Pengenalan Pola (Pattern Recognition); memungkinkan penggunaan model solusi masa lalu untuk mempercepat diagnosis akurat dan penentuan uji laboratorium kritis.
 
-**B.** Pengenalan Pola (Pattern Recognition); memungkinkan penggunaan model solusi masa lalu untuk mempercepat diagnosis akurat dan penentuan uji laboratorium kritis.
+**B.** Dekomposisi; dokter membagi tubuh pasien ke dalam organ-organ terpisah sebelum mendengarkan keluhan demam pasien.
 
 **C.** Abstraksi Buta; dokter menolak mendengarkan keluhan pasien dan langsung menyalin resep obat dari buku pedoman umum.
 
@@ -112,15 +112,15 @@ Perhatikan diagram peta jaringan kereta bawah tanah (MRT) atau komuter perkotaan
 
 Mengapa penyederhanaan pada peta MRT tersebut dikategorikan sebagai bentuk Abstraksi tingkat tinggi yang berhasil?
 
-**A.** Perancang peta kekurangan waktu dan anggaran untuk menggambar gedung dan pohon di sekitar stasiun secara realistis.
+**A.** Jalur kereta bawah tanah tidak terikat dengan hukum gravitasi dan tata ruang permukaan bumi sehingga gedung diabaikan.
 
-**B.** Jalur kereta bawah tanah tidak terikat dengan hukum gravitasi dan tata ruang permukaan bumi sehingga gedung diabaikan.
+**B.** Peta sengaja dibuat membingungkan agar masyarakat lebih memilih menggunakan kendaraan pribadi di jalan raya.
 
-**C.** Peta sengaja dibuat membingungkan agar masyarakat lebih memilih menggunakan kendaraan pribadi di jalan raya.
+**C.** Agar ukuran file gambar digital pada aplikasi ponsel pintar menjadi sekecil mungkin tanpa memedulikan kenyamanan pengguna.
 
-**D.** Agar ukuran file gambar digital pada aplikasi ponsel pintar menjadi sekecil mungkin tanpa memedulikan kenyamanan pengguna.
+**D.** Menyaring dan mempertahankan informasi esensial yang diperlukan penumpang (rute, stasiun, transit) sembari mengeliminasi detail fisik yang tidak relevan (noise visual).
 
-**E.** Menyaring dan mempertahankan informasi esensial yang diperlukan penumpang (rute, stasiun, transit) sembari mengeliminasi detail fisik yang tidak relevan (noise visual).
+**E.** Perancang peta kekurangan waktu dan anggaran untuk menggambar gedung dan pohon di sekitar stasiun secara realistis.
 
 *Kunci Jawaban:* **E**  
 *Pembahasan:* Abstraksi adalah seni memilah informasi esensial (stasiun & jalur) yang dibutuhkan agen pemroses (penumpang) dan mengabaikan detail tidak relevan (gedung, pohon, belokan riil) yang hanya mengotori persepsi.
@@ -156,11 +156,11 @@ Kota Delta adalah kawasan industri padat yang dilintasi oleh Sungai Ciliwung. Se
 
 Menghadapi krisis masif ini, Dr. Aris secara tegas menolak solusi reaktif semacam sekadar membagikan sembako atau menambal tanggul sementara. Mengapa penolakan Dr. Aris tersebut mencerminkan penerapan pola pikir Berpikir Komputasional tingkat tinggi?
 
-**A.** Karena Dr. Aris menilai anggaran belanja sembako daerah terlalu murah sehingga tidak mengangkat gengsi penelitian tim satgas.
+**A.** Karena warga pengungsi di hilir sungai menolak menerima bantuan logistik sebelum pabrik-pabrik ditutup secara paksa.
 
-**B.** Karena warga pengungsi di hilir sungai menolak menerima bantuan logistik sebelum pabrik-pabrik ditutup secara paksa.
+**B.** Karena solusi reaktif hanya meredakan gejala permukaan (symptomatic) tanpa menyentuh analisis kausalitas sistemik yang menjadi akar utama bencana.
 
-**C.** Karena solusi reaktif hanya meredakan gejala permukaan (symptomatic) tanpa menyentuh analisis kausalitas sistemik yang menjadi akar utama bencana.
+**C.** Karena Dr. Aris menilai anggaran belanja sembako daerah terlalu murah sehingga tidak mengangkat gengsi penelitian tim satgas.
 
 **D.** Karena Dr. Aris ingin menunggu hingga banjir surut dengan sendirinya tanpa intervensi manusia sama sekali.
 
@@ -178,9 +178,9 @@ Untuk mengungkap akar bencana banjir lumpur beracun di Kota Delta, Dr. Aris memb
 
 Dari perspektif pemrosesan informasi, keunggulan ilmiah apakah yang diperoleh melalui dekomposisi tiga area fokus investigasi tersebut?
 
-**A.** Menghilangkan kebutuhan rapat koordinasi karena ketiga tim dilarang saling bertukar data hingga bencana tahun berikutnya tiba.
+**A.** Memungkinkan investigasi mendalam dan pengumpulan bukti saintifik berjalan secara paralel pada tiga determinan kritis: atmosferik, bentang lahan, dan polutan kimia.
 
-**B.** Memungkinkan investigasi mendalam dan pengumpulan bukti saintifik berjalan secara paralel pada tiga determinan kritis: atmosferik, bentang lahan, dan polutan kimia.
+**B.** Menghilangkan kebutuhan rapat koordinasi karena ketiga tim dilarang saling bertukar data hingga bencana tahun berikutnya tiba.
 
 **C.** Memastikan seluruh anggaran belanja investigasi terbagi rata menjadi sepertiga bagian tanpa sisa di rekening kas daerah.
 
@@ -200,13 +200,13 @@ Setelah satu bulan mengumpulkan dan merekonsiliasi data, Tim Analisis membanding
 
 Penemuan kecenderungan konsisten tersebut merupakan manifestasi pilar Pengenalan Pola karena...
 
-**A.** Merupakan kebetulan statistik yang tidak memiliki korelasi fisika atmosfer dengan meluapnya air sungai Ciliwung.
+**A.** Membuktikan bahwa prediksi banjir dapat dilakukan tanpa memerlukan data kuantitatif curah hujan dari BMKG.
 
-**B.** Membuktikan bahwa prediksi banjir dapat dilakukan tanpa memerlukan data kuantitatif curah hujan dari BMKG.
+**B.** Mengabaikan faktor pasang air laut rob karena air laut berada di hilir dan tidak memengaruhi aliran air tawar sungai.
 
-**C.** Mengabaikan faktor pasang air laut rob karena air laut berada di hilir dan tidak memengaruhi aliran air tawar sungai.
+**C.** Menemukan keteraturan hubungan berulang dari rekaman data historis jangka panjang yang berfungsi sebagai kondisi batas pemicu (trigger boundary) bencana.
 
-**D.** Menemukan keteraturan hubungan berulang dari rekaman data historis jangka panjang yang berfungsi sebagai kondisi batas pemicu (trigger boundary) bencana.
+**D.** Merupakan kebetulan statistik yang tidak memiliki korelasi fisika atmosfer dengan meluapnya air sungai Ciliwung.
 
 **E.** Menunjukkan bahwa data cuaca selama 20 tahun tidak dapat dipercaya untuk menyusun model peringatan dini banjir.
 
@@ -222,15 +222,15 @@ Tim Uji Kualitas Air mendeteksi konsentrasi tinggi logam berat berbahaya kromium
 
 Alasan rasional paling mendasar mengapa pengabaian data tersebut merupakan penerapan Abstraksi yang sangat tepat adalah...
 
-**A.** Pabrik makanan dan ruko kecil membayar retribusi keamanan lebih tinggi kepada dinas perindustrian kota.
+**A.** Warna seragam pekerja dan tahun berdiri pabrik merupakan rahasia negara yang dilindungi undang-undang intelijen bisnis.
 
-**B.** Warna seragam pekerja dan tahun berdiri pabrik merupakan rahasia negara yang dilindungi undang-undang intelijen bisnis.
+**B.** Dr. Aris meyakini bahwa pabrik kayu dan makanan tidak menggunakan air sungai untuk membuang limbah domestik.
 
-**C.** Dr. Aris meyakini bahwa pabrik kayu dan makanan tidak menggunakan air sungai untuk membuang limbah domestik.
+**C.** Pabrik aki baterai dan tekstil berada di bawah naungan kementerian yang berbeda dengan pabrik makanan.
 
-**D.** Pabrik aki baterai dan tekstil berada di bawah naungan kementerian yang berbeda dengan pabrik makanan.
+**D.** Menyaring variabel yang tidak relevan (noise) agar fokus tim tercurah pada penghasil potensial kromium dan timbal, sehingga menghemat waktu dan sumber daya krusial.
 
-**E.** Menyaring variabel yang tidak relevan (noise) agar fokus tim tercurah pada penghasil potensial kromium dan timbal, sehingga menghemat waktu dan sumber daya krusial.
+**E.** Pabrik makanan dan ruko kecil membayar retribusi keamanan lebih tinggi kepada dinas perindustrian kota.
 
 *Kunci Jawaban:* **E**  
 *Pembahasan:* Abstraksi mengeliminasi variabel noise (pabrik non-B3, warna seragam, usia bangunan) dan memusatkan investigasi hanya pada pabrik yang secara kimiawi memproduksi limbah kromium dan timbal.
@@ -247,9 +247,9 @@ Langkah 3: Pintu air Katulampa Utara dibuka 50% untuk memecah debit, sementara w
 
 Struktur kontrol logika pemrograman komputasional apakah yang paling mendasari "Langkah 1" pada Protokol Mitigasi tersebut?
 
-**A.** Perulangan tanpa henti (Infinite While Loop) yang membunyikan sirine sepanjang tahun tanpa memeriksa kondisi cuaca.
+**A.** Percabangan kondisional logika ganda (IF curah_hujan > 150 AND pasang_rob == TRUE THEN aktifkan_sirine_level_1).
 
-**B.** Percabangan kondisional logika ganda (IF curah_hujan > 150 AND pasang_rob == TRUE THEN aktifkan_sirine_level_1).
+**B.** Perulangan tanpa henti (Infinite While Loop) yang membunyikan sirine sepanjang tahun tanpa memeriksa kondisi cuaca.
 
 **C.** Struktur antrean berurutan (Queue - FIFO) untuk mengevakuasi seluruh warga kota tanpa memandang zonasi merah atau hijau.
 
@@ -291,13 +291,13 @@ Perhatikan skenario kondisi ekstrem berikut: Pada suatu hari di bulan Januari, B
 
 Jika sistem mitigasi otomatis Kota Delta diprogram secara kaku (hardcoded) murni menggunakan syarat logika "curah_hujan > 150", kerentanan sistemik apakah yang akan terjadi (False Negative)?
 
-**A.** Pintu air Katulampa Utara akan otomatis terbuka 100% dan menyedot air laut masuk ke dalam kawasan hulu sungai.
+**A.** Komputer pemantau BMKG akan mengalami crash memori karena tidak sanggup membandingkan angka desimal di bawah 150.
 
-**B.** Komputer pemantau BMKG akan mengalami crash memori karena tidak sanggup membandingkan angka desimal di bawah 150.
+**B.** Seluruh pabrik tekstil dan aki akan otomatis meledak karena saluran pipa limbah tidak menerima data sinyal peringatan.
 
-**C.** Seluruh pabrik tekstil dan aki akan otomatis meledak karena saluran pipa limbah tidak menerima data sinyal peringatan.
+**C.** Sirine Level 1 tidak akan berbunyi karena curah hujan 149 mm tidak memenuhi syarat > 150, padahal kombinasi debit air dan pasang laut ekstrem tetap memicu bencana banjir besar.
 
-**D.** Sirine Level 1 tidak akan berbunyi karena curah hujan 149 mm tidak memenuhi syarat > 150, padahal kombinasi debit air dan pasang laut ekstrem tetap memicu bencana banjir besar.
+**D.** Pintu air Katulampa Utara akan otomatis terbuka 100% dan menyedot air laut masuk ke dalam kawasan hulu sungai.
 
 **E.** Warga zona merah akan secara sukarela mengungsi sendiri tanpa perlu menunggu instruksi dan bantuan dari tim satgas krisis.
 
@@ -313,11 +313,11 @@ Keberhasilan Protokol Mitigasi Kota Delta menjadikannya sebagai "cetak biru" (bl
 
 Karakteristik apakah yang menjadikan sebuah solusi komputasional seperti protokol Dr. Aris memiliki daya guna ulang (reusability) yang tinggi di lokasi lain?
 
-**A.** Protokol tersebut mewajibkan daerah lain memiliki luas wilayah, jumlah penduduk, dan letak geografis yang persis identik dengan Kota Delta.
+**A.** Protokol dibuat sangat rahasia sehingga hanya dapat dibeli oleh pemerintah kota yang memiliki anggaran miliaran rupiah.
 
-**B.** Protokol dibuat sangat rahasia sehingga hanya dapat dibeli oleh pemerintah kota yang memiliki anggaran miliaran rupiah.
+**B.** Protokol dirumuskan sebagai model algoritmik abstrak berbasis logika data empiris yang dapat disesuaikan parameter lokalnya di daerah lain tanpa mengubah esensi kerangka kerjanya.
 
-**C.** Protokol dirumuskan sebagai model algoritmik abstrak berbasis logika data empiris yang dapat disesuaikan parameter lokalnya di daerah lain tanpa mengubah esensi kerangka kerjanya.
+**C.** Protokol tersebut mewajibkan daerah lain memiliki luas wilayah, jumlah penduduk, dan letak geografis yang persis identik dengan Kota Delta.
 
 **D.** Protokol menolak integrasi dengan perangkat lunak komputer dan murni dijalankan menggunakan instruksi lisan turun-temurun.
 
@@ -335,15 +335,15 @@ Dalam tahapan Pengenalan Pola, seorang peneliti komputasional harus jeli memisah
 
 Di antara fenomena berikut di Kota Delta, manakah yang merupakan korelasi semu (spurious correlation) yang WAJIB disaring keluar melalui prinsip Abstraksi?
 
-**A.** Peningkatan laju erosi tanah di lereng hulu sungai Ciliwung akibat pembukaan hutan lindung menjadi kawasan villa komersial.
+**A.** Tingginya kadar timbal pada sedimen muara sungai yang berdekatan dengan saluran pembuangan akhir pabrik aki kendaraan.
 
-**B.** Tingginya kadar timbal pada sedimen muara sungai yang berdekatan dengan saluran pembuangan akhir pabrik aki kendaraan.
+**B.** Penyempitan penampang melintang sungai akibat sedimentasi lumpur yang menurunkan daya tampung volume aliran air.
 
-**C.** Penyempitan penampang melintang sungai akibat sedimentasi lumpur yang menurunkan daya tampung volume aliran air.
+**C.** Kenaikan muka air pasang rob laut Jawa yang menghambat laju pembuangan gravitasi aliran sungai menuju lepas pantai.
 
-**D.** Kenaikan muka air pasang rob laut Jawa yang menghambat laju pembuangan gravitasi aliran sungai menuju lepas pantai.
+**D.** Kenaikan drastis jumlah penjualan jas hujan dan payung di pasar swalayan Kota Delta pada setiap minggu yang bersamaan dengan terjadinya banjir lumpur.
 
-**E.** Kenaikan drastis jumlah penjualan jas hujan dan payung di pasar swalayan Kota Delta pada setiap minggu yang bersamaan dengan terjadinya banjir lumpur.
+**E.** Peningkatan laju erosi tanah di lereng hulu sungai Ciliwung akibat pembukaan hutan lindung menjadi kawasan villa komersial.
 
 *Kunci Jawaban:* **E**  
 *Pembahasan:* Penjualan payung/jas hujan meningkat di musim hujan bersamaan dengan banjir, tetapi payung bukan penyebab banjir. Ini adalah korelasi semu (spurious correlation) yang wajib dieliminasi dalam abstraksi.
@@ -377,11 +377,11 @@ Pada evaluasi akhir tahun, ditemukan bahwa sebuah pabrik tekstil besar tetap mem
 
 Strategi algoritma pengawasan komputasional apakah yang paling efektif untuk mendeteksi pelanggaran tersembunyi tersebut secara berkelanjutan?
 
-**A.** Mengirimkan surat peringatan tertulis setiap tiga bulan sekali melalui kantor pos tanpa melakukan pengambilan sampel air.
+**A.** Meminta satpam pabrik untuk mengisi kuesioner kejujuran tentang volume limbah yang dibuang oleh pihak manajemen.
 
-**B.** Meminta satpam pabrik untuk mengisi kuesioner kejujuran tentang volume limbah yang dibuang oleh pihak manajemen.
+**B.** Memasang sensor telemetri kualitas air otomatis di pipa outlet pabrik yang mengirimkan log data kadar kromium secara realtime 24 jam ke server pusat pengawas.
 
-**C.** Memasang sensor telemetri kualitas air otomatis di pipa outlet pabrik yang mengirimkan log data kadar kromium secara realtime 24 jam ke server pusat pengawas.
+**C.** Mengirimkan surat peringatan tertulis setiap tiga bulan sekali melalui kantor pos tanpa melakukan pengambilan sampel air.
 
 **D.** Menutup aliran listrik ke seluruh permukiman warga sekitar pabrik pada malam hari saat hujan deras turun.
 
@@ -401,13 +401,13 @@ Komandan Logistik, Kapten Rina, menolak melihat 15 desa tersebut sebagai satu ke
 
 Proses berpikir komputasional apakah yang diterapkan Kapten Rina melalui pengelompokan 15 desa tersebut?
 
-**A.** Pengenalan Pola Acak; mencampuradukkan data korban bencana tanpa memperhatikan tingkat kerusakan wilayah.
+**A.** Abstraksi Parsial; mengabaikan seluruh desa di Sektor Utara karena kerusakannya dianggap terlalu sulit untuk dijangkau.
 
-**B.** Abstraksi Parsial; mengabaikan seluruh desa di Sektor Utara karena kerusakannya dianggap terlalu sulit untuk dijangkau.
+**B.** Algoritma Buta; memerintahkan pilot menerbangkan helikopter ke arah mana pun sesuai arah tiupan angin pagi hari.
 
-**C.** Algoritma Buta; memerintahkan pilot menerbangkan helikopter ke arah mana pun sesuai arah tiupan angin pagi hari.
+**C.** Dekomposisi; mereduksi kompleksitas tantangan logistik 15 lokasi terisolasi menjadi 3 kluster terkelola berbasis derajat keparahan kerusakan dan skala prioritas.
 
-**D.** Dekomposisi; mereduksi kompleksitas tantangan logistik 15 lokasi terisolasi menjadi 3 kluster terkelola berbasis derajat keparahan kerusakan dan skala prioritas.
+**D.** Pengenalan Pola Acak; mencampuradukkan data korban bencana tanpa memperhatikan tingkat kerusakan wilayah.
 
 **E.** Simulasi Fiktif; menunda pengiriman bantuan hingga seluruh jalan darat selesai diaspal kembali oleh dinas pekerjaan umum.
 
@@ -423,9 +423,9 @@ Berdasarkan evaluasi arsip misi penanggulangan bencana tahun-tahun sebelumnya di
 
 Bagaimanakah rekognisi pola cuaca tersebut memengaruhi konstruksi strategi penerbangan Kapten Rina?
 
-**A.** Menyebabkan operasi penerbangan ke Sektor Utara dibatalkan sama sekali demi melindungi keselamatan helikopter dari tetesan air kabut.
+**A.** Mendorong Kapten Rina mengalokasikan seluruh (5) helikopter secara maksimal ke Sektor Utara pada pagi hari (06.00 - 10.00) sebelum batas jendela cuaca berkabut tertutup.
 
-**B.** Mendorong Kapten Rina mengalokasikan seluruh (5) helikopter secara maksimal ke Sektor Utara pada pagi hari (06.00 - 10.00) sebelum batas jendela cuaca berkabut tertutup.
+**B.** Menyebabkan operasi penerbangan ke Sektor Utara dibatalkan sama sekali demi melindungi keselamatan helikopter dari tetesan air kabut.
 
 **C.** Membuat Kapten Rina menginstruksikan pilot untuk menembus kabut tebal pada sore hari tanpa bantuan instrumen penerbangan.
 
@@ -445,15 +445,15 @@ Saat mempersiapkan pemuatan barang ke helikopter, banyak warga dan relawan donat
 
 Proses berpikir komputasional apakah yang diterapkan Kapten Rina, dan apakah justifikasi ilmiahnya dari sudut pandang keterbatasan sistem (system constraints)?
 
-**A.** Dekomposisi; membagikan mainan anak-anak terlebih dahulu agar korban bencana tidak mengalami kesedihan berlarut-larut.
+**A.** Algoritma Buta; mengabaikan seluruh permintaan bantuan dan membiarkan helikopter terbang dalam keadaan kosong tanpa muatan.
 
-**B.** Algoritma Buta; mengabaikan seluruh permintaan bantuan dan membiarkan helikopter terbang dalam keadaan kosong tanpa muatan.
+**B.** Pengenalan Pola; menyimpulkan bahwa seluruh korban bencana gempa bumi tidak membutuhkan pakaian dan obat-obatan.
 
-**C.** Pengenalan Pola; menyimpulkan bahwa seluruh korban bencana gempa bumi tidak membutuhkan pakaian dan obat-obatan.
+**C.** Otomatisasi Kargo; memprogram helikopter untuk menjatuhkan barang donasi di atas perairan danau tanpa parasut penerjun.
 
-**D.** Otomatisasi Kargo; memprogram helikopter untuk menjatuhkan barang donasi di atas perairan danau tanpa parasut penerjun.
+**D.** Abstraksi; membuang barang non-kritis dan memprioritaskan muatan penyelamat nyawa (life-saving) karena payload dan volume kargo helikopter sangat terbatas pada fase kritis 72 jam pertama.
 
-**E.** Abstraksi; membuang barang non-kritis dan memprioritaskan muatan penyelamat nyawa (life-saving) karena payload dan volume kargo helikopter sangat terbatas pada fase kritis 72 jam pertama.
+**E.** Dekomposisi; membagikan mainan anak-anak terlebih dahulu agar korban bencana tidak mengalami kesedihan berlarut-larut.
 
 *Kunci Jawaban:* **E**  
 *Pembahasan:* Abstraksi menyingkirkan detail/elemen non-kritis (baju bekas, mainan) dan fokus pada prioritas keselamatan nyawa (air, medis, makanan kalori, radio) karena kapasitas angkut helikopter sangat terbatas.
@@ -493,13 +493,13 @@ Dalam jadwal penerbangan Kapten Rina, pukul 10.00 - 11.00 ditetapkan secara keta
 
 Jika seorang pejabat lapangan menuntut agar tahap refueling tersebut dihilangkan demi gengsi publikasi bahwa helikopter terbang tanpa jeda, konsekuensi kegagalan sistem komputasional (system failure) apakah yang pasti terjadi?
 
-**A.** Helikopter akan terbang lebih kencang karena muatan bahan bakar di dalam tangki menjadi kosong dan ringan.
+**A.** Penduduk di Sektor Tengah akan menerima makanan instan dalam kondisi terlalu panas akibat panas mesin helikopter.
 
-**B.** Penduduk di Sektor Tengah akan menerima makanan instan dalam kondisi terlalu panas akibat panas mesin helikopter.
+**B.** Cuaca buruk di sore hari akan tertunda kemunculannya hingga pengisian bahan bakar dilakukan pada malam hari.
 
-**C.** Cuaca buruk di sore hari akan tertunda kemunculannya hingga pengisian bahan bakar dilakukan pada malam hari.
+**C.** Kehabisan daya sumber energi di tengah rute penerbangan sesi kedua (Resource Depletion), yang memicu insiden kecelakaan fatal dan kegagalan total seluruh misi kemanusiaan.
 
-**D.** Kehabisan daya sumber energi di tengah rute penerbangan sesi kedua (Resource Depletion), yang memicu insiden kecelakaan fatal dan kegagalan total seluruh misi kemanusiaan.
+**D.** Helikopter akan terbang lebih kencang karena muatan bahan bakar di dalam tangki menjadi kosong dan ringan.
 
 **E.** Pilot helikopter akan kehilangan sinyal GPS satelit secara permanen akibat ketiadaan avtur di dalam karburator.
 
@@ -515,9 +515,9 @@ Pada tahapan ke-4 jadwal Kapten Rina tertulis: "Pukul 14.00 - Selesai: Operasi d
 
 Dari perspektif pemeliharaan sistem komputasional yang tangguh (robust & sustainable system), mengapa penghentian operasi pada pukul 14.00 merupakan keputusan yang sangat cerdas, alih-alih bentuk pemalasan?
 
-**A.** Memberi kesempatan kepada Kapten Rina untuk meninggalkan lokasi posko bencana dan berlibur ke luar kota pegunungan.
+**A.** Menerapkan batas toleransi keamanan (safety threshold) untuk mencegah risiko kerugian aset total akibat cuaca buruk dan menjamin kesiapan armada untuk beroperasi kembali keesokan paginya.
 
-**B.** Menerapkan batas toleransi keamanan (safety threshold) untuk mencegah risiko kerugian aset total akibat cuaca buruk dan menjamin kesiapan armada untuk beroperasi kembali keesokan paginya.
+**B.** Memberi kesempatan kepada Kapten Rina untuk meninggalkan lokasi posko bencana dan berlibur ke luar kota pegunungan.
 
 **C.** Karena setelah pukul 14.00 seluruh korban bencana di perbukitan sudah tidak membutuhkan pertolongan medis.
 
@@ -537,11 +537,11 @@ Bandingkan tindakan Dr. Aris pada Kasus 1 (Kota Delta) dan Kapten Rina pada Kasu
 
 Persamaan mendasar apakah yang dapat disintesis dari cara kedua tokoh tersebut menerapkan pilar ABSTRAKSI dalam menyelesaikan krisis masing-masing?
 
-**A.** Keduanya menolak menggunakan bantuan teknologi komputer dan hanya mengandalkan firasat batin dalam memimpin operasi penyelamatan.
+**A.** Keduanya membagi daerah krisis menjadi sepuluh zona acak tanpa menggunakan data historis bencana masa lalu.
 
-**B.** Keduanya membagi daerah krisis menjadi sepuluh zona acak tanpa menggunakan data historis bencana masa lalu.
+**B.** Keduanya secara disiplin menyaring dan membuang elemen non-kritis (pabrik non-B3 oleh Dr. Aris, dan barang non-medis oleh Kapten Rina) demi memusatkan kapasitas terbatas pada faktor penyelamat hidup utama.
 
-**C.** Keduanya secara disiplin menyaring dan membuang elemen non-kritis (pabrik non-B3 oleh Dr. Aris, dan barang non-medis oleh Kapten Rina) demi memusatkan kapasitas terbatas pada faktor penyelamat hidup utama.
+**C.** Keduanya menolak menggunakan bantuan teknologi komputer dan hanya mengandalkan firasat batin dalam memimpin operasi penyelamatan.
 
 **D.** Keduanya membatalkan operasi evakuasi warga dan membiarkan krisis diselesaikan sendiri oleh alam.
 
@@ -559,15 +559,15 @@ Pada Kasus 1 (Kota Delta), Dr. Aris melakukan dekomposisi berdasarkan *aspek sai
 
 Kesimpulan konseptual apakah yang paling valid mengenai fleksibilitas pilar Dekomposisi dalam pemecahan masalah dunia nyata?
 
-**A.** Dekomposisi hanya sah dan benar jika membagi daerah menjadi tiga sektor geografis yang berbentuk bujur sangkar sempurna.
+**A.** Dekomposisi pada operasi tanggap bencana alam selalu gagal jika tidak menggunakan rumus matematika diferensial integral.
 
-**B.** Dekomposisi pada operasi tanggap bencana alam selalu gagal jika tidak menggunakan rumus matematika diferensial integral.
+**B.** Dekomposisi fungsional sains lingkungan tidak boleh digabungkan dengan dekomposisi geografis dalam satu sistem pemerintahan.
 
-**C.** Dekomposisi fungsional sains lingkungan tidak boleh digabungkan dengan dekomposisi geografis dalam satu sistem pemerintahan.
+**C.** Dekomposisi harus selalu menghasilkan bagian-bagian yang dikerjakan oleh robot tanpa keterlibatan tenaga manusia.
 
-**D.** Dekomposisi harus selalu menghasilkan bagian-bagian yang dikerjakan oleh robot tanpa keterlibatan tenaga manusia.
+**D.** Dekomposisi dapat diterapkan melalui berbagai dimensi pemotongan (fungsional, spasial/geografis, kronologis, atau derajat keparahan), disesuaikan dengan arsitektur masalah dan tujuan operasional.
 
-**E.** Dekomposisi dapat diterapkan melalui berbagai dimensi pemotongan (fungsional, spasial/geografis, kronologis, atau derajat keparahan), disesuaikan dengan arsitektur masalah dan tujuan operasional.
+**E.** Dekomposisi hanya sah dan benar jika membagi daerah menjadi tiga sektor geografis yang berbentuk bujur sangkar sempurna.
 
 *Kunci Jawaban:* **E**  
 *Pembahasan:* Dekomposisi bersifat fleksibel dan adaptif: dapat dilakukan secara fungsional keilmuan maupun spasial geografis, disesuaikan dengan kebutuhan pemecahan masalah di lapangan.
@@ -581,9 +581,9 @@ Pada pukul 08.00 pagi dalam misi Garuda Rescue, sebuah helikopter kargo mengalam
 
 Berdasarkan prinsip berpikir komputasional yang tangguh dan adaptif, modifikasi algoritma jadwal manakah yang paling rasional diambil oleh Kapten Rina?
 
-**A.** Membatalkan seluruh penerbangan hari itu dan membiarkan warga di 15 desa menunggu hingga helikopter pengganti tiba minggu depan.
+**A.** Menjaga prioritas penyelamatan Sektor Utara dengan mengerahkan ke-4 helikopter tersisa hingga pukul 10.00, lalu mengalokasikan masing-masing 2 helikopter untuk Sektor Tengah dan Selatan di sesi siang.
 
-**B.** Menjaga prioritas penyelamatan Sektor Utara dengan mengerahkan ke-4 helikopter tersisa hingga pukul 10.00, lalu mengalokasikan masing-masing 2 helikopter untuk Sektor Tengah dan Selatan di sesi siang.
+**B.** Membatalkan seluruh penerbangan hari itu dan membiarkan warga di 15 desa menunggu hingga helikopter pengganti tiba minggu depan.
 
 **C.** Memaksa helikopter yang rusak pompa oli untuk tetap terbang membawa muatan melintasi perbukitan berkabut tebal.
 
@@ -625,13 +625,13 @@ Kawasan pertanian apel di lereng Bumiaji dan Panderman Kota Batu menghadapi tant
 
 Siswa Kelas X SMAN 1 Batu ditugaskan merancang solusi sistem Pertanian Presisi (Smart Precision Farming) berbasis Berpikir Komputasional. Tindakan manakah yang merepresentasikan pilar PENGENALAN POLA secara tepat dalam proyek ini?
 
-**A.** Mengecat batang pohon apel dengan warna putih agar terlihat rapi saat difoto oleh wisatawan yang berkunjung ke kebun.
+**A.** Membeli pompa air berkapasitas terbesar di pasaran tanpa memeriksa debit sumber mata air alami di lereng bukit.
 
-**B.** Membeli pompa air berkapasitas terbesar di pasaran tanpa memeriksa debit sumber mata air alami di lereng bukit.
+**B.** Mengganti seluruh pohon apel dengan tanaman padi sawah tanpa menguji kesesuaian jenis tanah dan ketinggian lereng.
 
-**C.** Mengganti seluruh pohon apel dengan tanaman padi sawah tanpa menguji kesesuaian jenis tanah dan ketinggian lereng.
+**C.** Menganalisis korelasi data histori sensor kelembapan tanah, suhu udara, dan kecepatan angin selama 5 musim panen dengan siklus kemunculan ledakan populasi hama kutu sisik.
 
-**D.** Menganalisis korelasi data histori sensor kelembapan tanah, suhu udara, dan kecepatan angin selama 5 musim panen dengan siklus kemunculan ledakan populasi hama kutu sisik.
+**D.** Mengecat batang pohon apel dengan warna putih agar terlihat rapi saat difoto oleh wisatawan yang berkunjung ke kebun.
 
 **E.** Menyemprotkan cairan pestisida kimia secara serentak setiap jam sepanjang hari tanpa memantau keberadaan hama.
 
@@ -647,11 +647,11 @@ Setiap akhir pekan panjang, kemacetan parah melanda ruas jalan protokol Kota Bat
 
 Dalam proses memodelkan jaringan jalan Kota Batu ke dalam bentuk graf (Graph Modeling), tindakan ABSTRAKSI manakah yang paling esensial dilakukan?
 
-**A.** Menghitung secara rinci setiap helai daun dan jenis tanaman hias di median jalan sebelum menghitung volume kendaraan yang melintas.
+**A.** Mengharuskan setiap pengendara mobil wisata menyebutkan nama lengkap kakek-neneknya sebelum diizinkan melintasi jalan Diponegoro.
 
-**B.** Mengharuskan setiap pengendara mobil wisata menyebutkan nama lengkap kakek-neneknya sebelum diizinkan melintasi jalan Diponegoro.
+**B.** Merepresentasikan persimpangan sebagai titik (Nodes) dan ruas jalan sebagai garis berbobot (Edges) yang memuat panjang jalan serta kecepatan rata-rata, sembari mengabaikan warna cat ruko atau jenis pohon di tepi jalan.
 
-**C.** Merepresentasikan persimpangan sebagai titik (Nodes) dan ruas jalan sebagai garis berbobot (Edges) yang memuat panjang jalan serta kecepatan rata-rata, sembari mengabaikan warna cat ruko atau jenis pohon di tepi jalan.
+**C.** Menghitung secara rinci setiap helai daun dan jenis tanaman hias di median jalan sebelum menghitung volume kendaraan yang melintas.
 
 **D.** Menggambar kembali seluruh reklame iklan komersial di sepanjang jalan dengan tingkat kedetilan piksel 4K ke dalam peta GPS navigasi.
 
@@ -669,15 +669,15 @@ Sebagai generasi muda yang mempelajari Informatika dan Berpikir Komputasional di
 
 Prinsip etis dan humanis manakah yang paling fundamental dijaga oleh seorang perancang sistem komputasi yang bertanggung jawab?
 
-**A.** Merancang algoritma sebagai kotak hitam (Black Box) yang tertutup rapat agar tidak ada warga masyarakat yang dapat memprotes keputusan sistem.
+**A.** Memprogram sistem agar selalu mendahulukan kepentingan kelompok elit pemilik modal terbesar dibanding keselamatan warga perkampungan kecil.
 
-**B.** Memprogram sistem agar selalu mendahulukan kepentingan kelompok elit pemilik modal terbesar dibanding keselamatan warga perkampungan kecil.
+**B.** Menghapus rekaman log jejak audit secara otomatis jika terindikasi sistem melakukan kesalahan fatal yang merugikan masyarakat luas.
 
-**C.** Menghapus rekaman log jejak audit secara otomatis jika terindikasi sistem melakukan kesalahan fatal yang merugikan masyarakat luas.
+**C.** Menyerahkan seluruh keputusan etika dan moral kepada prosesor komputer tanpa menyediakan ruang banding atau pengawasan oleh manusia.
 
-**D.** Menyerahkan seluruh keputusan etika dan moral kepada prosesor komputer tanpa menyediakan ruang banding atau pengawasan oleh manusia.
+**D.** Menjaga transparansi logika pengambilan keputusan (Explainability), keadilan algoritma tanpa bias diskriminatif, perlindungan privasi data warga, dan akuntabilitas moral manusia terhadap dampak keputusan sistem.
 
-**E.** Menjaga transparansi logika pengambilan keputusan (Explainability), keadilan algoritma tanpa bias diskriminatif, perlindungan privasi data warga, dan akuntabilitas moral manusia terhadap dampak keputusan sistem.
+**E.** Merancang algoritma sebagai kotak hitam (Black Box) yang tertutup rapat agar tidak ada warga masyarakat yang dapat memprotes keputusan sistem.
 
 *Kunci Jawaban:* **E**  
 *Pembahasan:* Prinsip etika rekayasa komputasional modern menuntut transparansi (explainable algorithms), keadilan data (fairness), keselamatan warga, dan pertanggungjawaban manusia (human accountability) sebagai pemegang kendali utama.

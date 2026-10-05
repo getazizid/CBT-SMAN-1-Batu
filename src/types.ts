@@ -47,6 +47,7 @@ export interface Exam {
   teacherName: string;
   blockEarlyExit?: boolean; // Siswa tidak bisa keluar/kumpulkan sebelum waktu selesai
   disallowMultipleAttempts?: boolean; // Siswa hanya dapat mengerjakan 1 kali (tidak bisa mengerjakan 2x)
+  useWeightedScoring?: boolean; // false: Pilihan ganda standar (1 jawaban benar penuh, lainnya 0). true: Skor bertingkat per opsi A-E.
 }
 
 export interface StudentAnswerDetail {
