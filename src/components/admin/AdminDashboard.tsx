@@ -19,6 +19,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  Radio,
   Search,
   Shield,
   ShieldAlert,
@@ -49,6 +50,7 @@ import { StudentBatchImportModal } from './StudentBatchImportModal';
 import { StudentDetailModal } from './StudentDetailModal';
 import { StudentEditorModal } from './StudentEditorModal';
 import { WordImportModal } from './WordImportModal';
+import { LiveMonitorTab } from './LiveMonitorTab';
 import { Pagination } from '../common/Pagination';
 
 interface AdminDashboardProps {
@@ -66,7 +68,8 @@ interface AdminDashboardProps {
   onLogoutAdmin: () => void;
 }
 
-type AdminTab = 'exams' | 'questions' | 'students' | 'submissions' | 'accounts';
+type AdminTab = 'exams' | 'live' | 'questions' | 'students' | 'submissions' | 'accounts';
+
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   exams,
@@ -573,6 +576,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       badge: `${exams.length}`,
     },
     {
+      id: 'live' as AdminTab,
+      label: 'Live Monitor',
+      icon: Radio,
+      badge: 'LIVE',
+    },
+    {
       id: 'questions' as AdminTab,
       label: 'Editor Bank Soal',
       icon: ListOrdered,
@@ -620,13 +629,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="flex items-center gap-2.5 min-w-0">
               <Icon
                 className={`w-4 h-4 shrink-0 ${
-                  isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'
+                  isActive ? 'text-white' : item.id === 'live' ? 'text-rose-500 animate-pulse' : 'text-slate-400 dark:text-slate-500'
                 }`}
               />
               <span className="truncate">{item.label}</span>
             </div>
 
-            {item.badge && (
+            {item.id === 'live' ? (
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full font-black tracking-wider uppercase shrink-0 flex items-center gap-1.5 ${
+                  isActive
+                    ? 'bg-rose-500 text-white shadow-xs'
+                    : 'bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300'
+                }`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+                <span>LIVE</span>
+              </span>
+            ) : item.badge ? (
               <span
                 className={`text-[11px] px-2 py-0.5 rounded-full font-bold shrink-0 ${
                   isActive
@@ -636,7 +656,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               >
                 {item.badge}
               </span>
-            )}
+            ) : null}
           </button>
         );
       })}
@@ -766,6 +786,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div>
                 <h2 className="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white tracking-tight">
                   {activeTab === 'exams' && 'Paket Ujian'}
+                  {activeTab === 'live' && 'Pemantauan Ujian Realtime (Live Proctor)'}
                   {activeTab === 'questions' && 'Editor Bank Soal'}
                   {activeTab === 'students' && 'Data Siswa & Hak Akses Login'}
                   {activeTab === 'submissions' && 'Riwayat Nilai Siswa'}
@@ -773,6 +794,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
                   {activeTab === 'exams' && 'Daftar paket ujian, token, status aktif, pengaturan KKM, dan kunci waktu selesai.'}
+                  {activeTab === 'live' && 'Pantau layar siswa secara langsung, deteksi kecurangan, jawaban benar/salah, dan progres pengerjaan (Quizizz Pro).'}
                   {activeTab === 'questions' && 'Kelola soal dan pembobotan skor opsi jawaban A - E.'}
                   {activeTab === 'students' && 'Kelola daftar siswa yang ditentukan dan berhak login ke sistem ujian CBT.'}
                   {activeTab === 'submissions' && 'Rekapitulasi lembar jawaban siswa dan ekspor Excel.'}
@@ -1026,6 +1048,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <button
                             onClick={() => {
                               setSelectedExamId(exam.id);
+                              setActiveTab('live');
+                            }}
+                            className="p-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 rounded-xl border border-rose-200 dark:border-rose-900 transition-colors cursor-pointer"
+                            title="Buka Live Proctor Monitor untuk paket ini"
+                          >
+                            <Radio className="w-4 h-4 animate-pulse" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedExamId(exam.id);
                               setActiveTab('questions');
                               setQuestionsPage(1);
                             }}
@@ -1073,9 +1105,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs"
                 />
               )}
-                </>
-              )}
-            </div>
+            </>
+          )}
+        </div>
+      )}
+
+          {/* TAB: LIVE PROCTORING MONITOR (QUIZIZZ PRO REALTIME) */}
+          {activeTab === 'live' && (
+            <LiveMonitorTab
+              exams={exams}
+              selectedExamId={selectedExamId}
+              onSelectExam={(id) => setSelectedExamId(id)}
+              onSwitchToExamsTab={() => setActiveTab('exams')}
+            />
           )}
 
           {/* TAB 2: EDITOR BANK SOAL */}

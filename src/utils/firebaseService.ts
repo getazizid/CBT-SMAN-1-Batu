@@ -7,10 +7,12 @@ import {
   getDoc,
   onSnapshot,
   writeBatch,
+  query,
+  where,
   Unsubscribe,
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../firebase';
-import { AdminAccount, Exam, RegisteredStudent, StudentExamSubmission } from '../types';
+import { AdminAccount, Exam, LiveStudentSession, RegisteredStudent, StudentExamSubmission } from '../types';
 import {
   INITIAL_ADMIN_ACCOUNTS,
   INITIAL_EXAMS,
@@ -25,7 +27,9 @@ export const COLLECTIONS = {
   STUDENTS: 'cbt_students',
   ADMIN_ACCOUNTS: 'cbt_admin_accounts',
   SETTINGS: 'cbt_settings',
+  LIVE_SESSIONS: 'cbt_live_sessions',
 };
+
 
 /**
  * Seed & harmonize initial data for MPK-OSIS SMAN 1 Batu.
@@ -462,3 +466,202 @@ export const saveSettingsToFirestore = async (settings: { enforceWhitelist: bool
     console.error('Error saving settings to Firestore:', err);
   }
 };
+
+/**
+ * =========================================================================
+ * REALTIME LIVE MONITORING ENGINE (QUIZIZZ PRO-STYLE & FREE SPARK OPTIMIZED)
+ * =========================================================================
+ */
+const LIVE_CHANNEL_NAME = 'cbt_sman1batu_live_channel';
+
+const getBroadcastChannel = (): BroadcastChannel | null => {
+  if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+    try {
+      return new BroadcastChannel(LIVE_CHANNEL_NAME);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
+/**
+ * Save / Update student live exam status and progress.
+ * Dual-syncs to Firestore and local BroadcastChannel for zero-quota testing.
+ */
+export const saveLiveSessionToFirestore = async (session: LiveStudentSession): Promise<void> => {
+  // 1. Broadcast locally immediately (0 Firestore writes/reads, instant cross-tab sync)
+  try {
+    const bc = getBroadcastChannel();
+    if (bc) {
+      bc.postMessage({ type: 'LIVE_UPDATE', session });
+      bc.close();
+    }
+    // Also save in localStorage as reliable offline backup
+    localStorage.setItem(`cbt_live_session_${session.id}`, JSON.stringify(session));
+  } catch {
+    // Ignore local broadcast errors
+  }
+
+  // 2. Synchronize to Cloud Firestore if connected
+  if (!db || !isFirebaseConfigured()) return;
+
+  try {
+    const docRef = doc(db, COLLECTIONS.LIVE_SESSIONS, session.id);
+    await setDoc(docRef, cleanForFirestore(session), { merge: true });
+  } catch (err: unknown) {
+    const errorObj = err as { code?: string };
+    if (errorObj?.code === 'resource-exhausted') {
+      console.warn('⚠️ Batas kuota harian Firebase Spark tercapai. Menggunakan sinkronisasi cadangan.');
+    } else {
+      console.warn('Gagal sinkronisasi live session ke Firestore:', err);
+    }
+  }
+};
+
+/**
+ * Realtime listener for Admin Live Proctoring Monitor.
+ * Listens to active students for a specific exam, debounced and quota-protected.
+ */
+export const subscribeToLiveSessions = (
+  examId: string,
+  onUpdate: (sessions: LiveStudentSession[]) => void,
+  onError?: (error: Error) => void
+): Unsubscribe => {
+  const sessionsMap: Record<string, LiveStudentSession> = {};
+
+  // Check localStorage for any pre-existing local session records
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('cbt_live_session_')) {
+        const item = localStorage.getItem(key);
+        if (item) {
+          const parsed = JSON.parse(item) as LiveStudentSession;
+          if (parsed && (!examId || parsed.examId === examId)) {
+            sessionsMap[parsed.id] = parsed;
+          }
+        }
+      }
+    }
+    if (Object.keys(sessionsMap).length > 0) {
+      onUpdate(Object.values(sessionsMap));
+    }
+  } catch {
+    // Ignore localStorage scan error
+  }
+
+  // Set up local BroadcastChannel listener for instant zero-latency updates
+  const bc = getBroadcastChannel();
+  if (bc) {
+    bc.onmessage = (event) => {
+      const data = event.data;
+      if (data?.type === 'LIVE_UPDATE' && data.session) {
+        const s = data.session as LiveStudentSession;
+        if (!examId || s.examId === examId) {
+          sessionsMap[s.id] = s;
+          onUpdate(Object.values(sessionsMap));
+        }
+      } else if (data?.type === 'LIVE_DELETE' && data.sessionId) {
+        delete sessionsMap[data.sessionId];
+        onUpdate(Object.values(sessionsMap));
+      }
+    };
+  }
+
+  // If Firebase Firestore is not configured, rely purely on local channel
+  if (!db || !isFirebaseConfigured()) {
+    return () => {
+      if (bc) bc.close();
+    };
+  }
+
+  // Subscribe to Cloud Firestore collection query
+  let firestoreUnsub: Unsubscribe = () => {};
+  try {
+    const colRef = collection(db, COLLECTIONS.LIVE_SESSIONS);
+    const q = examId ? query(colRef, where('examId', '==', examId)) : colRef;
+
+    firestoreUnsub = onSnapshot(
+      q,
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const docData = change.doc.data() as LiveStudentSession;
+          if (change.type === 'removed') {
+            delete sessionsMap[change.doc.id];
+          } else if (docData && docData.id) {
+            sessionsMap[docData.id] = docData;
+          }
+        });
+
+        // Convert map to sorted array (violations first, then active, then others)
+        const list = Object.values(sessionsMap);
+        list.sort((a, b) => {
+          // Warning/exit status first
+          if (a.status === 'warning_exit' && b.status !== 'warning_exit') return -1;
+          if (b.status === 'warning_exit' && a.status !== 'warning_exit') return 1;
+          // Then by violation count descending
+          if ((b.violationCount || 0) !== (a.violationCount || 0)) {
+            return (b.violationCount || 0) - (a.violationCount || 0);
+          }
+          // Then by class & student name
+          return (a.studentClass || '').localeCompare(b.studentClass || '') || (a.studentName || '').localeCompare(b.studentName || '');
+        });
+
+        onUpdate(list);
+      },
+      (err) => {
+        console.warn('Firestore LiveSessions subscription notice:', err);
+        onError?.(err);
+      }
+    );
+  } catch (err) {
+    console.warn('Failed to start Firestore live sessions listener:', err);
+  }
+
+  return () => {
+    firestoreUnsub();
+    if (bc) bc.close();
+  };
+};
+
+/**
+ * Remove live session after student successfully submits
+ */
+export const deleteLiveSessionFromFirestore = async (sessionId: string): Promise<void> => {
+  try {
+    localStorage.removeItem(`cbt_live_session_${sessionId}`);
+    const bc = getBroadcastChannel();
+    if (bc) {
+      bc.postMessage({ type: 'LIVE_DELETE', sessionId });
+      bc.close();
+    }
+  } catch {
+    // Ignore error
+  }
+
+  if (!db || !isFirebaseConfigured()) return;
+  try {
+    await deleteDoc(doc(db, COLLECTIONS.LIVE_SESSIONS, sessionId));
+  } catch (err) {
+    console.error('Error removing live session from Firestore:', err);
+  }
+};
+
+/**
+ * Clear all live sessions for an exam (used by Proktor to reset session)
+ */
+export const clearAllLiveSessionsForExam = async (examId: string): Promise<void> => {
+  if (!db || !isFirebaseConfigured()) return;
+  try {
+    const colRef = collection(db, COLLECTIONS.LIVE_SESSIONS);
+    const q = query(colRef, where('examId', '==', examId));
+    const snap = await getDocs(q);
+    const batch = writeBatch(db);
+    snap.forEach((d) => batch.delete(d.ref));
+    await batch.commit();
+  } catch (err) {
+    console.error('Error clearing live sessions for exam:', err);
+  }
+};
+

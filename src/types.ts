@@ -142,3 +142,35 @@ export interface FirebaseConfigState {
   isConfigured: boolean;
   useLocalStorageFallback: boolean;
 }
+
+export interface LiveStudentSession {
+  id: string; // `${examId}_${studentNisn}`
+  examId: string;
+  examTitle: string;
+  studentNisn: string;
+  studentName: string;
+  studentClass: string;
+  status: 'active' | 'warning_exit' | 'offline' | 'submitted';
+  violationCount: number;
+  lastViolationAt?: string;
+  lastViolationReason?: string;
+  isFullscreen: boolean;
+  deviceType: 'Android' | 'iPhone' | 'iPad' | 'Desktop/PC';
+  deviceInfo?: string;
+  currentQuestionIndex: number;
+  currentQuestionNumber: number;
+  totalQuestions: number;
+  answeredCount: number;
+  unansweredCount: number;
+  flaggedCount: number;
+  correctCount: number;
+  incorrectCount: number;
+  scoreEarned: number;
+  maxScore: number;
+  scoreScale100: number;
+  timeLeftSeconds: number;
+  answers: Record<string, OptionKey>;
+  lastActiveAt: string;
+  startedAt: string;
+}
+

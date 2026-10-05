@@ -11,14 +11,16 @@ import {
   Maximize2,
   Minimize2,
   Moon,
+  Radio,
   Send,
   ShieldAlert,
+  Smartphone,
   Sun,
   Type,
   User,
   X
 } from 'lucide-react';
-import { Exam, OptionKey, Question, StudentAnswerDetail, StudentExamSubmission } from '../../types';
+import { Exam, LiveStudentSession, OptionKey, Question, StudentAnswerDetail, StudentExamSubmission } from '../../types';
 import { useTheme } from '../../context/ThemeContext';
 import {
   INITIAL_EXAMS,
@@ -29,11 +31,16 @@ import {
 } from '../../utils/storage';
 import {
   exitAppFullscreen,
+  getDeviceCategory,
+  getDeviceInfoString,
   isCurrentlyFullscreen,
   isFullscreenSupported,
   isIOSDevice,
+  isIOSStandalone,
   requestAppFullscreen,
 } from '../../utils/deviceHelper';
+import { saveLiveSessionToFirestore } from '../../utils/firebaseService';
+
 
 interface ExamRoomProps {
   exam: Exam;
@@ -155,16 +162,119 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
   const [tabSwitchCount, setTabSwitchCount] = useState<number>(() => initialSaved?.tabSwitchCount ?? 0);
   const [showCheatWarning, setShowCheatWarning] = useState<boolean>(false);
+  const [lastViolationReason, setLastViolationReason] = useState<string>('');
   const [showQuestionGridMobile, setShowQuestionGridMobile] = useState<boolean>(false);
   const [showRestoredNotice, setShowRestoredNotice] = useState<boolean>(() => !!initialSaved);
 
+  const fsSupported = isFullscreenSupported();
+  const isIOS = isIOSDevice();
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(() => 
+    fsSupported ? isCurrentlyFullscreen() : true
+  );
+  // Initial entry gate: require student to tap fullscreen button on Android & PC
+  const [needsInitialFullscreen, setNeedsInitialFullscreen] = useState<boolean>(() => 
+    !isIOS && fsSupported && !isCurrentlyFullscreen()
+  );
+
   const startTimeRef = useRef<string>(initialSaved?.startTime ?? new Date().toISOString());
   const lastViolationTimeRef = useRef<number>(0);
+  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const currentQuestion = displayQuestions[currentIndex] || displayQuestions[0] || {
     displayNumber: 1,
     originalQuestion: { id: 'fallback', number: 1, text: '', options: [], optionScores: {} },
     text: 'Memuat data soal...',
     options: [],
+  };
+
+  // Compute live progress and score breakdown for instant proctor display
+  const getLiveStats = () => {
+    let answered = 0;
+    let correct = 0;
+    let incorrect = 0;
+    let earned = 0;
+    let max = 0;
+
+    const masterQuestions =
+      exam?.questions && Array.isArray(exam.questions) && exam.questions.length > 0
+        ? exam.questions
+        : INITIAL_EXAMS[0]?.questions || [];
+
+    masterQuestions.forEach((q) => {
+      const scores = q.optionScores || {};
+      const maxScore = Math.max(...(Object.values(scores) as number[]), 0);
+      max += maxScore;
+
+      const selectedKey = answersByQuestionId[q.id];
+      if (selectedKey) {
+        answered++;
+        const score = scores[selectedKey] ?? 0;
+        earned += score;
+        if (score === maxScore && maxScore > 0) {
+          correct++;
+        } else {
+          incorrect++;
+        }
+      }
+    });
+
+    const scoreScale100 = max > 0 ? Math.round((earned / max) * 100 * 10) / 10 : 0;
+    const total = masterQuestions.length || displayQuestions.length;
+
+    return {
+      answeredCount: answered,
+      unansweredCount: total - answered,
+      correctCount: correct,
+      incorrectCount: incorrect,
+      scoreEarned: earned,
+      maxScore: max,
+      scoreScale100,
+      totalQuestions: total,
+    };
+  };
+
+  // Sync state to Firebase Live Proctor collection (Safe for Free Tier Spark & Vercel)
+  const syncLiveToFirebase = (
+    statusOverride?: 'active' | 'warning_exit' | 'offline' | 'submitted',
+    violationsOverride?: number,
+    violationReason?: string
+  ) => {
+    const stats = getLiveStats();
+    const currentStatus = statusOverride || (showCheatWarning ? 'warning_exit' : 'active');
+    const vCount = violationsOverride !== undefined ? violationsOverride : tabSwitchCount;
+
+    const liveSession: LiveStudentSession = {
+      id: `${exam.id}_${studentData.nisn}`,
+      examId: exam.id,
+      examTitle: exam.title,
+      studentNisn: studentData.nisn,
+      studentName: studentData.name,
+      studentClass: studentData.studentClass,
+      status: currentStatus,
+      violationCount: vCount,
+      lastViolationAt: vCount > 0 ? new Date().toISOString() : undefined,
+      lastViolationReason: violationReason || lastViolationReason,
+      isFullscreen: !showCheatWarning && isCurrentlyFullscreen(),
+      deviceType: getDeviceCategory(),
+      deviceInfo: getDeviceInfoString(),
+      currentQuestionIndex: currentIndex,
+      currentQuestionNumber: currentIndex + 1,
+      totalQuestions: stats.totalQuestions,
+      answeredCount: stats.answeredCount,
+      unansweredCount: stats.unansweredCount,
+      flaggedCount: flaggedDisplayNumbers.length,
+      correctCount: stats.correctCount,
+      incorrectCount: stats.incorrectCount,
+      scoreEarned: stats.scoreEarned,
+      maxScore: stats.maxScore,
+      scoreScale100: stats.scoreScale100,
+      timeLeftSeconds,
+      answers: answersByQuestionId,
+      lastActiveAt: new Date().toISOString(),
+      startedAt: startTimeRef.current,
+    };
+
+    saveLiveSessionToFirestore(liveSession);
   };
 
   // Auto-save exam progress continuously to localStorage
@@ -195,6 +305,34 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     currentIndex,
   ]);
 
+  // Debounced live sync to Firestore when answers or question position changes (2.5s debounce)
+  useEffect(() => {
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+    syncTimeoutRef.current = setTimeout(() => {
+      syncLiveToFirebase();
+    }, 2500);
+
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, [answersByQuestionId, currentIndex, flaggedDisplayNumbers]);
+
+  // Keep-alive heartbeat every 30 seconds to update remaining time & online status
+  useEffect(() => {
+    // Initial sync
+    syncLiveToFirebase();
+
+    const interval = setInterval(() => {
+      syncLiveToFirebase();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Window beforeunload protection
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -222,11 +360,18 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  const fsSupported = isFullscreenSupported();
-  const isIOS = isIOSDevice();
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(() => 
-    fsSupported ? isCurrentlyFullscreen() : true
-  );
+  // Setup iOS Fullscreen CSS & Viewport lock
+  useEffect(() => {
+    if (isIOS) {
+      document.documentElement.classList.add('cbt-ios-fullscreen');
+      window.scrollTo(0, 1);
+    }
+    return () => {
+      if (isIOS) {
+        document.documentElement.classList.remove('cbt-ios-fullscreen');
+      }
+    };
+  }, [isIOS]);
 
   const toggleFullscreen = () => {
     if (!fsSupported) return;
@@ -242,12 +387,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     requestAppFullscreen();
   };
 
-  // Anti-cheat detector & Fullscreen enforcer
+  // Anti-cheat detector & Fullscreen enforcer (Quizizz Pro Style)
   useEffect(() => {
-    if (fsSupported && !isCurrentlyFullscreen()) {
-      requestAppFullscreen();
-    }
-
     const playAlertSound = () => {
       try {
         if (typeof window === 'undefined') return;
@@ -272,40 +413,54 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       } catch {}
     };
 
-    const recordViolation = () => {
+    const recordViolation = (reason: string = 'Keluar Layar Penuh / Pindah Aplikasi') => {
       const now = Date.now();
       if (now - lastViolationTimeRef.current < 1500) return;
       lastViolationTimeRef.current = now;
-      setTabSwitchCount((prev) => prev + 1);
+      const nextCount = tabSwitchCount + 1;
+      setTabSwitchCount(nextCount);
+      setLastViolationReason(reason);
       setShowCheatWarning(true);
       playAlertSound();
+
+      // Send IMMEDIATE live notification to Proktor Admin
+      syncLiveToFirebase('warning_exit', nextCount, reason);
     };
 
     const handleFullscreenChange = () => {
       if (!fsSupported) return;
       const isFs = isCurrentlyFullscreen();
       setIsFullscreen(isFs);
-      if (!isFs) recordViolation();
+      if (!isFs && !needsInitialFullscreen) {
+        recordViolation('Keluar dari Mode Layar Penuh (Fullscreen)');
+      }
     };
 
     const handleVisibilityChange = () => {
-      if (document.hidden || document.visibilityState === 'hidden') recordViolation();
+      if (document.hidden || document.visibilityState === 'hidden') {
+        recordViolation('Berpindah Tab / Membuka Aplikasi Lain');
+      }
     };
 
-    const handlePageHide = () => recordViolation();
+    const handlePageHide = () => {
+      recordViolation('Meninggalkan Halaman Ujian (Page Hide)');
+    };
 
     const handleWindowBlur = () => {
       if (isIOS) {
-        if (document.hidden || document.visibilityState === 'hidden') recordViolation();
+        // On iOS Safari, check if document is actually hidden
+        if (document.hidden || document.visibilityState === 'hidden') {
+          recordViolation('Berpindah Aplikasi / Notifikasi di iPhone');
+        }
       } else {
-        recordViolation();
+        recordViolation('Jendela Ujian Kehilangan Fokus (Window Blur)');
       }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
         e.preventDefault();
-        recordViolation();
+        recordViolation('Membuka Developer Tools Browser');
       }
     };
 
@@ -338,7 +493,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       document.removeEventListener('cut', preventDefault);
       document.removeEventListener('paste', preventDefault);
     };
-  }, [fsSupported, isIOS]);
+  }, [fsSupported, isIOS, tabSwitchCount, needsInitialFullscreen]);
+
 
   const handleSelectOption = (opt: DisplayOption) => {
     const currentQ = displayQuestions[currentIndex];
@@ -464,6 +620,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       alert(`Waktu pengerjaan belum selesai! Anda baru dapat mengumpulkan ujian setelah waktu habis (${formatTimer(timeLeftSeconds)}).`);
       return;
     }
+    syncLiveToFirebase('submitted');
     clearStoredExamProgress(exam.id, studentData.nisn);
     saveStoredActiveStudentSession(null);
     const submission = calculateResults();
@@ -471,6 +628,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   };
 
   const handleAutoSubmit = () => {
+    syncLiveToFirebase('submitted');
     clearStoredExamProgress(exam.id, studentData.nisn);
     saveStoredActiveStudentSession(null);
     const submission = calculateResults();
@@ -485,6 +643,38 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
+      {/* Quizizz Pro Safe Exam Fullscreen Entry Gate for Android & PC */}
+      {needsInitialFullscreen && (
+        <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-blue-500/30 text-center animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-4 border border-blue-200 dark:border-blue-800 shadow-inner">
+              <Lock className="w-8 h-8" />
+            </div>
+            <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300">
+              Quizizz Pro Safe Mode
+            </span>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white mt-3 mb-2">
+              Kunci Layar Penuh (Fullscreen)
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+              Sistem CBT mewajibkan mode <strong>Layar Penuh Terkunci</strong>. Berpindah tab, membuka aplikasi lain, atau keluar dari layar penuh akan otomatis tercatat sebagai pelanggaran dan dilaporkan langsung secara <strong>realtime</strong> ke pengawas.
+            </p>
+            <button
+              onClick={async () => {
+                await requestAppFullscreen();
+                setNeedsInitialFullscreen(false);
+                setIsFullscreen(true);
+                syncLiveToFirebase('active', tabSwitchCount);
+              }}
+              className="w-full py-3.5 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            >
+              <Maximize2 className="w-5 h-5" />
+              <span>Aktifkan Layar Penuh & Mulai</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Restored Session Notification Banner */}
       {showRestoredNotice && (
         <div className="bg-emerald-600 dark:bg-emerald-700 text-white px-4 py-2.5 text-xs font-semibold flex items-center justify-between z-30 shadow-xs animate-in slide-in-from-top-2 duration-200">
@@ -507,8 +697,9 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       {/* Top sticky exam bar */}
       <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md text-slate-900 dark:text-slate-100 px-4 sm:px-6 py-3 border-b border-slate-200/80 dark:border-slate-800 shadow-xs sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 transition-colors duration-200">
         <div className="flex items-center gap-3">
-          <div className="bg-blue-50 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-bold px-2.5 py-1 rounded-xl text-xs">
-            CBT ROOM
+          <div className="bg-blue-50 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-bold px-2.5 py-1 rounded-xl text-xs flex items-center gap-1.5">
+            <Radio className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+            <span>CBT ROOM</span>
           </div>
           <div>
             <h2 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white truncate max-w-[200px] sm:max-w-md">
@@ -521,6 +712,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
             </div>
           </div>
         </div>
+
+
 
         {/* Center: Timer */}
         <div
@@ -966,11 +1159,11 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               <ShieldAlert className="w-6 h-6" />
             </div>
 
-            <h3 className="text-lg font-bold text-center text-slate-900 dark:text-white mb-1">
-              Peringatan Sistem Pengawas
+            <h3 className="text-lg font-black text-center text-slate-900 dark:text-white mb-1">
+              UJIAN TERKUNCI - PELANGGARAN TERDETEKSI
             </h3>
-            <p className="text-xs text-center text-slate-500 dark:text-slate-400 mb-4">
-              Sistem mendeteksi Anda meninggalkan jendela ujian (berpindah tab, membuka aplikasi lain, atau keluar dari Mode Layar Penuh/Fullscreen).
+            <p className="text-xs text-center text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+              {lastViolationReason || 'Sistem mendeteksi Anda meninggalkan jendela ujian (berpindah tab, membuka aplikasi lain, atau keluar dari Mode Layar Penuh).'}
             </p>
 
             <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-2xl p-3.5 text-xs text-rose-900 dark:text-rose-200 mb-5 space-y-1.5">
@@ -981,19 +1174,21 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                 </span>
               </p>
               <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
-                Ujian mewajibkan tampilan <strong>Layar Penuh (Fullscreen)</strong>. Dilarang membuka tab browser lain, aplikasi lain, maupun klik di luar layar ujian. Seluruh pelanggaran terekam otomatis dan dilaporkan kepada proktor/guru pengawas.
+                🔴 <strong>Terkirim Realtime:</strong> Status keluar Anda telah langsung dilaporkan ke Proktor/Guru Pengawas. Seluruh soal dikunci sampai Anda mengaktifkan kembali Layar Penuh.
               </p>
             </div>
 
             <button
-              onClick={() => {
+              onClick={async () => {
                 setShowCheatWarning(false);
-                enforceFullscreen();
+                await requestAppFullscreen();
+                setIsFullscreen(true);
+                syncLiveToFirebase('active', tabSwitchCount);
               }}
-              className="w-full py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm cursor-pointer transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-lg shadow-rose-600/30 cursor-pointer transition-colors flex items-center justify-center gap-2 active:scale-98"
             >
               <Maximize2 className="w-4 h-4" />
-              <span>Kembalikan Layar Penuh & Lanjutkan Ujian</span>
+              <span>Kembalikan Layar Penuh & Buka Kunci</span>
             </button>
           </div>
         </div>

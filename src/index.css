@@ -67,3 +67,25 @@
     display: none !important;
   }
 }
+
+/* iOS Safari Fullscreen Simulation and Viewport Lockdown */
+html.cbt-ios-fullscreen,
+html.cbt-ios-fullscreen body {
+  position: fixed;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Exam Room Anti-Cheat Protection */
+.cbt-exam-active {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior-y: contain;
+}
+
