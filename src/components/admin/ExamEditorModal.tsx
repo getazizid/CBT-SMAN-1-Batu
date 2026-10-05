@@ -12,7 +12,8 @@ import {
   Sparkles,
   Info,
   Shuffle,
-  Lock
+  Lock,
+  ShieldAlert
 } from 'lucide-react';
 import { Exam, OptionKey, OptionScoreMap, Question, QuestionOption } from '../../types';
 import {
@@ -59,6 +60,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
   const [shuffleQuestions, setShuffleQuestions] = useState<boolean>(false);
   const [shuffleOptions, setShuffleOptions] = useState<boolean>(false);
   const [blockEarlyExit, setBlockEarlyExit] = useState<boolean>(true);
+  const [disallowMultipleAttempts, setDisallowMultipleAttempts] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'settings' | 'questions'>('settings');
 
   const [questionsPage, setQuestionsPage] = useState(1);
@@ -94,6 +96,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setShuffleQuestions(exam.shuffleQuestions ?? false);
       setShuffleOptions(exam.shuffleOptions ?? false);
       setBlockEarlyExit(exam.blockEarlyExit ?? true);
+      setDisallowMultipleAttempts(exam.disallowMultipleAttempts ?? true);
     } else {
       setTitle('');
       setSubject('');
@@ -110,6 +113,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setShuffleQuestions(false);
       setShuffleOptions(false);
       setBlockEarlyExit(true);
+      setDisallowMultipleAttempts(true);
     }
     setActiveTab('settings');
   }, [exam, isOpen]);
@@ -250,6 +254,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       maxCheatViolations: 3,
       isActive,
       blockEarlyExit,
+      disallowMultipleAttempts,
       createdAt: exam?.createdAt || new Date().toISOString(),
     };
 
@@ -717,6 +722,31 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     </label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                       Mencegah siswa keluar atau mengumpulkan ujian lebih awal. Tombol kumpulkan terkunci dan lembar ujian baru otomatis dikirim saat waktu habis (00:00).
+                    </p>
+                  </div>
+                </div>
+
+                {/* Batasi 1x Mengerjakan (Siswa Tidak Bisa Mengerjakan 2x) */}
+                <div className="flex items-start gap-3 pt-2 border-t border-slate-200 dark:border-slate-700/60">
+                  <input
+                    type="checkbox"
+                    id="disallow-multiple-attempts-toggle"
+                    checked={disallowMultipleAttempts}
+                    onChange={(e) => setDisallowMultipleAttempts(e.target.checked)}
+                    className="w-4 h-4 text-rose-600 rounded cursor-pointer mt-0.5"
+                  />
+                  <div>
+                    <label htmlFor="disallow-multiple-attempts-toggle" className="text-xs font-bold text-slate-900 dark:text-white cursor-pointer flex items-center gap-1.5">
+                      <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Batasi 1 Kali Pengerjaan: Siswa Tidak Bisa Mengerjakan Ujian 2x</span>
+                      {disallowMultipleAttempts && (
+                        <span className="bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 text-[10px] font-semibold px-1.5 py-0.2 rounded">
+                          Terkunci 1x
+                        </span>
+                      )}
+                    </label>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Mencegah siswa yang sudah selesai mengumpulkan ujian untuk login atau mengerjakan ulang. Siswa yang mencoba masuk kembali akan otomatis ditolak sistem.
                     </p>
                   </div>
                 </div>

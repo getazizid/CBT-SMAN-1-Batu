@@ -231,6 +231,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     onUpdateExams(updated);
   };
 
+  const handleToggleDisallowMultipleAttempts = (examId: string) => {
+    const updated = exams.map((e) =>
+      e.id === examId ? { ...e, disallowMultipleAttempts: !(e.disallowMultipleAttempts ?? true) } : e
+    );
+    onUpdateExams(updated);
+  };
+
   const handleDeleteExam = (examId: string) => {
     const targetExam = exams.find((e) => e.id === examId);
     const examName = targetExam ? `"${targetExam.subject}"` : 'ini';
@@ -979,6 +986,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             >
                               <Lock className="w-3 h-3" />
                               <span>{isLocked ? 'Waktu Terkunci' : 'Bebas Keluar'}</span>
+                            </button>
+
+                            {/* Badge Batas 1x Mengerjakan (Siswa Tidak Bisa Mengerjakan 2x) */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleDisallowMultipleAttempts(exam.id)}
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 transition-colors cursor-pointer border ${
+                                exam.disallowMultipleAttempts !== false
+                                  ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                              }`}
+                              title={
+                                exam.disallowMultipleAttempts !== false
+                                  ? 'Siswa hanya bisa mengerjakan 1 kali (tidak bisa mengerjakan 2x). Klik untuk ubah.'
+                                  : 'Siswa diizinkan mengulang ujian. Klik untuk batasi 1x.'
+                              }
+                            >
+                              <ShieldAlert className="w-3 h-3" />
+                              <span>{exam.disallowMultipleAttempts !== false ? '1x Pengerjaan' : 'Boleh Ulang'}</span>
                             </button>
                           </div>
 

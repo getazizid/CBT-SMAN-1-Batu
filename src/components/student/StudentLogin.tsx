@@ -9,8 +9,9 @@ import {
   Play,
   User,
   LogOut,
+  ShieldAlert,
 } from 'lucide-react';
-import { Exam, RegisteredStudent } from '../../types';
+import { Exam, RegisteredStudent, StudentExamSubmission } from '../../types';
 import { ALL_SCHOOL_CLASSES, isStudentClassEligible } from '../../utils/constants';
 import { getStoredStudents } from '../../utils/storage';
 import {
@@ -26,6 +27,7 @@ const sanitizeText = (val: string): string => {
 
 interface StudentLoginProps {
   exams: Exam[];
+  submissions?: StudentExamSubmission[];
   registeredStudents?: RegisteredStudent[];
   enforceWhitelist?: boolean;
   onStartExam: (
@@ -36,6 +38,7 @@ interface StudentLoginProps {
 
 export const StudentLogin: React.FC<StudentLoginProps> = ({
   exams,
+  submissions = [],
   registeredStudents = [],
   enforceWhitelist = true,
   onStartExam,
@@ -77,6 +80,23 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     exams.find((e) => e.id === selectedExamId) ||
     eligibleExams[0] ||
     activeExams[0];
+
+  // Check whether the student has already submitted this exam (if disallowMultipleAttempts is active)
+  const isExamAlreadySubmitted = (exam?: Exam, nisn?: string): boolean => {
+    if (!exam || !nisn) return false;
+    if (exam.disallowMultipleAttempts === false) return false;
+    const cleanStudentNisn = sanitizeText(nisn).toLowerCase();
+    return submissions.some(
+      (s) =>
+        s.examId === exam.id &&
+        sanitizeText(s.studentNisn).toLowerCase() === cleanStudentNisn
+    );
+  };
+
+  const hasAlreadySubmittedCurrentExam = isExamAlreadySubmitted(
+    currentExam,
+    authenticatedStudent?.nisn
+  );
 
   const fsSupported = isFullscreenSupported();
 
@@ -222,6 +242,11 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     const expectedToken = currentExam.token.trim().toUpperCase();
     if (enteredToken !== expectedToken) {
       setErrorMsg('Token ujian tidak sesuai! Silakan periksa kembali token dari pengawas.');
+      return;
+    }
+
+    if (hasAlreadySubmittedCurrentExam) {
+      setErrorMsg('Anda sudah pernah mengerjakan ujian ini. Paket ujian diatur hanya untuk 1 kali pengerjaan.');
       return;
     }
 
@@ -429,43 +454,64 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
               </div>
             </div>
 
-            {/* Input Token Ujian */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <KeyRound className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span>Token Ujian (Dari Pengawas)</span>
-              </label>
-              <input
-                type="text"
-                placeholder="MASUKKAN TOKEN"
-                value={tokenInput}
-                onChange={(e) => setTokenInput(e.target.value.toUpperCase())}
-                required
-                autoCapitalize="characters"
-                autoCorrect="off"
-                spellCheck={false}
-                autoComplete="off"
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none font-mono uppercase font-bold tracking-widest text-center transition-all placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal placeholder:text-xs"
-              />
-            </div>
+            {/* Peringatan Ujian Sudah Dikerjakan (Blokir Mengerjakan 2x) */}
+            {hasAlreadySubmittedCurrentExam ? (
+              <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-2xl p-4 text-center space-y-2.5 animate-in fade-in zoom-in-95 duration-150">
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-900/70 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-inner">
+                  <ShieldAlert className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-rose-900 dark:text-rose-200 text-sm">
+                    Ujian Sudah Pernah Dikerjakan
+                  </h4>
+                  <p className="text-xs text-rose-700 dark:text-rose-300 mt-1 leading-relaxed">
+                    Paket ujian <strong>{currentExam?.subject}</strong> diatur hanya untuk <strong>1 kali pengerjaan</strong>. Lembar jawaban Anda telah tersimpan di sistem dan Anda tidak diizinkan mengerjakan ulang.
+                  </p>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 bg-white/80 dark:bg-slate-900/50 py-1.5 px-3 rounded-xl border border-rose-100 dark:border-rose-950 leading-relaxed">
+                  Jika Anda mengalami kendala teknis atau memerlukan pengerjaan ulang, hubungi <strong>Proktor / Guru Pengawas</strong> untuk membuka akses.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <KeyRound className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <span>Token Ujian (Dari Pengawas)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="MASUKKAN TOKEN"
+                  value={tokenInput}
+                  onChange={(e) => setTokenInput(e.target.value.toUpperCase())}
+                  required
+                  autoCapitalize="characters"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  autoComplete="off"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none font-mono uppercase font-bold tracking-widest text-center transition-all placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal placeholder:text-xs"
+                />
+              </div>
+            )}
 
             {/* Tombol Aksi */}
             <div className="pt-2 flex items-center gap-2">
               <button
                 type="button"
                 onClick={handleLogoutStudent}
-                className="w-1/3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-2.5 px-3 rounded-xl transition-colors cursor-pointer text-xs text-center"
+                className={`${hasAlreadySubmittedCurrentExam ? 'w-full' : 'w-1/3'} bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-2.5 px-3 rounded-xl transition-colors cursor-pointer text-xs text-center`}
               >
-                Batal
+                {hasAlreadySubmittedCurrentExam ? 'Kembali ke Halaman Login' : 'Batal'}
               </button>
-              <button
-                type="submit"
-                id="start-exam-button"
-                className="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-3 rounded-xl shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer text-xs uppercase tracking-wider"
-              >
-                <Play className="w-4 h-4 fill-current" />
-                <span>Mulai Ujian</span>
-              </button>
+              {!hasAlreadySubmittedCurrentExam && (
+                <button
+                  type="submit"
+                  id="start-exam-button"
+                  className="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-3 rounded-xl shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer text-xs uppercase tracking-wider"
+                >
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>Mulai Ujian</span>
+                </button>
+              )}
             </div>
           </form>
         )}

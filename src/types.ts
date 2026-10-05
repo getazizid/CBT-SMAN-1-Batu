@@ -46,6 +46,7 @@ export interface Exam {
   createdAt: string;
   teacherName: string;
   blockEarlyExit?: boolean; // Siswa tidak bisa keluar/kumpulkan sebelum waktu selesai
+  disallowMultipleAttempts?: boolean; // Siswa hanya dapat mengerjakan 1 kali (tidak bisa mengerjakan 2x)
 }
 
 export interface StudentAnswerDetail {

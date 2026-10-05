@@ -256,6 +256,22 @@ export default function App() {
     exam: Exam,
     studentData: { name: string; nisn: string; studentClass: string }
   ) => {
+    // Validasi 1x pengerjaan jika paket ujian membatasi tidak bisa mengerjakan 2x
+    if (exam.disallowMultipleAttempts !== false) {
+      const cleanStudentNisn = studentData.nisn.trim().toLowerCase();
+      const alreadySubmitted = submissions.some(
+        (s) =>
+          s.examId === exam.id &&
+          s.studentNisn.trim().toLowerCase() === cleanStudentNisn
+      );
+      if (alreadySubmitted) {
+        alert(
+          `Pemberitahuan CBT: Siswa dengan NISN ${studentData.nisn} (${studentData.name}) sudah pernah mengerjakan paket ujian ini. Paket ujian diatur hanya untuk 1 kali pengerjaan.`
+        );
+        return;
+      }
+    }
+
     saveStoredActiveStudentSession({
       exam,
       studentData,
@@ -334,6 +350,7 @@ export default function App() {
             {studentFlow.phase === 'login' && (
               <StudentLogin
                 exams={exams}
+                submissions={submissions}
                 registeredStudents={students}
                 enforceWhitelist={enforceWhitelist}
                 onStartExam={handleStartExam}
