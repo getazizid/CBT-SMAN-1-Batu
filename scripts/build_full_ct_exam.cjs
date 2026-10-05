@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { execSync } = require('child_process');
 const docx = require('docx');
 const {
   Document,
@@ -17,41 +18,26 @@ const {
   ShadingType
 } = docx;
 
-// 1. Read existing exam data
-const content = fs.readFileSync('src/data/ctInformatikaExamData.ts', 'utf8');
+// 1. Load authoritative master correct answers from commit 360c508
+const mdMaster = execSync('git show 360c508:Bank_Soal_30_CT_Informatika_SMAN_1_Batu.md', { encoding: 'utf8' });
+const masterRaw = mdMaster.split(/### Soal No\.\s*(\d+)[^\n]*/g);
+const masterData = {};
+for (let i = 1; i < masterRaw.length; i += 2) {
+  const num = parseInt(masterRaw[i], 10);
+  const rawBody = masterRaw[i + 1].trim();
+  const keyMatch = rawBody.match(/\*Kunci Jawaban:\*\s*\*\*([A-E])\*\*/i);
+  const key = keyMatch ? keyMatch[1] : null;
+  const reg = new RegExp('\\*\\*' + key + '\\.\\*\\*\\s*([\\s\\S]*?)(?=\\n\\s*\\*\\*[A-E]\\.\\*\\*|\\n\\s*\\*Kunci|$)');
+  const m = rawBody.match(reg);
+  masterData[num] = {
+    key,
+    correctText: m ? m[1].trim() : '',
+    pembahasan: (rawBody.match(/\*Pembahasan:\*\s*([\s\S]*?)(?=\n---|###|$)/i) || ['', ''])[1].trim()
+  };
+}
 
-const targetKeys = [
-  'C', // 1
-  'A', // 2
-  'D', // 3
-  'B', // 4
-  'E', // 5
-  'A', // 6
-  'C', // 7
-  'B', // 8
-  'D', // 9
-  'E', // 10
-  'B', // 11
-  'A', // 12
-  'D', // 13
-  'C', // 14
-  'E', // 15
-  'A', // 16
-  'C', // 17
-  'D', // 18
-  'B', // 19
-  'E', // 20
-  'A', // 21
-  'D', // 22
-  'B', // 23
-  'C', // 24
-  'E', // 25
-  'B', // 26
-  'A', // 27
-  'D', // 28
-  'C', // 29
-  'E', // 30
-];
+// 2. Read existing exam data from src/data/ctInformatikaExamData.ts
+const content = fs.readFileSync('src/data/ctInformatikaExamData.ts', 'utf8');
 
 const sandbox = { module: {} };
 const tsWithoutImports = content
@@ -63,51 +49,49 @@ const tsWithoutImports = content
 
 vm.runInNewContext(tsWithoutImports, sandbox);
 const rawExam = sandbox.module.exports;
-const letters = ['A', 'B', 'C', 'D', 'E'];
 
-// Rebalance questions
-const updatedQuestions = rawExam.questions.map((q, idx) => {
-  const targetKey = targetKeys[idx];
-  
-  // In the original, the correct answer is the option currently having key 'A'
-  const currentCorrectOpt = q.options.find(o => o.key === 'A') || q.options[0];
-  const distractors = q.options.filter(o => o !== currentCorrectOpt);
-  
-  const originalDistractorScores = [4, 3, 2, 1]; // or whatever was assigned to B, C, D, E
-  
-  const newOptions = [];
-  const newOptionScores = {};
-  
-  let distractorIdx = 0;
-  for (const letter of letters) {
-    if (letter === targetKey) {
-      newOptions.push({
-        key: letter,
-        text: currentCorrectOpt.text,
-      });
-      newOptionScores[letter] = 10;
-    } else {
-      const dOpt = distractors[distractorIdx];
-      newOptions.push({
-        key: letter,
-        text: dOpt.text,
-      });
-      newOptionScores[letter] = 0; // Bobot dinonaktifkan: hanya 1 jawaban benar yang bernilai poin
-      distractorIdx++;
-    }
+// 3. Reconstruct questions with Key A as authoritative correct answer
+const updatedQuestions = rawExam.questions.map((q) => {
+  const num = q.number;
+  const master = masterData[num];
+  if (!master) {
+    throw new Error('Master data not found for question ' + num);
   }
-  
-  // Strip bracketed title from question text (e.g. [STIMULUS LITERASI TEORI KOMPUTASI])
+
+  // Find the correct option in current q.options matching master.correctText prefix
+  const correctOpt = q.options.find(o =>
+    o.text.trim().toLowerCase().startsWith(master.correctText.trim().toLowerCase().substring(0, 30))
+  );
+
+  if (!correctOpt) {
+    throw new Error('Could not find correct option for Q' + num);
+  }
+
+  const distractors = q.options.filter(o => o !== correctOpt);
+  if (distractors.length !== 4) {
+    throw new Error('Expected 4 distractors, found ' + distractors.length + ' for Q' + num);
+  }
+
+  // Strip any bracketed title (e.g. [STIMULUS LITERASI TEORI KOMPUTASI])
   const cleanText = q.text.replace(/^\s*\[[^\]]+\]\s*\r?\n*/, '').trim();
+
+  // Master options with Option A as the correct answer
+  const newOptions = [
+    { key: 'A', text: correctOpt.text.trim() },
+    { key: 'B', text: distractors[0].text.trim() },
+    { key: 'C', text: distractors[1].text.trim() },
+    { key: 'D', text: distractors[2].text.trim() },
+    { key: 'E', text: distractors[3].text.trim() },
+  ];
 
   return {
     id: q.id,
     number: q.number,
     text: cleanText,
     options: newOptions,
-    correctOption: targetKey,
-    optionScores: newOptionScores,
-    explanation: q.explanation,
+    correctOption: 'A',
+    optionScores: { A: 10, B: 0, C: 0, D: 0, E: 0 },
+    explanation: q.explanation.trim(),
   };
 });
 
@@ -118,12 +102,14 @@ const updatedExam = {
   subject: 'Informatika - Computational Thinking',
   gradeClass: 'Semua Kelas X (X-1 s/d X-12)',
   defaultOptionScores: { A: 10, B: 0, C: 0, D: 0, E: 0 },
-  useWeightedScoring: false, // User explicitly requested unweighted single correct answer
-  createdAt: '2026-10-05T12:45:00.000Z',
+  useWeightedScoring: false, // Mode 1 jawaban benar (kunci di opsi A)
+  shuffleQuestions: true,   // Di siswa diacak nomor soal
+  shuffleOptions: true,     // Di siswa diacak urutan opsi A-E
+  createdAt: '2026-10-05T13:00:00.000Z', // Timestamp baru untuk memicu auto-update cache siswa & Firestore
   questions: updatedQuestions,
 };
 
-// 2. Write updated src/data/ctInformatikaExamData.ts
+// 4. Write updated src/data/ctInformatikaExamData.ts
 let tsOutput = `import { Exam, RegisteredStudent } from '../types';
 
 /**
@@ -187,8 +173,9 @@ export const STUDENTS_KELAS_X: RegisteredStudent[] = [
  * Paket Ujian 30 Soal HOTS Literasi Panjang & Mendalam
  * Berdasarkan Materi Resmi "Materi_CT_Informatika_SMAN_1_Batu.pdf"
  * Penyusun: Abdul Aziz., S.Kom., Gr
- * Distribusi Kunci Jawaban Seimbang A-E (masing-masing 6 butir)
- * Metode Penilaian: Standar 1 Jawaban Benar (Bobot Nonaktif, hanya kunci bernilai 10)
+ * Konfigurasi Guru/Admin: Kunci Jawaban selalu di Opsi A
+ * Konfigurasi Siswa: Otomatis diacak (shuffleQuestions: true, shuffleOptions: true)
+ * Metode Penilaian: Standar 1 Jawaban Benar (Bobot Nonaktif, hanya kunci A bernilai 10)
  */
 export const CT_INFORMATIKA_30_EXAM: Exam = {
   id: '${updatedExam.id}',
@@ -217,7 +204,6 @@ updatedQuestions.forEach((q) => {
   tsOutput += `    {\n`;
   tsOutput += `      id: '${q.id}',\n`;
   tsOutput += `      number: ${q.number},\n`;
-  // Format text with backticks
   const escapedText = q.text.replace(/`/g, '\\`').replace(/\$/g, '\\$');
   tsOutput += `      text: \`${escapedText}\`,\n`;
   tsOutput += `      options: [\n`;
@@ -241,13 +227,14 @@ tsOutput += `  ],\n};\n`;
 fs.writeFileSync('src/data/ctInformatikaExamData.ts', tsOutput, 'utf8');
 console.log('src/data/ctInformatikaExamData.ts written successfully!');
 
-// 3. Generate Bank_Soal_30_CT_Informatika_SMAN_1_Batu.md
+// 5. Generate Bank_Soal_30_CT_Informatika_SMAN_1_Batu.md
 let mdContent = `# BANK SOAL ASESMEN BERPIKIR KOMPUTASIONAL (COMPUTATIONAL THINKING)
 ## INFORMATIKA KELAS X - SMA NEGERI 1 BATU
 **Penyusun:** Abdul Aziz., S.Kom., Gr  
 **Bahan Bacaan Siswa:** \`Materi_CT_Informatika_SMAN_1_Batu.pdf\`  
 **Jumlah Soal:** 30 Soal Pilihan Ganda (Opsi A - E) dengan Literasi Panjang HOTS  
 **Alokasi Waktu:** 90 Menit | **KKM:** 75  
+**Konfigurasi Master Bank Soal:** Kunci Jawaban di Opsi A (Otomatis Diacak untuk Siswa di CBT)
 
 ---
 
@@ -281,12 +268,13 @@ updatedQuestions.forEach((q) => {
   mdContent += `| ${q.number} | **${q.correctOption}** | Berpikir Komputasional | ${q.explanation.slice(0, 70)}... |\n`;
 });
 
-mdContent += `\n\n*Dokumen Asli CBT SMAN 1 Batu - Disusun untuk Ujian Berpikir Komputasional Kelas X*\n`;
+mdContent += `\n\n*Catatan: Pada sistem CBT siswa, urutan opsi A-E diacak secara dinamis via Fisher-Yates shuffle sehingga kunci jawaban tidak selalu A di layar siswa.*\n`;
+mdContent += `\n*Dokumen Asli CBT SMAN 1 Batu - Disusun untuk Ujian Berpikir Komputasional Kelas X*\n`;
 
 fs.writeFileSync('Bank_Soal_30_CT_Informatika_SMAN_1_Batu.md', mdContent, 'utf8');
 console.log('Bank_Soal_30_CT_Informatika_SMAN_1_Batu.md written successfully!');
 
-// 4. Generate soal_ct_siap_import_word.txt (Word Import format)
+// 6. Generate soal_ct_siap_import_word.txt (Word Import format)
 let txtImportContent = ``;
 updatedQuestions.forEach((q) => {
   txtImportContent += `${q.number}. ${q.text.replace(/\n+/g, ' ')}\n`;
@@ -301,7 +289,7 @@ updatedQuestions.forEach((q) => {
 fs.writeFileSync('soal_ct_siap_import_word.txt', txtImportContent, 'utf8');
 console.log('soal_ct_siap_import_word.txt written successfully!');
 
-// 5. Generate Bank_Soal_30_CT_Informatika_SMAN_1_Batu.docx
+// 7. Generate Bank_Soal_30_CT_Informatika_SMAN_1_Batu.docx
 async function buildDocx() {
   const docChildren = [];
 

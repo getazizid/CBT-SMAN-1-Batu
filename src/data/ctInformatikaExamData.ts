@@ -61,8 +61,9 @@ export const STUDENTS_KELAS_X: RegisteredStudent[] = [
  * Paket Ujian 30 Soal HOTS Literasi Panjang & Mendalam
  * Berdasarkan Materi Resmi "Materi_CT_Informatika_SMAN_1_Batu.pdf"
  * Penyusun: Abdul Aziz., S.Kom., Gr
- * Distribusi Kunci Jawaban Seimbang A-E (masing-masing 6 butir)
- * Metode Penilaian: Standar 1 Jawaban Benar (Bobot Nonaktif, hanya kunci bernilai 10)
+ * Konfigurasi Guru/Admin: Kunci Jawaban selalu di Opsi A
+ * Konfigurasi Siswa: Otomatis diacak (shuffleQuestions: true, shuffleOptions: true)
+ * Metode Penilaian: Standar 1 Jawaban Benar (Bobot Nonaktif, hanya kunci A bernilai 10)
  */
 export const CT_INFORMATIKA_30_EXAM: Exam = {
   id: 'exam-ct-informatika-30',
@@ -84,7 +85,7 @@ export const CT_INFORMATIKA_30_EXAM: Exam = {
   maxCheatViolations: 3,
   isActive: true,
   blockEarlyExit: false,
-  createdAt: '2026-10-05T12:45:00.000Z',
+  createdAt: '2026-10-05T13:00:00.000Z',
   questions: [
     {
       id: 'q-ct-01',
@@ -114,8 +115,8 @@ Berdasarkan pemaparan mendalam di atas, manakah kesimpulan yang paling tepat men
           text: 'Proses otomatisasi penuh yang bertujuan menggantikan peran akal budi manusia seutuhnya dengan algoritma kecerdasan buatan.',
         },
       ],
-      correctOption: 'C',
-      optionScores: {"A":0,"B":0,"C":10,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Sesuai naskah Jeannette M. Wing (2006), CT adalah proses kognitif pemecahan masalah di mana solusinya diformulasikan agar dapat dieksekusi oleh agen pemroses informasi (manusia maupun komputer), bukan sekadar mengetik kode atau berpikir mekanis seperti robot.',
     },
     {
@@ -159,11 +160,11 @@ Manakah di antara skenario berikut yang mencerminkan penerapan Dekomposisi yang 
       options: [
         {
           key: 'A',
-          text: 'Menginstruksikan satu orang ahli untuk menyelesaikan seluruh penyelidikan krisis hulu-hilir sendirian secara bersamaan.',
+          text: 'Memecah penanganan krisis banjir lumpur beracun kota ke dalam tiga fokus investigasi spesifik: hidrologi/cuaca, evaluasi tata guna lahan hulu, dan uji kimia limbah sedimen.',
         },
         {
           key: 'B',
-          text: 'Memecah penanganan krisis banjir lumpur beracun kota ke dalam tiga fokus investigasi spesifik: hidrologi/cuaca, evaluasi tata guna lahan hulu, dan uji kimia limbah sedimen.',
+          text: 'Menginstruksikan satu orang ahli untuk menyelesaikan seluruh penyelidikan krisis hulu-hilir sendirian secara bersamaan.',
         },
         {
           key: 'C',
@@ -178,8 +179,8 @@ Manakah di antara skenario berikut yang mencerminkan penerapan Dekomposisi yang 
           text: 'Menghentikan seluruh operasional transportasi perkotaan secara mendadak tanpa menganalisis titik simpul kemacetan yang kritis.',
         },
       ],
-      correctOption: 'D',
-      optionScores: {"A":0,"B":0,"C":0,"D":10,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Dekomposisi yang tepat memecah masalah besar menjadi sub-masalah logis dan terkelola berdasarkan domain determinan (cuaca, tata lahan, uji kimiawi) seperti yang dilakukan Dr. Aris pada materi CT.',
     },
     {
@@ -191,11 +192,11 @@ Prinsip komputasional apakah yang mendasari proses kognitif dokter tersebut, dan
       options: [
         {
           key: 'A',
-          text: 'Dekomposisi; dokter membagi tubuh pasien ke dalam organ-organ terpisah sebelum mendengarkan keluhan demam pasien.',
+          text: 'Pengenalan Pola (Pattern Recognition); memungkinkan penggunaan model solusi masa lalu untuk mempercepat diagnosis akurat dan penentuan uji laboratorium kritis.',
         },
         {
           key: 'B',
-          text: 'Pengenalan Pola (Pattern Recognition); memungkinkan penggunaan model solusi masa lalu untuk mempercepat diagnosis akurat dan penentuan uji laboratorium kritis.',
+          text: 'Dekomposisi; dokter membagi tubuh pasien ke dalam organ-organ terpisah sebelum mendengarkan keluhan demam pasien.',
         },
         {
           key: 'C',
@@ -210,8 +211,8 @@ Prinsip komputasional apakah yang mendasari proses kognitif dokter tersebut, dan
           text: 'Automasi Robotik; dokter menyerahkan seluruh pemeriksaan fisik kepada mesin rontgen tanpa melakukan wawancara anamnesis.',
         },
       ],
-      correctOption: 'B',
-      optionScores: {"A":0,"B":10,"C":0,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Pengenalan Pola (Pattern Recognition) mengenali keteraturan dan kesamaan gejala saat ini dengan pengalaman historis, sehingga dokter dapat segera merekomendasikan tes trombosit darah secara efisien dan tepat sasaran.',
     },
     {
@@ -223,15 +224,15 @@ Mengapa penyederhanaan pada peta MRT tersebut dikategorikan sebagai bentuk Abstr
       options: [
         {
           key: 'A',
-          text: 'Peta sengaja dibuat membingungkan agar masyarakat lebih memilih menggunakan kendaraan pribadi di jalan raya.',
+          text: 'Menyaring dan mempertahankan informasi esensial yang diperlukan penumpang (rute, stasiun, transit) sembari mengeliminasi detail fisik yang tidak relevan (noise visual).',
         },
         {
           key: 'B',
-          text: 'Agar ukuran file gambar digital pada aplikasi ponsel pintar menjadi sekecil mungkin tanpa memedulikan kenyamanan pengguna.',
+          text: 'Peta sengaja dibuat membingungkan agar masyarakat lebih memilih menggunakan kendaraan pribadi di jalan raya.',
         },
         {
           key: 'C',
-          text: 'Menyaring dan mempertahankan informasi esensial yang diperlukan penumpang (rute, stasiun, transit) sembari mengeliminasi detail fisik yang tidak relevan (noise visual).',
+          text: 'Agar ukuran file gambar digital pada aplikasi ponsel pintar menjadi sekecil mungkin tanpa memedulikan kenyamanan pengguna.',
         },
         {
           key: 'D',
@@ -242,8 +243,8 @@ Mengapa penyederhanaan pada peta MRT tersebut dikategorikan sebagai bentuk Abstr
           text: 'Jalur kereta bawah tanah tidak terikat dengan hukum gravitasi dan tata ruang permukaan bumi sehingga gedung diabaikan.',
         },
       ],
-      correctOption: 'E',
-      optionScores: {"A":0,"B":0,"C":0,"D":0,"E":10},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Abstraksi adalah seni memilah informasi esensial (stasiun & jalur) yang dibutuhkan agen pemroses (penumpang) dan mengabaikan detail tidak relevan (gedung, pohon, belokan riil) yang hanya mengotori persepsi.',
     },
     {
@@ -306,8 +307,8 @@ Menghadapi krisis masif ini, Dr. Aris secara tegas menolak solusi reaktif semaca
           text: 'Karena pembagian sembako secara hukum dilarang dalam undang-undang manajemen penanggulangan bencana alam darurat.',
         },
       ],
-      correctOption: 'C',
-      optionScores: {"A":0,"B":0,"C":10,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'CT berorientasi pada pemecahan masalah berbasis akar penyebab (root-cause solving). Membagikan sembako adalah respons reaktif yang tidak menyelesaikan akar masalah hidrologi, alih fungsi lahan hulu, maupun pencemaran B3.',
     },
     {
@@ -319,11 +320,11 @@ Dari perspektif pemrosesan informasi, keunggulan ilmiah apakah yang diperoleh me
       options: [
         {
           key: 'A',
-          text: 'Menghilangkan kebutuhan rapat koordinasi karena ketiga tim dilarang saling bertukar data hingga bencana tahun berikutnya tiba.',
+          text: 'Memungkinkan investigasi mendalam dan pengumpulan bukti saintifik berjalan secara paralel pada tiga determinan kritis: atmosferik, bentang lahan, dan polutan kimia.',
         },
         {
           key: 'B',
-          text: 'Memungkinkan investigasi mendalam dan pengumpulan bukti saintifik berjalan secara paralel pada tiga determinan kritis: atmosferik, bentang lahan, dan polutan kimia.',
+          text: 'Menghilangkan kebutuhan rapat koordinasi karena ketiga tim dilarang saling bertukar data hingga bencana tahun berikutnya tiba.',
         },
         {
           key: 'C',
@@ -338,8 +339,8 @@ Dari perspektif pemrosesan informasi, keunggulan ilmiah apakah yang diperoleh me
           text: 'Membebaskan Dr. Aris dari tanggung jawab pelaporan kepada gubernur karena investigasi telah didelegasikan kepada ketua tim.',
         },
       ],
-      correctOption: 'B',
-      optionScores: {"A":0,"B":10,"C":0,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Dekomposisi memecah kompleksitas krisis lingkungan menjadi 3 subsistem (atmosferik cuaca, hidrologi hulu, polutan industri) yang dapat dianalisis secara saintifik, paralel, dan mendalam.',
     },
     {
@@ -351,11 +352,11 @@ Penemuan kecenderungan konsisten tersebut merupakan manifestasi pilar Pengenalan
       options: [
         {
           key: 'A',
-          text: 'Mengabaikan faktor pasang air laut rob karena air laut berada di hilir dan tidak memengaruhi aliran air tawar sungai.',
+          text: 'Menemukan keteraturan hubungan berulang dari rekaman data historis jangka panjang yang berfungsi sebagai kondisi batas pemicu (trigger boundary) bencana.',
         },
         {
           key: 'B',
-          text: 'Menemukan keteraturan hubungan berulang dari rekaman data historis jangka panjang yang berfungsi sebagai kondisi batas pemicu (trigger boundary) bencana.',
+          text: 'Mengabaikan faktor pasang air laut rob karena air laut berada di hilir dan tidak memengaruhi aliran air tawar sungai.',
         },
         {
           key: 'C',
@@ -370,8 +371,8 @@ Penemuan kecenderungan konsisten tersebut merupakan manifestasi pilar Pengenalan
           text: 'Menunjukkan bahwa data cuaca selama 20 tahun tidak dapat dipercaya untuk menyusun model peringatan dini banjir.',
         },
       ],
-      correctOption: 'D',
-      optionScores: {"A":0,"B":0,"C":0,"D":10,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Pengenalan Pola menemukan keteraturan (curah hujan >150mm/hari 3 hari berturut-turut + pasang rob maksimum) dari data 20 tahun sebagai pemicu deterministik bencana untuk dijadikan basis sistem deteksi dini.',
     },
     {
@@ -383,15 +384,15 @@ Alasan rasional paling mendasar mengapa pengabaian data tersebut merupakan pener
       options: [
         {
           key: 'A',
-          text: 'Dr. Aris meyakini bahwa pabrik kayu dan makanan tidak menggunakan air sungai untuk membuang limbah domestik.',
+          text: 'Menyaring variabel yang tidak relevan (noise) agar fokus tim tercurah pada penghasil potensial kromium dan timbal, sehingga menghemat waktu dan sumber daya krusial.',
         },
         {
           key: 'B',
-          text: 'Pabrik aki baterai dan tekstil berada di bawah naungan kementerian yang berbeda dengan pabrik makanan.',
+          text: 'Dr. Aris meyakini bahwa pabrik kayu dan makanan tidak menggunakan air sungai untuk membuang limbah domestik.',
         },
         {
           key: 'C',
-          text: 'Menyaring variabel yang tidak relevan (noise) agar fokus tim tercurah pada penghasil potensial kromium dan timbal, sehingga menghemat waktu dan sumber daya krusial.',
+          text: 'Pabrik aki baterai dan tekstil berada di bawah naungan kementerian yang berbeda dengan pabrik makanan.',
         },
         {
           key: 'D',
@@ -402,8 +403,8 @@ Alasan rasional paling mendasar mengapa pengabaian data tersebut merupakan pener
           text: 'Warna seragam pekerja dan tahun berdiri pabrik merupakan rahasia negara yang dilindungi undang-undang intelijen bisnis.',
         },
       ],
-      correctOption: 'E',
-      optionScores: {"A":0,"B":0,"C":0,"D":0,"E":10},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Abstraksi mengeliminasi variabel noise (pabrik non-B3, warna seragam, usia bangunan) dan memusatkan investigasi hanya pada pabrik yang secara kimiawi memproduksi limbah kromium dan timbal.',
     },
     {
@@ -418,11 +419,11 @@ Struktur kontrol logika pemrograman komputasional apakah yang paling mendasari "
       options: [
         {
           key: 'A',
-          text: 'Perulangan tanpa henti (Infinite While Loop) yang membunyikan sirine sepanjang tahun tanpa memeriksa kondisi cuaca.',
+          text: 'Percabangan kondisional logika ganda (IF curah_hujan > 150 AND pasang_rob == TRUE THEN aktifkan_sirine_level_1).',
         },
         {
           key: 'B',
-          text: 'Percabangan kondisional logika ganda (IF curah_hujan > 150 AND pasang_rob == TRUE THEN aktifkan_sirine_level_1).',
+          text: 'Perulangan tanpa henti (Infinite While Loop) yang membunyikan sirine sepanjang tahun tanpa memeriksa kondisi cuaca.',
         },
         {
           key: 'C',
@@ -437,8 +438,8 @@ Struktur kontrol logika pemrograman komputasional apakah yang paling mendasari "
           text: 'Operasi logika disjungsi tunggal (OR) yang mengabaikan salah satu faktor cuaca maupun pasang air laut.',
         },
       ],
-      correctOption: 'B',
-      optionScores: {"A":0,"B":10,"C":0,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Langkah 1 menerapkan struktur percabangan kondisional dengan konjungsi logika AND (kedua kondisi: hujan >150mm DAN pasang rob wajib terpenuhi bersamaan untuk memicu sirine Level 1).',
     },
     {
@@ -482,11 +483,11 @@ Jika sistem mitigasi otomatis Kota Delta diprogram secara kaku (hardcoded) murni
       options: [
         {
           key: 'A',
-          text: 'Seluruh pabrik tekstil dan aki akan otomatis meledak karena saluran pipa limbah tidak menerima data sinyal peringatan.',
+          text: 'Sirine Level 1 tidak akan berbunyi karena curah hujan 149 mm tidak memenuhi syarat > 150, padahal kombinasi debit air dan pasang laut ekstrem tetap memicu bencana banjir besar.',
         },
         {
           key: 'B',
-          text: 'Sirine Level 1 tidak akan berbunyi karena curah hujan 149 mm tidak memenuhi syarat > 150, padahal kombinasi debit air dan pasang laut ekstrem tetap memicu bencana banjir besar.',
+          text: 'Seluruh pabrik tekstil dan aki akan otomatis meledak karena saluran pipa limbah tidak menerima data sinyal peringatan.',
         },
         {
           key: 'C',
@@ -501,8 +502,8 @@ Jika sistem mitigasi otomatis Kota Delta diprogram secara kaku (hardcoded) murni
           text: 'Warga zona merah akan secara sukarela mengungsi sendiri tanpa perlu menunggu instruksi dan bantuan dari tim satgas krisis.',
         },
       ],
-      correctOption: 'D',
-      optionScores: {"A":0,"B":0,"C":0,"D":10,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Kelemahan sistem berbasis ambang batas kaku (hardcoded boundary) tanpa margin toleransi atau fuzzy logic adalah terjadinya False Negative (gagal membunyikan alarm padahal bahaya nyata terjadi).',
     },
     {
@@ -533,8 +534,8 @@ Karakteristik apakah yang menjadikan sebuah solusi komputasional seperti protoko
           text: 'Protokol tersebut menjamin bahwa seluruh bencana banjir di muka bumi akan hilang seutuhnya tanpa perlu melakukan penanaman pohon kembali.',
         },
       ],
-      correctOption: 'C',
-      optionScores: {"A":0,"B":0,"C":10,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Reusability terjadi karena solusi telah diabstraksi menjadi kerangka kerja algoritmik parametrik yang dapat diadaptasikan ke sistem lingkungan kota lain dengan menyesuaikan variabel ambang batas lokalnya.',
     },
     {
@@ -546,15 +547,15 @@ Di antara fenomena berikut di Kota Delta, manakah yang merupakan korelasi semu (
       options: [
         {
           key: 'A',
-          text: 'Penyempitan penampang melintang sungai akibat sedimentasi lumpur yang menurunkan daya tampung volume aliran air.',
+          text: 'Kenaikan drastis jumlah penjualan jas hujan dan payung di pasar swalayan Kota Delta pada setiap minggu yang bersamaan dengan terjadinya banjir lumpur.',
         },
         {
           key: 'B',
-          text: 'Kenaikan muka air pasang rob laut Jawa yang menghambat laju pembuangan gravitasi aliran sungai menuju lepas pantai.',
+          text: 'Penyempitan penampang melintang sungai akibat sedimentasi lumpur yang menurunkan daya tampung volume aliran air.',
         },
         {
           key: 'C',
-          text: 'Kenaikan drastis jumlah penjualan jas hujan dan payung di pasar swalayan Kota Delta pada setiap minggu yang bersamaan dengan terjadinya banjir lumpur.',
+          text: 'Kenaikan muka air pasang rob laut Jawa yang menghambat laju pembuangan gravitasi aliran sungai menuju lepas pantai.',
         },
         {
           key: 'D',
@@ -565,8 +566,8 @@ Di antara fenomena berikut di Kota Delta, manakah yang merupakan korelasi semu (
           text: 'Tingginya kadar timbal pada sedimen muara sungai yang berdekatan dengan saluran pembuangan akhir pabrik aki kendaraan.',
         },
       ],
-      correctOption: 'E',
-      optionScores: {"A":0,"B":0,"C":0,"D":0,"E":10},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Penjualan payung/jas hujan meningkat di musim hujan bersamaan dengan banjir, tetapi payung bukan penyebab banjir. Ini adalah korelasi semu (spurious correlation) yang wajib dieliminasi dalam abstraksi.',
     },
     {
@@ -627,8 +628,8 @@ Strategi algoritma pengawasan komputasional apakah yang paling efektif untuk men
           text: 'Menghapus kromium dari daftar zat kimia berbahaya agar pabrik tidak dianggap melanggar regulasi lingkungan hidup.',
         },
       ],
-      correctOption: 'C',
-      optionScores: {"A":0,"B":0,"C":10,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Otomatisasi pengawasan telemetri 24 jam menghilangkan celah kelemahan pengawasan manual manusia dan mendeteksi anomali limbah malam hari secara presisi.',
     },
     {
@@ -642,11 +643,11 @@ Proses berpikir komputasional apakah yang diterapkan Kapten Rina melalui pengelo
       options: [
         {
           key: 'A',
-          text: 'Algoritma Buta; memerintahkan pilot menerbangkan helikopter ke arah mana pun sesuai arah tiupan angin pagi hari.',
+          text: 'Dekomposisi; mereduksi kompleksitas tantangan logistik 15 lokasi terisolasi menjadi 3 kluster terkelola berbasis derajat keparahan kerusakan dan skala prioritas.',
         },
         {
           key: 'B',
-          text: 'Dekomposisi; mereduksi kompleksitas tantangan logistik 15 lokasi terisolasi menjadi 3 kluster terkelola berbasis derajat keparahan kerusakan dan skala prioritas.',
+          text: 'Algoritma Buta; memerintahkan pilot menerbangkan helikopter ke arah mana pun sesuai arah tiupan angin pagi hari.',
         },
         {
           key: 'C',
@@ -661,8 +662,8 @@ Proses berpikir komputasional apakah yang diterapkan Kapten Rina melalui pengelo
           text: 'Simulasi Fiktif; menunda pengiriman bantuan hingga seluruh jalan darat selesai diaspal kembali oleh dinas pekerjaan umum.',
         },
       ],
-      correctOption: 'D',
-      optionScores: {"A":0,"B":0,"C":0,"D":10,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Mengelompokkan 15 desa menjadi 3 sektor berdasarkan tingkat keparahan adalah penerapan pilar Dekomposisi untuk memecah masalah besar menjadi sub-masalah logis yang terkelola.',
     },
     {
@@ -674,11 +675,11 @@ Bagaimanakah rekognisi pola cuaca tersebut memengaruhi konstruksi strategi pener
       options: [
         {
           key: 'A',
-          text: 'Menyebabkan operasi penerbangan ke Sektor Utara dibatalkan sama sekali demi melindungi keselamatan helikopter dari tetesan air kabut.',
+          text: 'Mendorong Kapten Rina mengalokasikan seluruh (5) helikopter secara maksimal ke Sektor Utara pada pagi hari (06.00 - 10.00) sebelum batas jendela cuaca berkabut tertutup.',
         },
         {
           key: 'B',
-          text: 'Mendorong Kapten Rina mengalokasikan seluruh (5) helikopter secara maksimal ke Sektor Utara pada pagi hari (06.00 - 10.00) sebelum batas jendela cuaca berkabut tertutup.',
+          text: 'Menyebabkan operasi penerbangan ke Sektor Utara dibatalkan sama sekali demi melindungi keselamatan helikopter dari tetesan air kabut.',
         },
         {
           key: 'C',
@@ -693,8 +694,8 @@ Bagaimanakah rekognisi pola cuaca tersebut memengaruhi konstruksi strategi pener
           text: 'Mengubah jadwal misi sehingga penerbangan hanya dilakukan pada malam hari saat matahari telah terbenam.',
         },
       ],
-      correctOption: 'B',
-      optionScores: {"A":0,"B":10,"C":0,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Pengenalan pola kabut tebal setelah jam 14.00 di lembah Sektor Utara menjadi dasar penentuan urutan jadwal (algoritma): fokuskan seluruh armada di pagi hari (06.00-10.00) ke Sektor Utara.',
     },
     {
@@ -706,15 +707,15 @@ Proses berpikir komputasional apakah yang diterapkan Kapten Rina, dan apakah jus
       options: [
         {
           key: 'A',
-          text: 'Pengenalan Pola; menyimpulkan bahwa seluruh korban bencana gempa bumi tidak membutuhkan pakaian dan obat-obatan.',
+          text: 'Abstraksi; membuang barang non-kritis dan memprioritaskan muatan penyelamat nyawa (life-saving) karena payload dan volume kargo helikopter sangat terbatas pada fase kritis 72 jam pertama.',
         },
         {
           key: 'B',
-          text: 'Otomatisasi Kargo; memprogram helikopter untuk menjatuhkan barang donasi di atas perairan danau tanpa parasut penerjun.',
+          text: 'Pengenalan Pola; menyimpulkan bahwa seluruh korban bencana gempa bumi tidak membutuhkan pakaian dan obat-obatan.',
         },
         {
           key: 'C',
-          text: 'Abstraksi; membuang barang non-kritis dan memprioritaskan muatan penyelamat nyawa (life-saving) karena payload dan volume kargo helikopter sangat terbatas pada fase kritis 72 jam pertama.',
+          text: 'Otomatisasi Kargo; memprogram helikopter untuk menjatuhkan barang donasi di atas perairan danau tanpa parasut penerjun.',
         },
         {
           key: 'D',
@@ -725,8 +726,8 @@ Proses berpikir komputasional apakah yang diterapkan Kapten Rina, dan apakah jus
           text: 'Algoritma Buta; mengabaikan seluruh permintaan bantuan dan membiarkan helikopter terbang dalam keadaan kosong tanpa muatan.',
         },
       ],
-      correctOption: 'E',
-      optionScores: {"A":0,"B":0,"C":0,"D":0,"E":10},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Abstraksi menyingkirkan detail/elemen non-kritis (baju bekas, mainan) dan fokus pada prioritas keselamatan nyawa (air, medis, makanan kalori, radio) karena kapasitas angkut helikopter sangat terbatas.',
     },
     {
@@ -774,11 +775,11 @@ Jika seorang pejabat lapangan menuntut agar tahap refueling tersebut dihilangkan
       options: [
         {
           key: 'A',
-          text: 'Cuaca buruk di sore hari akan tertunda kemunculannya hingga pengisian bahan bakar dilakukan pada malam hari.',
+          text: 'Kehabisan daya sumber energi di tengah rute penerbangan sesi kedua (Resource Depletion), yang memicu insiden kecelakaan fatal dan kegagalan total seluruh misi kemanusiaan.',
         },
         {
           key: 'B',
-          text: 'Kehabisan daya sumber energi di tengah rute penerbangan sesi kedua (Resource Depletion), yang memicu insiden kecelakaan fatal dan kegagalan total seluruh misi kemanusiaan.',
+          text: 'Cuaca buruk di sore hari akan tertunda kemunculannya hingga pengisian bahan bakar dilakukan pada malam hari.',
         },
         {
           key: 'C',
@@ -793,8 +794,8 @@ Jika seorang pejabat lapangan menuntut agar tahap refueling tersebut dihilangkan
           text: 'Pilot helikopter akan kehilangan sinyal GPS satelit secara permanen akibat ketiadaan avtur di dalam karburator.',
         },
       ],
-      correctOption: 'D',
-      optionScores: {"A":0,"B":0,"C":0,"D":10,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Dalam manajemen sistem sumber daya terbatas, proses replenishment (pengisian ulang avtur) adalah prasyarat mutlak. Menghilangkannya memicu kegagalan sistemik fatal (kehabisan bahan bakar di udara).',
     },
     {
@@ -806,11 +807,11 @@ Dari perspektif pemeliharaan sistem komputasional yang tangguh (robust & sustain
       options: [
         {
           key: 'A',
-          text: 'Memberi kesempatan kepada Kapten Rina untuk meninggalkan lokasi posko bencana dan berlibur ke luar kota pegunungan.',
+          text: 'Menerapkan batas toleransi keamanan (safety threshold) untuk mencegah risiko kerugian aset total akibat cuaca buruk dan menjamin kesiapan armada untuk beroperasi kembali keesokan paginya.',
         },
         {
           key: 'B',
-          text: 'Menerapkan batas toleransi keamanan (safety threshold) untuk mencegah risiko kerugian aset total akibat cuaca buruk dan menjamin kesiapan armada untuk beroperasi kembali keesokan paginya.',
+          text: 'Memberi kesempatan kepada Kapten Rina untuk meninggalkan lokasi posko bencana dan berlibur ke luar kota pegunungan.',
         },
         {
           key: 'C',
@@ -825,8 +826,8 @@ Dari perspektif pemeliharaan sistem komputasional yang tangguh (robust & sustain
           text: 'Agar seluruh pilot helikopter dapat menghadiri konferensi pers di kantor bupati sebelum matahari terbenam.',
         },
       ],
-      correctOption: 'B',
-      optionScores: {"A":0,"B":10,"C":0,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Pilar algoritma memperhitungkan batasan keselamatan lingkungan (safety margin). Menghentikan operasi pada pukul 14.00 mencegah kecelakaan di cuaca ekstrem berkabut dan memastikan kesiapan armada jangka panjang.',
     },
     {
@@ -857,8 +858,8 @@ Persamaan mendasar apakah yang dapat disintesis dari cara kedua tokoh tersebut m
           text: 'Keduanya memfokuskan seluruh bantuan logistik kepada masyarakat yang memiliki jabatan politik tertinggi di wilayah krisis.',
         },
       ],
-      correctOption: 'C',
-      optionScores: {"A":0,"B":0,"C":10,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Kedua tokoh mendemonstrasikan pilar Abstraksi: menyingkirkan elemen noise (pabrik non-B3 dan barang donasi sekunder) untuk memprioritaskan faktor esensial penyelamat hidup (life-saving factors).',
     },
     {
@@ -870,15 +871,15 @@ Kesimpulan konseptual apakah yang paling valid mengenai fleksibilitas pilar Deko
       options: [
         {
           key: 'A',
-          text: 'Dekomposisi fungsional sains lingkungan tidak boleh digabungkan dengan dekomposisi geografis dalam satu sistem pemerintahan.',
+          text: 'Dekomposisi dapat diterapkan melalui berbagai dimensi pemotongan (fungsional, spasial/geografis, kronologis, atau derajat keparahan), disesuaikan dengan arsitektur masalah dan tujuan operasional.',
         },
         {
           key: 'B',
-          text: 'Dekomposisi harus selalu menghasilkan bagian-bagian yang dikerjakan oleh robot tanpa keterlibatan tenaga manusia.',
+          text: 'Dekomposisi fungsional sains lingkungan tidak boleh digabungkan dengan dekomposisi geografis dalam satu sistem pemerintahan.',
         },
         {
           key: 'C',
-          text: 'Dekomposisi dapat diterapkan melalui berbagai dimensi pemotongan (fungsional, spasial/geografis, kronologis, atau derajat keparahan), disesuaikan dengan arsitektur masalah dan tujuan operasional.',
+          text: 'Dekomposisi harus selalu menghasilkan bagian-bagian yang dikerjakan oleh robot tanpa keterlibatan tenaga manusia.',
         },
         {
           key: 'D',
@@ -889,8 +890,8 @@ Kesimpulan konseptual apakah yang paling valid mengenai fleksibilitas pilar Deko
           text: 'Dekomposisi pada operasi tanggap bencana alam selalu gagal jika tidak menggunakan rumus matematika diferensial integral.',
         },
       ],
-      correctOption: 'E',
-      optionScores: {"A":0,"B":0,"C":0,"D":0,"E":10},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Dekomposisi bersifat fleksibel dan adaptif: dapat dilakukan secara fungsional keilmuan maupun spasial geografis, disesuaikan dengan kebutuhan pemecahan masalah di lapangan.',
     },
     {
@@ -902,11 +903,11 @@ Berdasarkan prinsip berpikir komputasional yang tangguh dan adaptif, modifikasi 
       options: [
         {
           key: 'A',
-          text: 'Membatalkan seluruh penerbangan hari itu dan membiarkan warga di 15 desa menunggu hingga helikopter pengganti tiba minggu depan.',
+          text: 'Menjaga prioritas penyelamatan Sektor Utara dengan mengerahkan ke-4 helikopter tersisa hingga pukul 10.00, lalu mengalokasikan masing-masing 2 helikopter untuk Sektor Tengah dan Selatan di sesi siang.',
         },
         {
           key: 'B',
-          text: 'Menjaga prioritas penyelamatan Sektor Utara dengan mengerahkan ke-4 helikopter tersisa hingga pukul 10.00, lalu mengalokasikan masing-masing 2 helikopter untuk Sektor Tengah dan Selatan di sesi siang.',
+          text: 'Membatalkan seluruh penerbangan hari itu dan membiarkan warga di 15 desa menunggu hingga helikopter pengganti tiba minggu depan.',
         },
         {
           key: 'C',
@@ -921,8 +922,8 @@ Berdasarkan prinsip berpikir komputasional yang tangguh dan adaptif, modifikasi 
           text: 'Memerintahkan pilot menerbangkan helikopter ke Sektor Selatan saja karena paling mudah dijangkau dan bebas resiko.',
         },
       ],
-      correctOption: 'B',
-      optionScores: {"A":0,"B":10,"C":0,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Algoritma yang adaptif melakukan penyesuaian parameter sumber daya (dari 5 unit menjadi 4 unit) tanpa mengorbankan prioritas keselamatan utama (Sektor Utara tetap prioritas pagi hari).',
     },
     {
@@ -966,11 +967,11 @@ Siswa Kelas X SMAN 1 Batu ditugaskan merancang solusi sistem Pertanian Presisi (
       options: [
         {
           key: 'A',
-          text: 'Mengganti seluruh pohon apel dengan tanaman padi sawah tanpa menguji kesesuaian jenis tanah dan ketinggian lereng.',
+          text: 'Menganalisis korelasi data histori sensor kelembapan tanah, suhu udara, dan kecepatan angin selama 5 musim panen dengan siklus kemunculan ledakan populasi hama kutu sisik.',
         },
         {
           key: 'B',
-          text: 'Menganalisis korelasi data histori sensor kelembapan tanah, suhu udara, dan kecepatan angin selama 5 musim panen dengan siklus kemunculan ledakan populasi hama kutu sisik.',
+          text: 'Mengganti seluruh pohon apel dengan tanaman padi sawah tanpa menguji kesesuaian jenis tanah dan ketinggian lereng.',
         },
         {
           key: 'C',
@@ -985,8 +986,8 @@ Siswa Kelas X SMAN 1 Batu ditugaskan merancang solusi sistem Pertanian Presisi (
           text: 'Menyemprotkan cairan pestisida kimia secara serentak setiap jam sepanjang hari tanpa memantau keberadaan hama.',
         },
       ],
-      correctOption: 'D',
-      optionScores: {"A":0,"B":0,"C":0,"D":10,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Pengenalan Pola pada pertanian presisi mengkorelasikan variabel iklim mikro (suhu, kelembapan) dengan waktu munculnya hama selama beberapa musim panen untuk memprediksi serangan lebih dini.',
     },
     {
@@ -1017,8 +1018,8 @@ Dalam proses memodelkan jaringan jalan Kota Batu ke dalam bentuk graf (Graph Mod
           text: 'Menghapus nama-nama jalan di Kota Batu dan menggantinya dengan angka acak yang diundi setiap pagi hari.',
         },
       ],
-      correctOption: 'C',
-      optionScores: {"A":0,"B":0,"C":10,"D":0,"E":0},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Dalam pemodelan graf rute lalu lintas, Abstraksi mereduksi jalan menjadi simpul (nodes) persimpangan dan ruas (edges) berbobot jarak/waktu, membuang detail visual (warna toko, pohon) yang tidak relevan bagi kalkulasi rute terpendek.',
     },
     {
@@ -1030,15 +1031,15 @@ Prinsip etis dan humanis manakah yang paling fundamental dijaga oleh seorang per
       options: [
         {
           key: 'A',
-          text: 'Menghapus rekaman log jejak audit secara otomatis jika terindikasi sistem melakukan kesalahan fatal yang merugikan masyarakat luas.',
+          text: 'Menjaga transparansi logika pengambilan keputusan (Explainability), keadilan algoritma tanpa bias diskriminatif, perlindungan privasi data warga, dan akuntabilitas moral manusia terhadap dampak keputusan sistem.',
         },
         {
           key: 'B',
-          text: 'Menyerahkan seluruh keputusan etika dan moral kepada prosesor komputer tanpa menyediakan ruang banding atau pengawasan oleh manusia.',
+          text: 'Menghapus rekaman log jejak audit secara otomatis jika terindikasi sistem melakukan kesalahan fatal yang merugikan masyarakat luas.',
         },
         {
           key: 'C',
-          text: 'Menjaga transparansi logika pengambilan keputusan (Explainability), keadilan algoritma tanpa bias diskriminatif, perlindungan privasi data warga, dan akuntabilitas moral manusia terhadap dampak keputusan sistem.',
+          text: 'Menyerahkan seluruh keputusan etika dan moral kepada prosesor komputer tanpa menyediakan ruang banding atau pengawasan oleh manusia.',
         },
         {
           key: 'D',
@@ -1049,8 +1050,8 @@ Prinsip etis dan humanis manakah yang paling fundamental dijaga oleh seorang per
           text: 'Memprogram sistem agar selalu mendahulukan kepentingan kelompok elit pemilik modal terbesar dibanding keselamatan warga perkampungan kecil.',
         },
       ],
-      correctOption: 'E',
-      optionScores: {"A":0,"B":0,"C":0,"D":0,"E":10},
+      correctOption: 'A',
+      optionScores: {"A":10,"B":0,"C":0,"D":0,"E":0},
       explanation: 'Prinsip etika rekayasa komputasional modern menuntut transparansi (explainable algorithms), keadilan data (fairness), keselamatan warga, dan pertanggungjawaban manusia (human accountability) sebagai pemegang kendali utama.',
     },
   ],
