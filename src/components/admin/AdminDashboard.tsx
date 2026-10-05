@@ -155,6 +155,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     onUpdateExams(updated);
   };
 
+  const handleToggleBlockEarlyExit = (examId: string) => {
+    const updated = exams.map((e) =>
+      e.id === examId ? { ...e, blockEarlyExit: !(e.blockEarlyExit ?? true) } : e
+    );
+    onUpdateExams(updated);
+  };
+
   const handleDeleteExam = (examId: string) => {
     if (exams.length <= 1) {
       alert('Minimal harus ada 1 paket ujian.');
@@ -632,7 +639,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   {activeTab === 'accounts' && 'Manajemen Akun Admin & Guru'}
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
-                  {activeTab === 'exams' && 'Daftar paket ujian, token, status aktif, dan pengaturan KKM.'}
+                  {activeTab === 'exams' && 'Daftar paket ujian, token, status aktif, pengaturan KKM, dan kunci waktu selesai.'}
                   {activeTab === 'questions' && 'Kelola soal dan pembobotan skor opsi jawaban A - E.'}
                   {activeTab === 'students' && 'Kelola daftar siswa yang ditentukan dan berhak login ke sistem ujian CBT.'}
                   {activeTab === 'submissions' && 'Rekapitulasi lembar jawaban siswa dan ekspor Excel.'}
@@ -730,34 +737,58 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {exams.map((exam) => {
                   const count = exam.questions.length;
                   const examSubmissions = submissions.filter((s) => s.examId === exam.id);
+                  const isLocked = exam.blockEarlyExit !== false;
+
                   return (
                     <div
                       key={exam.id}
-                      className={`bg-white dark:bg-slate-900 rounded-3xl p-5 border shadow-sm flex flex-col justify-between transition-all ${
+                      className={`bg-white dark:bg-slate-900 rounded-3xl p-5 border shadow-xs flex flex-col justify-between transition-all ${
                         exam.isActive
                           ? 'border-blue-300 dark:border-blue-800/80 ring-1 ring-blue-100 dark:ring-blue-950/40'
-                          : 'border-slate-200 dark:border-slate-800 opacity-80'
+                          : 'border-slate-200 dark:border-slate-800 opacity-85'
                       }`}
                     >
                       <div>
-                        {/* Top status */}
-                        <div className="flex items-center justify-between mb-3">
-                          <span
-                            className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
-                              exam.isActive
-                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
-                            }`}
-                          >
-                            {exam.isActive ? 'Ujian Aktif' : 'Nonaktif'}
-                          </span>
+                        {/* Top status, lock & token */}
+                        <div className="flex items-center justify-between gap-2 mb-3">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span
+                              className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
+                                exam.isActive
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                              }`}
+                            >
+                              {exam.isActive ? 'Ujian Aktif' : 'Nonaktif'}
+                            </span>
 
-                          <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-lg font-mono text-xs font-bold">
+                            {/* Badge Kunci Waktu (Anak-anak tidak bisa keluar sebelum waktu selesai) */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleBlockEarlyExit(exam.id)}
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 transition-colors cursor-pointer border ${
+                                isLocked
+                                  ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                              }`}
+                              title={
+                                isLocked
+                                  ? 'Siswa tidak bisa keluar/kumpulkan sebelum waktu selesai. Klik untuk ubah.'
+                                  : 'Siswa bebas keluar/kumpulkan kapan saja. Klik untuk ubah.'
+                              }
+                            >
+                              <Lock className="w-3 h-3" />
+                              <span>{isLocked ? 'Waktu Terkunci' : 'Bebas Keluar'}</span>
+                            </button>
+                          </div>
+
+                          <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-2.5 py-0.5 rounded-lg font-mono text-xs font-bold shrink-0">
                             <Key className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                             <span>{exam.token}</span>
                           </div>
                         </div>
 
+                        {/* Title & Subject */}
                         <h3 className="font-extrabold text-slate-900 dark:text-white text-base leading-snug mb-1">
                           {exam.subject}
                         </h3>
@@ -765,66 +796,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           {exam.title}
                         </p>
 
-                        {/* Metadata details */}
-                        <div className="bg-slate-50 dark:bg-slate-800/70 p-3.5 rounded-2xl space-y-1.5 text-xs text-slate-600 dark:text-slate-300 mb-4 border border-slate-100 dark:border-slate-700/60">
-                          <div className="flex justify-between">
-                            <span>Target Kelas:</span>
-                            <span className="font-bold text-slate-800 dark:text-slate-200">{exam.gradeClass}</span>
+                        {/* Simplified Key Metrics Grid */}
+                        <div className="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-800/70 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/60 text-xs mb-3">
+                          <div>
+                            <span className="text-[11px] text-slate-400 block">Alokasi Durasi</span>
+                            <span className="font-bold text-slate-800 dark:text-slate-200">{exam.durationMinutes} Menit</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>Jumlah Soal:</span>
-                            <span className="font-bold text-blue-700 dark:text-blue-400">{count} / 50 Butir</span>
+                          <div>
+                            <span className="text-[11px] text-slate-400 block">Standar KKM</span>
+                            <span className="font-bold text-emerald-600 dark:text-emerald-400">{exam.passingGrade}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>Alokasi Durasi:</span>
-                            <span className="font-bold text-slate-800 dark:text-slate-200">
-                              {exam.durationMinutes} Menit
-                            </span>
+                          <div>
+                            <span className="text-[11px] text-slate-400 block">Bank Soal</span>
+                            <span className="font-bold text-blue-600 dark:text-blue-400">{count} Butir</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>KKM Kelulusan:</span>
-                            <span className="font-bold text-emerald-700 dark:text-emerald-400">
-                              {exam.passingGrade}
-                            </span>
+                          <div>
+                            <span className="text-[11px] text-slate-400 block">Peserta Selesai</span>
+                            <span className="font-bold text-slate-800 dark:text-slate-200">{examSubmissions.length} Siswa</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>Tampil Nilai ke Siswa:</span>
-                            <span
-                              className={`font-bold ${
-                                exam.showInstantScore ? 'text-blue-700 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'
-                              }`}
-                            >
-                              {exam.showInstantScore ? 'Ditampilkan' : 'Disembunyikan'}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span>Acak Soal / Opsi:</span>
-                            <div className="flex items-center gap-1 font-bold text-[10px]">
-                              <span
-                                className={`px-1.5 py-0.2 rounded border ${
-                                  exam.shuffleQuestions
-                                    ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
-                                }`}
-                              >
-                                Soal: {exam.shuffleQuestions ? 'Acak' : 'Urut'}
-                              </span>
-                              <span
-                                className={`px-1.5 py-0.2 rounded border ${
-                                  exam.shuffleOptions
-                                    ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
-                                }`}
-                              >
-                                Opsi: {exam.shuffleOptions ? 'Acak' : 'Urut'}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Peserta Selesai:</span>
-                            <span className="font-bold text-slate-800 dark:text-slate-200">
-                              {examSubmissions.length} Siswa
-                            </span>
+                        </div>
+
+                        {/* Target Kelas & Rules summary */}
+                        <div className="space-y-1 mb-3 text-[11px] text-slate-500 dark:text-slate-400">
+                          <p className="truncate">
+                            <strong className="text-slate-700 dark:text-slate-300">Target:</strong> {exam.gradeClass}
+                          </p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span>Kunci Waktu: <strong className={isLocked ? 'text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-400'}>{isLocked ? 'Aktif' : 'Nonaktif'}</strong></span>
+                            <span>&bull;</span>
+                            <span>Acak: <strong>{exam.shuffleQuestions ? 'Ya' : 'Tidak'}</strong></span>
+                            <span>&bull;</span>
+                            <span>Nilai: <strong>{exam.showInstantScore ? 'Tampil' : 'Sembunyi'}</strong></span>
                           </div>
                         </div>
                       </div>

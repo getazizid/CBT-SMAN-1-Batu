@@ -7,6 +7,7 @@ import {
   Clock,
   Flag,
   HelpCircle,
+  Lock,
   Maximize2,
   Minimize2,
   Moon,
@@ -370,6 +371,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   };
 
   const isLowTime = timeLeftSeconds < 300; // < 5 minutes
+  const isEarlyExitBlocked = (exam.blockEarlyExit ?? false) && timeLeftSeconds > 0;
 
   const answeredCount = Object.keys(displayAnswers).length;
   const totalCount = displayQuestions.length;
@@ -458,6 +460,10 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   };
 
   const handleManualSubmit = () => {
+    if (isEarlyExitBlocked) {
+      alert(`Waktu pengerjaan belum selesai! Anda baru dapat mengumpulkan ujian setelah waktu habis (${formatTimer(timeLeftSeconds)}).`);
+      return;
+    }
     clearStoredExamProgress(exam.id, studentData.nisn);
     saveStoredActiveStudentSession(null);
     const submission = calculateResults();
@@ -748,10 +754,18 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                 <button
                   id="finish-exam-btn"
                   onClick={() => setShowSubmitModal(true)}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className={`font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors ${
+                    isEarlyExitBlocked
+                      ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                  }`}
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Selesai & Kumpulkan</span>
+                  {isEarlyExitBlocked ? <Lock className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                  <span>
+                    {isEarlyExitBlocked
+                      ? `Terkunci (${formatTimer(timeLeftSeconds)})`
+                      : 'Selesai & Kumpulkan'}
+                  </span>
                 </button>
               )}
             </div>
@@ -839,8 +853,16 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               onClick={() => setShowSubmitModal(true)}
               className="w-full bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold py-3 px-4 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer border border-slate-800 dark:border-slate-700"
             >
-              <Send className="w-4 h-4 text-emerald-400" />
-              <span>Konfirmasi Pengumpulan</span>
+              {isEarlyExitBlocked ? (
+                <Lock className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Send className="w-4 h-4 text-emerald-400" />
+              )}
+              <span>
+                {isEarlyExitBlocked
+                  ? `Pengumpulan Terkunci (${formatTimer(timeLeftSeconds)})`
+                  : 'Konfirmasi Pengumpulan'}
+              </span>
             </button>
           </div>
         </div>
@@ -894,6 +916,18 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               </div>
             )}
 
+            {isEarlyExitBlocked && (
+              <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/80 rounded-2xl text-amber-900 dark:text-amber-200 text-xs mb-5 flex items-start gap-2.5">
+                <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold">Ujian Terkunci Sampai Waktu Selesai</p>
+                  <p className="text-[11px] mt-0.5 text-amber-800 dark:text-amber-300">
+                    Sesuai aturan pengawas, Anda tidak dapat mengumpulkan ujian sebelum waktu habis. Sisa waktu pengerjaan: <strong className="font-mono font-bold">{formatTimer(timeLeftSeconds)}</strong>. Jawaban Anda otomatis dikumpulkan saat waktu habis.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setShowSubmitModal(false)}
@@ -901,13 +935,24 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               >
                 Cek Kembali
               </button>
-              <button
-                id="confirm-final-submit-btn"
-                onClick={handleManualSubmit}
-                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs transition-colors cursor-pointer"
-              >
-                Ya, Kumpulkan
-              </button>
+              {isEarlyExitBlocked ? (
+                <button
+                  disabled
+                  className="w-full py-2.5 px-4 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-semibold text-xs cursor-not-allowed flex items-center justify-center gap-1.5"
+                  title="Pengumpulan ujian terkunci sampai waktu habis"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Terkunci ({formatTimer(timeLeftSeconds)})</span>
+                </button>
+              ) : (
+                <button
+                  id="confirm-final-submit-btn"
+                  onClick={handleManualSubmit}
+                  className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs transition-colors cursor-pointer"
+                >
+                  Ya, Kumpulkan
+                </button>
+              )}
             </div>
           </div>
         </div>

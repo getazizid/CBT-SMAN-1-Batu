@@ -45,6 +45,7 @@ export interface Exam {
   isActive: boolean;
   createdAt: string;
   teacherName: string;
+  blockEarlyExit?: boolean; // Siswa tidak bisa keluar/kumpulkan sebelum waktu selesai
 }
 
 export interface StudentAnswerDetail {

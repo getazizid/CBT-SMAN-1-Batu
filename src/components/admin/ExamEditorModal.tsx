@@ -11,7 +11,8 @@ import {
   Sliders,
   Sparkles,
   Info,
-  Shuffle
+  Shuffle,
+  Lock
 } from 'lucide-react';
 import { Exam, OptionKey, OptionScoreMap, Question, QuestionOption } from '../../types';
 import {
@@ -56,6 +57,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
   const [showInstantScore, setShowInstantScore] = useState<boolean>(true);
   const [shuffleQuestions, setShuffleQuestions] = useState<boolean>(false);
   const [shuffleOptions, setShuffleOptions] = useState<boolean>(false);
+  const [blockEarlyExit, setBlockEarlyExit] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'settings' | 'questions'>('settings');
 
   // Sync state whenever exam prop or isOpen changes so existing data is always loaded
@@ -77,6 +79,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setShowInstantScore(exam.showInstantScore ?? true);
       setShuffleQuestions(exam.shuffleQuestions ?? false);
       setShuffleOptions(exam.shuffleOptions ?? false);
+      setBlockEarlyExit(exam.blockEarlyExit ?? true);
     } else {
       setTitle('');
       setSubject('');
@@ -92,6 +95,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setShowInstantScore(true);
       setShuffleQuestions(false);
       setShuffleOptions(false);
+      setBlockEarlyExit(true);
     }
     setActiveTab('settings');
   }, [exam, isOpen]);
@@ -230,6 +234,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       allowReview: exam?.allowReview ?? true,
       maxCheatViolations: 3,
       isActive,
+      blockEarlyExit,
       createdAt: exam?.createdAt || new Date().toISOString(),
     };
 
@@ -675,9 +680,34 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 </div>
               </div>
 
-              {/* Switches */}
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center gap-3">
+              {/* Pengaturan & Kebijakan Ujian */}
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3.5">
+                <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wide">
+                  Kebijakan & Keamanan Ujian
+                </h4>
+
+                {/* Kunci Ujian: Anak-anak tidak bisa keluar sebelum waktu selesai */}
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="block-early-exit-toggle"
+                    checked={blockEarlyExit}
+                    onChange={(e) => setBlockEarlyExit(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 rounded cursor-pointer mt-0.5"
+                  />
+                  <div>
+                    <label htmlFor="block-early-exit-toggle" className="text-xs font-bold text-slate-900 dark:text-white cursor-pointer flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Kunci Ujian: Siswa Tidak Bisa Keluar / Kumpulkan Sebelum Waktu Selesai</span>
+                    </label>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Mencegah siswa keluar atau mengumpulkan ujian lebih awal. Tombol kumpulkan terkunci dan lembar ujian baru otomatis dikirim saat waktu habis (00:00).
+                    </p>
+                  </div>
+                </div>
+
+                {/* Status Aktif */}
+                <div className="flex items-center gap-3 pt-2 border-t border-slate-200 dark:border-slate-700/60">
                   <input
                     type="checkbox"
                     id="active-toggle"
@@ -686,11 +716,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     className="w-4 h-4 text-blue-600 rounded cursor-pointer"
                   />
                   <label htmlFor="active-toggle" className="text-xs font-semibold text-slate-800 dark:text-slate-200 cursor-pointer">
-                    Aktifkan Paket Ujian Ini untuk Diakses Siswa di Halaman Depan
+                    Aktifkan Paket Ujian Ini (Dapat Diakses Siswa di Halaman Depan)
                   </label>
                 </div>
 
-                <div className="flex items-start gap-3">
+                {/* Tampilkan Nilai */}
+                <div className="flex items-start gap-3 pt-2 border-t border-slate-200 dark:border-slate-700/60">
                   <input
                     type="checkbox"
                     id="instant-score-toggle"
@@ -702,8 +733,8 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                     <label htmlFor="instant-score-toggle" className="text-xs font-semibold text-slate-800 dark:text-slate-200 cursor-pointer">
                       Tampilkan Nilai ke Siswa Setelah Selesai Mengerjakan Ujian
                     </label>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Jika dinonaktifkan, siswa tidak akan melihat angka nilai atau status kelulusan, melainkan hanya tanda terima konfirmasi bahwa ujian telah berhasil dikirim.
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      Jika dinonaktifkan, siswa hanya melihat tanda terima bahwa ujian telah berhasil dikirim tanpa menampilkan skor/kelulusan.
                     </p>
                   </div>
                 </div>

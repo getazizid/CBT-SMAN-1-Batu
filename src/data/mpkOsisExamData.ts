@@ -71,6 +71,7 @@ export const MPK_OSIS_50_EXAM: Exam = {
   allowReview: true,
   maxCheatViolations: 3,
   isActive: true,
+  blockEarlyExit: true,
   createdAt: new Date().toISOString(),
   questions: [
     // 1 - 5: VISI & KEPEMIMPINAN TRANSFORMASIONAL
