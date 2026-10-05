@@ -42,9 +42,9 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
   try {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
     const settingsSnap = await getDoc(settingsRef);
-    const isV7Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'ct_v7_36_students';
+    const isV8Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'ct_v8_36_students_x2';
 
-    if (!isV7Updated) {
+    if (!isV8Updated) {
       console.log('🔄 Memperbarui dataset Ujian CT Informatika (30 Soal HOTS) & 36 Siswa Kelas X SMAN 1 Batu ke Cloud Firestore...');
       const batch = writeBatch(db);
 
@@ -96,7 +96,7 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
       batch.set(settingsRef, {
         enforceWhitelist: true,
         isInitialized: true,
-        version: 'ct_v7_36_students',
+        version: 'ct_v8_36_students_x2',
         updatedAt: new Date().toISOString(),
       }, { merge: true });
 

@@ -133,8 +133,12 @@ export const getStoredStudents = (): RegisteredStudent[] => {
     const nonCtStudents = cleaned.filter((s) => !ctStudentMap.has(s.nisn) && !s.id.startsWith('std-ct-x-'));
     const merged = [...STUDENTS_KELAS_X, ...nonCtStudents];
 
-    // Simpan jika ada perubahan data siswa
-    if (merged.length !== parsed.length || !parsed.some((s) => s.id === 'std-ct-x-36')) {
+    // Simpan jika ada perubahan data siswa atau perubahan kelas ke X-2
+    if (
+      merged.length !== parsed.length ||
+      !parsed.some((s) => s.id === 'std-ct-x-36') ||
+      parsed.some((s) => s.id === 'std-ct-x-01' && s.studentClass !== 'X-2')
+    ) {
       localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(merged));
     }
     return merged;
