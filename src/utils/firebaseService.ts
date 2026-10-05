@@ -66,17 +66,13 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
         batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
       });
 
-      // 3. Clean up old demo submissions and set real submissions
+      // 3. JANGAN PERNAH HAPUS data submission siswa! Hanya inisialisasi jika koleksi submissions benar-benar kosong
       const subsSnap = await getDocs(collection(db, COLLECTIONS.SUBMISSIONS));
-      const realSubIds = new Set(REAL_SUBMISSIONS_MPK_OSIS.map((s) => s.id));
-      subsSnap.forEach((d) => {
-        if (!realSubIds.has(d.id)) {
-          batch.delete(doc(db, COLLECTIONS.SUBMISSIONS, d.id));
-        }
-      });
-      REAL_SUBMISSIONS_MPK_OSIS.forEach((sub) => {
-        batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), cleanForFirestore(sub));
-      });
+      if (subsSnap.empty) {
+        REAL_SUBMISSIONS_MPK_OSIS.forEach((sub) => {
+          batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), cleanForFirestore(sub));
+        });
+      }
 
       // 4. Admin accounts: if only demo accounts existed, harmonize to 1 primary admin account (preserves custom edits)
       const accountsSnap = await getDocs(collection(db, COLLECTIONS.ADMIN_ACCOUNTS));

@@ -127,8 +127,33 @@ export default function App() {
     const unsubSubmissions = subscribeToSubmissions(
       (remoteSubmissions) => {
         if (remoteSubmissions) {
-          setSubmissions(remoteSubmissions);
-          saveStoredSubmissions(remoteSubmissions);
+          // Auto-Recovery: Pertahankan data submission siswa yang tersimpan di localStorage perangkat siswa/lokal
+          const localStored = getStoredSubmissions();
+          const remoteIdSet = new Set(remoteSubmissions.map((s) => s.id));
+          const missingLocals = localStored.filter(
+            (localSub) =>
+              !remoteIdSet.has(localSub.id) &&
+              !localSub.id.startsWith('sub-mpk-') // bukan dummy MPK OSIS bawaan
+          );
+
+          // Jika ada lembar jawaban siswa di HP/perangkat yang belum ada di Cloud, otomatis re-upload ke Cloud Firestore!
+          if (missingLocals.length > 0) {
+            console.log(`🔄 Auto-Recovery: Mengunggah ulang ${missingLocals.length} riwayat siswa dari penyimpanan perangkat ke Cloud Firestore...`);
+            missingLocals.forEach((sub) => {
+              saveSubmissionToFirestore(sub).catch(console.warn);
+            });
+          }
+
+          const merged = [...remoteSubmissions];
+          missingLocals.forEach((sub) => {
+            if (!merged.some((m) => m.id === sub.id)) {
+              merged.push(sub);
+            }
+          });
+          merged.sort((a, b) => new Date(b.submittedAt || '').getTime() - new Date(a.submittedAt || '').getTime());
+
+          setSubmissions(merged);
+          saveStoredSubmissions(merged);
           setIsCloudConnected(true);
         }
       },

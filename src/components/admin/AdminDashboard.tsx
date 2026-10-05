@@ -110,6 +110,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   }, [exams, selectedExamId]);
   const [searchStudent, setSearchStudent] = useState('');
   const [selectedClassFilter, setSelectedClassFilter] = useState('ALL');
+  const [submissionExamFilter, setSubmissionExamFilter] = useState('ALL');
 
   // Student management filters & multi-select
   const [searchRegisteredStudent, setSearchRegisteredStudent] = useState('');
@@ -158,9 +159,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const currentExam = exams.find((e) => e.id === selectedExamId) || exams[0];
 
-  // Filtered submissions
+  // Filtered submissions (mendukung filter Semua Paket dan backward compatibility ID lama)
   const relevantSubmissions = submissions.filter((s) => {
-    const matchExam = currentExam ? s.examId === currentExam.id : true;
+    const matchExam =
+      submissionExamFilter === 'ALL'
+        ? true
+        : s.examId === submissionExamFilter ||
+          ((submissionExamFilter === 'exam-ct-inf-x-30' || submissionExamFilter === 'exam-ct-informatika-30') &&
+           (s.examId === 'exam-ct-inf-x-30' || s.examId === 'exam-ct-informatika-30'));
     const matchSearch =
       s.studentName.toLowerCase().includes(searchStudent.toLowerCase()) ||
       s.studentNisn.includes(searchStudent);
@@ -451,8 +457,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const handleExportExcel = () => {
-    if (!currentExam) return;
-    exportExamResultsToExcel(currentExam, submissions);
+    const targetExam =
+      submissionExamFilter !== 'ALL'
+        ? exams.find((e) => e.id === submissionExamFilter) || currentExam
+        : currentExam;
+    if (!targetExam) return;
+    exportExamResultsToExcel(targetExam, relevantSubmissions);
   };
 
   // Submissions CRUD & selection actions
@@ -2347,6 +2357,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       onChange={(e) => setSearchStudent(e.target.value)}
                       className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
+                  </div>
+
+                  {/* Exam Filter */}
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <BookOpen className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                    <select
+                      value={submissionExamFilter}
+                      onChange={(e) => {
+                        setSubmissionExamFilter(e.target.value);
+                        setSubmissionsPage(1);
+                      }}
+                      className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    >
+                      <option value="ALL" className="dark:bg-slate-800">Semua Paket Ujian</option>
+                      {exams.map((e) => (
+                        <option key={e.id} value={e.id} className="dark:bg-slate-800">
+                          {e.subject} ({e.token})
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Class Filter */}
