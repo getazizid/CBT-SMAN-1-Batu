@@ -42,20 +42,20 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
   try {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
     const settingsSnap = await getDoc(settingsRef);
-    const isV4Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'ct_v4';
+    const isV5Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'ct_v5_30_soal';
 
-    if (!isV4Updated) {
-      console.log('🔄 Memperbarui dataset Ujian CT Informatika & MPK-OSIS SMAN 1 Batu ke Cloud Firestore...');
+    if (!isV5Updated) {
+      console.log('🔄 Memperbarui dataset Ujian CT Informatika (30 Soal HOTS) & MPK-OSIS SMAN 1 Batu ke Cloud Firestore...');
       const batch = writeBatch(db);
 
       // 1. Seed CT Informatika 30 Exam and MPK OSIS 50 Exam
-      batch.set(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), CT_INFORMATIKA_30_EXAM);
-      batch.set(doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id), MPK_OSIS_50_EXAM);
+      batch.set(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), cleanForFirestore(CT_INFORMATIKA_30_EXAM));
+      batch.set(doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id), cleanForFirestore(MPK_OSIS_50_EXAM));
 
       // 2. Seed students: Kelas X-1 s/d X-5 + Real MPK OSIS
       const allStudents = [...STUDENTS_KELAS_X, ...REAL_STUDENTS_MPK_OSIS];
       allStudents.forEach((student) => {
-        batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), student);
+        batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
       });
 
       // 3. Clean up old demo submissions and set real submissions
@@ -67,14 +67,14 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
         }
       });
       REAL_SUBMISSIONS_MPK_OSIS.forEach((sub) => {
-        batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), sub);
+        batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), cleanForFirestore(sub));
       });
 
       // 4. Admin accounts: if only demo accounts existed, harmonize to 1 primary admin account (preserves custom edits)
       const accountsSnap = await getDocs(collection(db, COLLECTIONS.ADMIN_ACCOUNTS));
       if (accountsSnap.empty) {
         INITIAL_ADMIN_ACCOUNTS.forEach((account) => {
-          batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), account);
+          batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), cleanForFirestore(account));
         });
       } else {
         // Remove unneeded default demo accounts (adm-002, adm-003) if they were not modified
@@ -88,12 +88,12 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
       batch.set(settingsRef, {
         enforceWhitelist: true,
         isInitialized: true,
-        version: 'ct_v4',
+        version: 'ct_v5_30_soal',
         updatedAt: new Date().toISOString(),
       }, { merge: true });
 
       await batch.commit();
-      console.log('✅ Dataset Ujian CT Informatika & SMAN 1 Batu berhasil disinkronkan ke Cloud Firestore!');
+      console.log('✅ Dataset Ujian CT Informatika (30 Soal HOTS) & SMAN 1 Batu berhasil disinkronkan ke Cloud Firestore!');
     }
     return true;
   } catch (error) {
@@ -123,7 +123,26 @@ export const subscribeToExams = (
             list.push(data);
           }
         });
-        list.sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
+
+        // Ensure CT exam is in the list and matches latest version
+        const ctExam = list.find((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
+        if (!ctExam || (ctExam.questions?.length ?? 0) !== 30 || ctExam.createdAt !== CT_INFORMATIKA_30_EXAM.createdAt) {
+          setDoc(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), cleanForFirestore(CT_INFORMATIKA_30_EXAM)).catch(console.warn);
+          if (!ctExam) {
+            list.unshift(CT_INFORMATIKA_30_EXAM);
+          } else {
+            const idx = list.findIndex((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
+            list[idx] = CT_INFORMATIKA_30_EXAM;
+          }
+        }
+
+        // Prioritize CT Informatika exam first
+        list.sort((a, b) => {
+          if (a.id === CT_INFORMATIKA_30_EXAM.id) return -1;
+          if (b.id === CT_INFORMATIKA_30_EXAM.id) return 1;
+          return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
+        });
+
         onUpdate(list);
       },
       (err) => {

@@ -392,6 +392,7 @@ export default function App() {
             onUpdateAdminAccounts={handleUpdateAdminAccounts}
             onToggleEnforceWhitelist={handleToggleEnforceWhitelist}
             onLogoutAdmin={handleLogoutAdmin}
+            onResetDemoData={handleResetDemoData}
           />
         )}
       </main>

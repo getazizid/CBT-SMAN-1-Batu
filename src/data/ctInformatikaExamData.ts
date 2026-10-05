@@ -67,7 +67,7 @@ export const CT_INFORMATIKA_30_EXAM: Exam = {
   id: 'exam-ct-informatika-30',
   title: 'Asesmen Berpikir Komputasional (CT) & Literasi Kompleks Informatika',
   subject: 'Informatika - Computational Thinking',
-  gradeClass: 'X-1, X-2, X-3, X-4, X-5',
+  gradeClass: 'Semua Kelas X (X-1 s/d X-12)',
   academicYear: '2025/2026',
   durationMinutes: 90,
   token: 'CTBATU',

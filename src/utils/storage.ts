@@ -56,14 +56,14 @@ export const getStoredExams = (): Exam[] => {
     const parsed: Exam[] = JSON.parse(raw);
     const ctIdx = parsed.findIndex((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
     if (ctIdx === -1) {
-      const merged = [CT_INFORMATIKA_30_EXAM, ...parsed];
-      localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(merged));
-      return merged;
-    } else if (parsed[ctIdx].createdAt !== CT_INFORMATIKA_30_EXAM.createdAt) {
+      parsed.unshift(CT_INFORMATIKA_30_EXAM);
+      localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(parsed));
+    } else if (parsed[ctIdx].createdAt !== CT_INFORMATIKA_30_EXAM.createdAt || (parsed[ctIdx].questions?.length ?? 0) !== 30) {
       parsed[ctIdx] = CT_INFORMATIKA_30_EXAM;
       localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(parsed));
-      return parsed;
     }
+    // Prioritize CT Informatika exam first
+    parsed.sort((a, b) => (a.id === CT_INFORMATIKA_30_EXAM.id ? -1 : b.id === CT_INFORMATIKA_30_EXAM.id ? 1 : 0));
     return parsed;
   } catch {
     return INITIAL_EXAMS;

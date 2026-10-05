@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BookOpen,
   CheckCircle2,
@@ -32,7 +32,8 @@ import {
   UserCog,
   UserPlus,
   Users,
-  X
+  X,
+  RotateCcw
 } from 'lucide-react';
 import {
   AdminAccount,
@@ -66,6 +67,7 @@ interface AdminDashboardProps {
   onUpdateAdminAccounts: (accounts: AdminAccount[]) => void;
   onToggleEnforceWhitelist: (enforce: boolean) => void;
   onLogoutAdmin: () => void;
+  onResetDemoData?: () => void;
 }
 
 type AdminTab = 'exams' | 'live' | 'questions' | 'students' | 'submissions' | 'accounts';
@@ -84,12 +86,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onUpdateAdminAccounts,
   onToggleEnforceWhitelist,
   onLogoutAdmin,
+  onResetDemoData,
 }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('exams');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
-  const [selectedExamId, setSelectedExamId] = useState<string>(exams[0]?.id || '');
+  const [selectedExamId, setSelectedExamId] = useState<string>(
+    exams.find((e) => e.id === 'exam-ct-informatika-30')?.id || exams[0]?.id || ''
+  );
+
+  useEffect(() => {
+    if (exams.length > 0) {
+      if (!selectedExamId || !exams.some((e) => e.id === selectedExamId)) {
+        const preferred = exams.find((e) => e.id === 'exam-ct-informatika-30') || exams[0];
+        setSelectedExamId(preferred.id);
+      }
+    }
+  }, [exams, selectedExamId]);
   const [searchStudent, setSearchStudent] = useState('');
   const [selectedClassFilter, setSelectedClassFilter] = useState('ALL');
 
@@ -836,6 +850,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
               {activeTab === 'exams' && (
                 <div className="flex items-center gap-2">
+                  {onResetDemoData && (
+                    <button
+                      onClick={onResetDemoData}
+                      className="text-xs font-semibold px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                      title="Sinkronkan ulang seluruh paket ujian (CT 30 Soal HOTS & MPK OSIS) ke Cloud Firestore dan sistem lokal"
+                    >
+                      <RotateCcw className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span className="hidden sm:inline">Sinkronkan Soal Awal</span>
+                    </button>
+                  )}
+
                   <button
                     onClick={handleDeleteAllExams}
                     disabled={exams.length === 0}
