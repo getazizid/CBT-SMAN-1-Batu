@@ -1,5 +1,6 @@
 import { AdminAccount, Exam, OptionScoreMap, RegisteredStudent, StudentExamSubmission } from '../types';
 import { MPK_OSIS_50_EXAM, REAL_STUDENTS_MPK_OSIS, REAL_SUBMISSIONS_MPK_OSIS } from '../data/mpkOsisExamData';
+import { CT_INFORMATIKA_30_EXAM, STUDENTS_KELAS_X } from '../data/ctInformatikaExamData';
 
 const STORAGE_KEYS = {
   EXAMS: 'cbt_sman1batu_exams',
@@ -20,14 +21,17 @@ export const DEFAULT_OPTION_SCORES: OptionScoreMap = {
   E: 2,
 };
 
-// 1 Paket Ujian Utama: 50 Soal Asesmen MPK OSIS SMAN 1 Batu
-export const INITIAL_EXAMS: Exam[] = [MPK_OSIS_50_EXAM];
+// Paket Ujian Utama: CT Informatika Kelas X (30 Soal HOTS) & Asesmen MPK OSIS (50 Soal)
+export const INITIAL_EXAMS: Exam[] = [CT_INFORMATIKA_30_EXAM, MPK_OSIS_50_EXAM];
 
 // 5 Riwayat Nilai Siswa Real
 export const INITIAL_SUBMISSIONS: StudentExamSubmission[] = REAL_SUBMISSIONS_MPK_OSIS;
 
-// 5 Data Siswa Realistis Calon Pengurus MPK OSIS
-export const INITIAL_STUDENTS: RegisteredStudent[] = REAL_STUDENTS_MPK_OSIS;
+// Data Siswa: Perwakilan Kelas X-1 s/d X-5 & Calon Pengurus MPK OSIS
+export const INITIAL_STUDENTS: RegisteredStudent[] = [
+  ...STUDENTS_KELAS_X,
+  ...REAL_STUDENTS_MPK_OSIS,
+];
 
 // 1 Akun Admin Utama Sistem
 export const INITIAL_ADMIN_ACCOUNTS: AdminAccount[] = [
@@ -49,7 +53,14 @@ export const getStoredExams = (): Exam[] => {
       localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(INITIAL_EXAMS));
       return INITIAL_EXAMS;
     }
-    return JSON.parse(raw);
+    const parsed: Exam[] = JSON.parse(raw);
+    const hasCtExam = parsed.some((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
+    if (!hasCtExam) {
+      const merged = [CT_INFORMATIKA_30_EXAM, ...parsed];
+      localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(merged));
+      return merged;
+    }
+    return parsed;
   } catch {
     return INITIAL_EXAMS;
   }
@@ -97,7 +108,15 @@ export const getStoredStudents = (): RegisteredStudent[] => {
       localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(INITIAL_STUDENTS));
       return INITIAL_STUDENTS;
     }
-    return JSON.parse(raw);
+    const parsed: RegisteredStudent[] = JSON.parse(raw);
+    const existingIds = new Set(parsed.map((s) => s.id));
+    const missing = STUDENTS_KELAS_X.filter((s) => !existingIds.has(s.id));
+    if (missing.length > 0) {
+      const merged = [...parsed, ...missing];
+      localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(merged));
+      return merged;
+    }
+    return parsed;
   } catch {
     return INITIAL_STUDENTS;
   }
