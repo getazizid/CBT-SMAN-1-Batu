@@ -97,11 +97,13 @@ const updatedQuestions = rawExam.questions.map((q, idx) => {
     }
   }
   
+  // Strip bracketed title from question text (e.g. [STIMULUS LITERASI TEORI KOMPUTASI])
+  const cleanText = q.text.replace(/^\s*\[[^\]]+\]\s*\r?\n*/, '').trim();
+
   return {
     id: q.id,
     number: q.number,
-    category: q.category,
-    text: q.text,
+    text: cleanText,
     options: newOptions,
     correctOption: targetKey,
     optionScores: newOptionScores,
@@ -112,10 +114,12 @@ const updatedQuestions = rawExam.questions.map((q, idx) => {
 // Update the exam object
 const updatedExam = {
   ...rawExam,
+  title: 'Informatika - Computational Thinking',
+  subject: 'Informatika - Computational Thinking',
   gradeClass: 'Semua Kelas X (X-1 s/d X-12)',
   defaultOptionScores: { A: 10, B: 0, C: 0, D: 0, E: 0 },
   useWeightedScoring: false, // User explicitly requested unweighted single correct answer
-  createdAt: '2026-10-05T12:30:00.000Z',
+  createdAt: '2026-10-05T12:45:00.000Z',
   questions: updatedQuestions,
 };
 
@@ -213,7 +217,6 @@ updatedQuestions.forEach((q) => {
   tsOutput += `    {\n`;
   tsOutput += `      id: '${q.id}',\n`;
   tsOutput += `      number: ${q.number},\n`;
-  tsOutput += `      category: '${q.category}',\n`;
   // Format text with backticks
   const escapedText = q.text.replace(/`/g, '\\`').replace(/\$/g, '\\$');
   tsOutput += `      text: \`${escapedText}\`,\n`;
@@ -261,7 +264,7 @@ let mdContent = `# BANK SOAL ASESMEN BERPIKIR KOMPUTASIONAL (COMPUTATIONAL THINK
 `;
 
 updatedQuestions.forEach((q) => {
-  mdContent += `### Soal No. ${q.number} [${q.category}]\n\n`;
+  mdContent += `### Soal No. ${q.number}\n\n`;
   mdContent += `${q.text}\n\n`;
   q.options.forEach((opt) => {
     mdContent += `**${opt.key}.** ${opt.text}\n\n`;
@@ -272,10 +275,10 @@ updatedQuestions.forEach((q) => {
 });
 
 mdContent += `## TABEL KUNCI JAWABAN LENGKAP (1 - 30)\n\n`;
-mdContent += `| No | Kunci | Kategori Materi | Keterangan Pilar |\n`;
+mdContent += `| No | Kunci | Topik Materi | Keterangan Pilar |\n`;
 mdContent += `|:---:|:---:|:---|:---|\n`;
 updatedQuestions.forEach((q) => {
-  mdContent += `| ${q.number} | **${q.correctOption}** | ${q.category} | ${q.explanation.slice(0, 70)}... |\n`;
+  mdContent += `| ${q.number} | **${q.correctOption}** | Berpikir Komputasional | ${q.explanation.slice(0, 70)}... |\n`;
 });
 
 mdContent += `\n\n*Dokumen Asli CBT SMAN 1 Batu - Disusun untuk Ujian Berpikir Komputasional Kelas X*\n`;
@@ -386,7 +389,7 @@ async function buildDocx() {
     docChildren.push(
       new Paragraph({
         children: [
-          new TextRun({ text: `SOAL NO. ${q.number} [${q.category}]`, bold: true, size: 22, color: '1A365D', font: 'Arial' }),
+          new TextRun({ text: `SOAL NO. ${q.number}`, bold: true, size: 22, color: '1A365D', font: 'Arial' }),
         ],
         spacing: { before: 200, after: 100 },
       })
@@ -449,10 +452,10 @@ async function buildDocx() {
       children: [
         new TableCell({ width: { size: 1000, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'No', bold: true, size: 18 })] })] }),
         new TableCell({ width: { size: 1200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'Kunci', bold: true, size: 18 })] })] }),
-        new TableCell({ width: { size: 3500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'Kategori', bold: true, size: 18 })] })] }),
+        new TableCell({ width: { size: 3500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'Topik', bold: true, size: 18 })] })] }),
         new TableCell({ width: { size: 1000, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'No', bold: true, size: 18 })] })] }),
         new TableCell({ width: { size: 1200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'Kunci', bold: true, size: 18 })] })] }),
-        new TableCell({ width: { size: 3500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'Kategori', bold: true, size: 18 })] })] }),
+        new TableCell({ width: { size: 3500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'Topik', bold: true, size: 18 })] })] }),
       ],
     }),
   ];
@@ -465,10 +468,10 @@ async function buildDocx() {
         children: [
           new TableCell({ width: { size: 1000, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: String(q1.number), size: 18 })] })] }),
           new TableCell({ width: { size: 1200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: q1.correctOption, bold: true, size: 18 })] })] }),
-          new TableCell({ width: { size: 3500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: q1.category, size: 16 })] })] }),
+          new TableCell({ width: { size: 3500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'Berpikir Komputasional', size: 16 })] })] }),
           new TableCell({ width: { size: 1000, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: String(q2.number), size: 18 })] })] }),
           new TableCell({ width: { size: 1200, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: q2.correctOption, bold: true, size: 18 })] })] }),
-          new TableCell({ width: { size: 3500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: q2.category, size: 16 })] })] }),
+          new TableCell({ width: { size: 3500, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'Berpikir Komputasional', size: 16 })] })] }),
         ],
       })
     );
