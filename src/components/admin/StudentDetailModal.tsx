@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CheckCircle2, Clock, Printer, ShieldAlert, User, X, XCircle } from 'lucide-react';
 import { Exam, OptionKey, StudentExamSubmission } from '../../types';
+import { Pagination } from '../common/Pagination';
 
 interface StudentDetailModalProps {
   isOpen: boolean;
@@ -15,7 +16,16 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
   submission,
   exam,
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   if (!isOpen || !submission) return null;
+
+  const totalQuestions = exam?.questions.length || 0;
+  const safePage = Math.min(currentPage, Math.max(1, Math.ceil(totalQuestions / pageSize)));
+  const paginatedQuestions = exam?.questions
+    ? exam.questions.slice((safePage - 1) * pageSize, safePage * pageSize)
+    : [];
 
   const handlePrint = () => {
     window.print();
@@ -133,49 +143,51 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {exam?.questions.map((q) => {
-                    const selected = submission.answers[q.number] || null;
-                    const score = selected ? (q.optionScores[selected] ?? 0) : 0;
-                    const maxScore = Math.max(...(Object.values(q.optionScores) as number[]));
+                  {paginatedQuestions.length > 0 ? (
+                    paginatedQuestions.map((q) => {
+                      const selected = submission.answers[q.number] || null;
+                      const score = selected ? (q.optionScores[selected] ?? 0) : 0;
+                      const maxScore = Math.max(...(Object.values(q.optionScores) as number[]));
 
-                    return (
-                      <tr key={q.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/50">
-                        <td className="py-2.5 px-3 font-semibold text-center text-slate-600 dark:text-slate-400">
-                          {q.number}
-                        </td>
-                        <td className="py-2.5 px-3">
-                          <p className="text-slate-800 dark:text-slate-200 font-medium line-clamp-1">{q.text}</p>
-                        </td>
-                        <td className="py-2.5 px-3 text-center">
-                          {selected ? (
-                            <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
-                              {selected}
+                      return (
+                        <tr key={q.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/50">
+                          <td className="py-2.5 px-3 font-semibold text-center text-slate-600 dark:text-slate-400">
+                            {q.number}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <p className="text-slate-800 dark:text-slate-200 font-medium line-clamp-1">{q.text}</p>
+                          </td>
+                          <td className="py-2.5 px-3 text-center">
+                            {selected ? (
+                              <span className="font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                                {selected}
+                              </span>
+                            ) : (
+                              <span className="text-rose-500 dark:text-rose-400 font-semibold">Kosong</span>
+                            )}
+                          </td>
+                          <td className="py-2.5 px-3 text-center font-bold">
+                            <span
+                              className={
+                                score === maxScore
+                                  ? 'text-emerald-700 dark:text-emerald-400'
+                                  : score > 0
+                                  ? 'text-blue-600 dark:text-blue-400'
+                                  : 'text-rose-600 dark:text-rose-400'
+                              }
+                            >
+                              +{score} poin
                             </span>
-                          ) : (
-                            <span className="text-rose-500 dark:text-rose-400 font-semibold">Kosong</span>
-                          )}
-                        </td>
-                        <td className="py-2.5 px-3 text-center font-bold">
-                          <span
-                            className={
-                              score === maxScore
-                                ? 'text-emerald-700 dark:text-emerald-400'
-                                : score > 0
-                                ? 'text-blue-600 dark:text-blue-400'
-                                : 'text-rose-600 dark:text-rose-400'
-                            }
-                          >
-                            +{score} poin
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-3 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
-                          {Object.entries(q.optionScores)
-                            .map(([k, val]) => `${k}:${val}p`)
-                            .join(' ')}
-                        </td>
-                      </tr>
-                    );
-                  }) || (
+                          </td>
+                          <td className="py-2.5 px-3 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                            {Object.entries(q.optionScores)
+                              .map(([k, val]) => `${k}:${val}p`)
+                              .join(' ')}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
                     <tr>
                       <td colSpan={5} className="text-center py-4 text-slate-400 dark:text-slate-500">
                         Tidak ada data butir soal.
@@ -185,6 +197,22 @@ export const StudentDetailModal: React.FC<StudentDetailModalProps> = ({
                 </tbody>
               </table>
             </div>
+
+            {totalQuestions > pageSize && (
+              <Pagination
+                currentPage={safePage}
+                totalItems={totalQuestions}
+                pageSize={pageSize}
+                pageSizeOptions={[10, 25, 50]}
+                onPageChange={(p) => setCurrentPage(p)}
+                onPageSizeChange={(s) => {
+                  setPageSize(s);
+                  setCurrentPage(1);
+                }}
+                itemLabel="butir soal"
+                className="pt-3"
+              />
+            )}
           </div>
         </div>
 

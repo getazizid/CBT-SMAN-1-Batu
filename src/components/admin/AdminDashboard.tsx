@@ -49,6 +49,7 @@ import { StudentBatchImportModal } from './StudentBatchImportModal';
 import { StudentDetailModal } from './StudentDetailModal';
 import { StudentEditorModal } from './StudentEditorModal';
 import { WordImportModal } from './WordImportModal';
+import { Pagination } from '../common/Pagination';
 
 interface AdminDashboardProps {
   exams: Exam[];
@@ -104,6 +105,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [isAccountEditorOpen, setIsAccountEditorOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<AdminAccount | null>(null);
 
+  // Pagination states
+  const [questionsPage, setQuestionsPage] = useState(1);
+  const [questionsPerPage, setQuestionsPerPage] = useState(10);
+
+  const [studentsPage, setStudentsPage] = useState(1);
+  const [studentsPerPage, setStudentsPerPage] = useState(10);
+
+  const [submissionsPage, setSubmissionsPage] = useState(1);
+  const [submissionsPerPage, setSubmissionsPerPage] = useState(10);
+
+  const [accountsPage, setAccountsPage] = useState(1);
+  const [accountsPerPage, setAccountsPerPage] = useState(10);
+
+  const [examsPage, setExamsPage] = useState(1);
+  const [examsPerPage, setExamsPerPage] = useState(6);
+
   // Modals state
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
@@ -148,6 +165,55 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       acc.role.toLowerCase().includes(searchAccount.toLowerCase())
     );
   });
+
+  // Pagination safe calculations
+  const totalQuestions = currentExam?.questions.length || 0;
+  const safeQuestionsPage = Math.min(
+    questionsPage,
+    Math.max(1, Math.ceil(totalQuestions / questionsPerPage))
+  );
+  const paginatedQuestions = currentExam
+    ? currentExam.questions.slice(
+        (safeQuestionsPage - 1) * questionsPerPage,
+        safeQuestionsPage * questionsPerPage
+      )
+    : [];
+
+  const safeStudentsPage = Math.min(
+    studentsPage,
+    Math.max(1, Math.ceil(filteredStudents.length / studentsPerPage))
+  );
+  const paginatedStudents = filteredStudents.slice(
+    (safeStudentsPage - 1) * studentsPerPage,
+    safeStudentsPage * studentsPerPage
+  );
+
+  const safeSubmissionsPage = Math.min(
+    submissionsPage,
+    Math.max(1, Math.ceil(relevantSubmissions.length / submissionsPerPage))
+  );
+  const paginatedSubmissions = relevantSubmissions.slice(
+    (safeSubmissionsPage - 1) * submissionsPerPage,
+    safeSubmissionsPage * submissionsPerPage
+  );
+
+  const safeAccountsPage = Math.min(
+    accountsPage,
+    Math.max(1, Math.ceil(filteredAccounts.length / accountsPerPage))
+  );
+  const paginatedAccounts = filteredAccounts.slice(
+    (safeAccountsPage - 1) * accountsPerPage,
+    safeAccountsPage * accountsPerPage
+  );
+
+  const safeExamsPage = Math.min(
+    examsPage,
+    Math.max(1, Math.ceil(exams.length / examsPerPage))
+  );
+  const paginatedExams = exams.slice(
+    (safeExamsPage - 1) * examsPerPage,
+    safeExamsPage * examsPerPage
+  );
 
   // Action handlers for exams
   const handleToggleExamActive = (examId: string) => {
@@ -224,6 +290,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       onUpdateSubmissions(updated);
       setSelectedSubmissionIds((prev) => prev.filter((id) => id !== subId));
     }
+  };
+
+  const isAllCurrentPageSubmissionsSelected =
+    paginatedSubmissions.length > 0 &&
+    paginatedSubmissions.every((s) => selectedSubmissionIds.includes(s.id));
+
+  const toggleSelectCurrentPageSubmissions = () => {
+    if (isAllCurrentPageSubmissionsSelected) {
+      const pageIdSet = new Set(paginatedSubmissions.map((s) => s.id));
+      setSelectedSubmissionIds((prev) => prev.filter((id) => !pageIdSet.has(id)));
+    } else {
+      const combined = Array.from(
+        new Set([...selectedSubmissionIds, ...paginatedSubmissions.map((s) => s.id)])
+      );
+      setSelectedSubmissionIds(combined);
+    }
+  };
+
+  const selectAllFilteredSubmissions = () => {
+    const combined = Array.from(
+      new Set([...selectedSubmissionIds, ...relevantSubmissions.map((s) => s.id)])
+    );
+    setSelectedSubmissionIds(combined);
   };
 
   const isAllFilteredSubmissionsSelected =
@@ -307,6 +396,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       onUpdateStudents(updated);
       setSelectedStudentIds((prev) => prev.filter((id) => id !== studentId));
     }
+  };
+
+  const isAllCurrentPageStudentsSelected =
+    paginatedStudents.length > 0 &&
+    paginatedStudents.every((s) => selectedStudentIds.includes(s.id));
+
+  const toggleSelectCurrentPageStudents = () => {
+    if (isAllCurrentPageStudentsSelected) {
+      const pageIdSet = new Set(paginatedStudents.map((s) => s.id));
+      setSelectedStudentIds((prev) => prev.filter((id) => !pageIdSet.has(id)));
+    } else {
+      const combined = Array.from(
+        new Set([...selectedStudentIds, ...paginatedStudents.map((s) => s.id)])
+      );
+      setSelectedStudentIds(combined);
+    }
+  };
+
+  const selectAllFilteredStudents = () => {
+    const combined = Array.from(
+      new Set([...selectedStudentIds, ...filteredStudents.map((s) => s.id)])
+    );
+    setSelectedStudentIds(combined);
   };
 
   const isAllFilteredStudentsSelected =
@@ -656,7 +768,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span className="text-slate-400 dark:text-slate-500 hidden md:inline">Paket:</span>
                   <select
                     value={selectedExamId}
-                    onChange={(e) => setSelectedExamId(e.target.value)}
+                    onChange={(e) => {
+                      setSelectedExamId(e.target.value);
+                      setQuestionsPage(1);
+                      setSubmissionsPage(1);
+                    }}
                     className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-slate-900 dark:text-white rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none max-w-[200px] sm:max-w-xs truncate"
                   >
                     {exams.map((e) => (
@@ -734,7 +850,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {activeTab === 'exams' && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {exams.map((exam) => {
+                {paginatedExams.map((exam) => {
                   const count = exam.questions.length;
                   const examSubmissions = submissions.filter((s) => s.examId === exam.id);
                   const isLocked = exam.blockEarlyExit !== false;
@@ -849,6 +965,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             onClick={() => {
                               setSelectedExamId(exam.id);
                               setActiveTab('questions');
+                              setQuestionsPage(1);
                             }}
                             className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                             title="Buka Bank Soal"
@@ -878,6 +995,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   );
                 })}
               </div>
+
+              {exams.length > 6 && (
+                <Pagination
+                  currentPage={safeExamsPage}
+                  totalItems={exams.length}
+                  pageSize={examsPerPage}
+                  pageSizeOptions={[6, 12, 24]}
+                  onPageChange={(page) => setExamsPage(page)}
+                  onPageSizeChange={(size) => {
+                    setExamsPerPage(size);
+                    setExamsPage(1);
+                  }}
+                  itemLabel="paket ujian"
+                  className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs"
+                />
+              )}
             </div>
           )}
 
@@ -930,6 +1063,65 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
 
+              {/* Quick Question Number Jump Strip */}
+              {totalQuestions > 0 && (
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      Navigasi Cepat Nomor Soal:
+                    </span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Klik nomor butir soal untuk membuka halaman terkait
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1">
+                    {currentExam.questions.map((q, idx) => {
+                      const qNum = q.number || idx + 1;
+                      const pageOfThisQuestion = Math.floor(idx / questionsPerPage) + 1;
+                      const isCurrentPage = pageOfThisQuestion === safeQuestionsPage;
+                      return (
+                        <button
+                          key={q.id || `jump-${idx}`}
+                          type="button"
+                          onClick={() => {
+                            setQuestionsPage(pageOfThisQuestion);
+                            setTimeout(() => {
+                              const el = document.getElementById(`question-card-${qNum}`);
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 50);
+                          }}
+                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+                            isCurrentPage
+                              ? 'bg-blue-600 text-white shadow-xs ring-2 ring-blue-300 dark:ring-blue-700'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-100 dark:hover:bg-slate-700'
+                          }`}
+                          title={`Buka Soal No. ${qNum} (Halaman ${pageOfThisQuestion})`}
+                        >
+                          {qNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Top Pagination for Questions */}
+              {totalQuestions > 0 && (
+                <Pagination
+                  currentPage={safeQuestionsPage}
+                  totalItems={totalQuestions}
+                  pageSize={questionsPerPage}
+                  pageSizeOptions={[5, 10, 20, 50]}
+                  onPageChange={(page) => setQuestionsPage(page)}
+                  onPageSizeChange={(size) => {
+                    setQuestionsPerPage(size);
+                    setQuestionsPage(1);
+                  }}
+                  itemLabel="butir soal"
+                  className="bg-white dark:bg-slate-900 px-5 py-3 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs"
+                />
+              )}
+
               {/* Questions List */}
               <div className="space-y-4">
                 {currentExam.questions.length === 0 ? (
@@ -946,106 +1138,132 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </button>
                   </div>
                 ) : (
-                  currentExam.questions.map((question, qIdx) => (
-                    <div
-                      key={question.id || `q-${qIdx}`}
-                      className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-4"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-xs">
-                            Soal No. {question.number || qIdx + 1}
-                          </span>
-                          {question.category && (
-                            <span className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-lg font-medium">
-                              {question.category}
+                  paginatedQuestions.map((question, pIdx) => {
+                    const globalIdx = currentExam.questions.findIndex((q) => q.id === question.id);
+                    const qIdx = globalIdx >= 0 ? globalIdx : (safeQuestionsPage - 1) * questionsPerPage + pIdx;
+                    const questionNumber = question.number || qIdx + 1;
+                    return (
+                      <div
+                        key={question.id || `q-${qIdx}`}
+                        id={`question-card-${questionNumber}`}
+                        className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-xs">
+                              Soal No. {questionNumber}
                             </span>
-                          )}
+                            {question.category && (
+                              <span className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-lg font-medium">
+                                {question.category}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Question Text */}
-                      <p className="text-slate-900 dark:text-white text-sm font-semibold whitespace-pre-line leading-relaxed">
-                        {question.text}
-                      </p>
+                        {/* Question Text */}
+                        <p className="text-slate-900 dark:text-white text-sm font-semibold whitespace-pre-line leading-relaxed">
+                          {question.text}
+                        </p>
 
-                      {/* Options & Weights Table */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-2">
-                        {question.options.map((opt) => {
-                          const score = question.optionScores[opt.key] ?? 0;
-                          return (
-                            <div
-                              key={opt.key}
-                              className={`p-3.5 rounded-2xl border text-xs flex flex-col justify-between space-y-2.5 transition-all ${
-                                score === 10
-                                  ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/40'
-                                  : score > 0
-                                  ? 'border-blue-100 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/30'
-                                  : 'border-slate-200 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40'
-                              }`}
-                            >
-                              <div className="flex items-start gap-2">
-                                <span
-                                  className={`w-5 h-5 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${
-                                    score === 10
-                                      ? 'bg-emerald-600 text-white'
-                                      : score > 0
-                                      ? 'bg-blue-600 text-white'
-                                      : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                                  }`}
-                                >
-                                  {opt.key}
-                                </span>
-                                <span className="text-slate-700 dark:text-slate-300 line-clamp-2 text-[11px] font-medium">
-                                  {opt.text}
-                                </span>
+                        {/* Options & Weights Table */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-2">
+                          {question.options.map((opt) => {
+                            const score = question.optionScores[opt.key] ?? 0;
+                            return (
+                              <div
+                                key={opt.key}
+                                className={`p-3.5 rounded-2xl border text-xs flex flex-col justify-between space-y-2.5 transition-all ${
+                                  score === 10
+                                    ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/40'
+                                    : score > 0
+                                    ? 'border-blue-100 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/30'
+                                    : 'border-slate-200 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40'
+                                }`}
+                              >
+                                <div className="flex items-start gap-2">
+                                  <span
+                                    className={`w-5 h-5 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${
+                                      score === 10
+                                        ? 'bg-emerald-600 text-white'
+                                        : score > 0
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                    }`}
+                                  >
+                                    {opt.key}
+                                  </span>
+                                  <span className="text-slate-700 dark:text-slate-300 line-clamp-2 text-[11px] font-medium">
+                                    {opt.text}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/60 text-[11px]">
+                                  <span className="text-slate-400 dark:text-slate-500 font-medium">Poin Bobot:</span>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    value={score}
+                                    onChange={(e) => {
+                                      const newScore = parseInt(e.target.value, 10) || 0;
+                                      const updatedQuestions = currentExam.questions.map((q, idx) => {
+                                        if (idx === qIdx) {
+                                          return {
+                                            ...q,
+                                            optionScores: {
+                                              ...q.optionScores,
+                                              [opt.key]: newScore,
+                                            },
+                                          };
+                                        }
+                                        return q;
+                                      });
+                                      handleSaveExam({
+                                        ...currentExam,
+                                        questions: updatedQuestions,
+                                      });
+                                    }}
+                                    className="w-14 text-center font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-1 py-0.5 focus:ring-1 focus:ring-blue-500 focus:outline-none text-slate-900 dark:text-white"
+                                  />
+                                </div>
                               </div>
-
-                              <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/60 text-[11px]">
-                                <span className="text-slate-400 dark:text-slate-500 font-medium">Poin Bobot:</span>
-                                <input
-                                  type="number"
-                                  min="0"
-                                  max="100"
-                                  value={score}
-                                  onChange={(e) => {
-                                    const newScore = parseInt(e.target.value, 10) || 0;
-                                    const updatedQuestions = currentExam.questions.map((q, idx) => {
-                                      if (idx === qIdx) {
-                                        return {
-                                          ...q,
-                                          optionScores: {
-                                            ...q.optionScores,
-                                            [opt.key]: newScore,
-                                          },
-                                        };
-                                      }
-                                      return q;
-                                    });
-                                    handleSaveExam({
-                                      ...currentExam,
-                                      questions: updatedQuestions,
-                                    });
-                                  }}
-                                  className="w-14 text-center font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-1 py-0.5 focus:ring-1 focus:ring-blue-500 focus:outline-none text-slate-900 dark:text-white"
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Explanation */}
-                      {question.explanation && (
-                        <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl text-xs text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700/60">
-                          <span className="font-bold text-slate-800 dark:text-white">Pembahasan Guru: </span>
-                          <span>{question.explanation}</span>
+                            );
+                          })}
                         </div>
-                      )}
-                    </div>
-                  ))
+
+                        {/* Explanation */}
+                        {question.explanation && (
+                          <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl text-xs text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700/60">
+                            <span className="font-bold text-slate-800 dark:text-white">Pembahasan Guru: </span>
+                            <span>{question.explanation}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
+
+              {/* Bottom Pagination for Questions */}
+              {totalQuestions > questionsPerPage && (
+                <Pagination
+                  currentPage={safeQuestionsPage}
+                  totalItems={totalQuestions}
+                  pageSize={questionsPerPage}
+                  pageSizeOptions={[5, 10, 20, 50]}
+                  onPageChange={(page) => {
+                    setQuestionsPage(page);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  onPageSizeChange={(size) => {
+                    setQuestionsPerPage(size);
+                    setQuestionsPage(1);
+                  }}
+                  itemLabel="butir soal"
+                  className="bg-white dark:bg-slate-900 px-5 py-3.5 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs"
+                />
+              )}
             </div>
           )}
 
@@ -1114,7 +1332,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         type="text"
                         placeholder="Cari nama atau NISN siswa..."
                         value={searchRegisteredStudent}
-                        onChange={(e) => setSearchRegisteredStudent(e.target.value)}
+                        onChange={(e) => {
+                          setSearchRegisteredStudent(e.target.value);
+                          setStudentsPage(1);
+                        }}
                         className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                       />
                     </div>
@@ -1124,7 +1345,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <Filter className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                       <select
                         value={studentClassFilter}
-                        onChange={(e) => setStudentClassFilter(e.target.value)}
+                        onChange={(e) => {
+                          setStudentClassFilter(e.target.value);
+                          setStudentsPage(1);
+                        }}
                         className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       >
                         <option value="ALL" className="dark:bg-slate-800">Semua Kelas ({students.length})</option>
@@ -1140,9 +1364,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <div className="flex items-center gap-1 text-xs">
                       <select
                         value={studentStatusFilter}
-                        onChange={(e) =>
-                          setStudentStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE')
-                        }
+                        onChange={(e) => {
+                          setStudentStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'INACTIVE');
+                          setStudentsPage(1);
+                        }}
                         className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       >
                         <option value="ALL" className="dark:bg-slate-800">Semua Status</option>
@@ -1206,6 +1431,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <span>
                         {selectedStudentIds.length} dari {students.length} siswa dipilih
                       </span>
+                      {selectedStudentIds.length < filteredStudents.length && (
+                        <button
+                          type="button"
+                          onClick={selectAllFilteredStudents}
+                          className="text-xs text-blue-700 dark:text-blue-300 underline font-semibold hover:text-blue-900 dark:hover:text-white cursor-pointer ml-1"
+                        >
+                          (Pilih semua {filteredStudents.length} siswa hasil filter)
+                        </button>
+                      )}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
@@ -1253,10 +1487,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3 text-center w-10">
                           <input
                             type="checkbox"
-                            checked={isAllFilteredStudentsSelected}
-                            onChange={toggleSelectAllFilteredStudents}
+                            checked={isAllCurrentPageStudentsSelected}
+                            onChange={toggleSelectCurrentPageStudents}
                             className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
-                            title={isAllFilteredStudentsSelected ? 'Batal pilih semua' : 'Pilih semua yang tampil'}
+                            title={isAllCurrentPageStudentsSelected ? 'Batal pilih semua di halaman ini' : 'Pilih semua siswa di halaman ini'}
                           />
                         </th>
                         <th className="py-3 px-3.5 text-center w-12">No</th>
@@ -1269,9 +1503,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {filteredStudents.length > 0 ? (
-                        filteredStudents.map((std, idx) => {
+                      {paginatedStudents.length > 0 ? (
+                        paginatedStudents.map((std, idx) => {
                           const isChecked = selectedStudentIds.includes(std.id);
+                          const rowNum = (safeStudentsPage - 1) * studentsPerPage + idx + 1;
                           return (
                             <tr
                               key={std.id}
@@ -1288,7 +1523,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 />
                               </td>
                               <td className="py-3 px-3.5 text-center font-semibold text-slate-500 dark:text-slate-400">
-                                {idx + 1}
+                                {rowNum}
                               </td>
                               <td className="py-3 px-3.5 font-mono font-bold text-slate-900 dark:text-white">
                                 {std.nisn}
@@ -1358,6 +1593,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </tbody>
                   </table>
                 </div>
+
+                <Pagination
+                  currentPage={safeStudentsPage}
+                  totalItems={filteredStudents.length}
+                  pageSize={studentsPerPage}
+                  pageSizeOptions={[10, 25, 50, 100]}
+                  onPageChange={(page) => setStudentsPage(page)}
+                  onPageSizeChange={(size) => {
+                    setStudentsPerPage(size);
+                    setStudentsPage(1);
+                  }}
+                  itemLabel="siswa"
+                  className="pt-2"
+                />
               </div>
             </div>
           )}
@@ -1433,6 +1682,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <span className="text-xs font-bold text-blue-900 dark:text-blue-300">
                       Aksi massal untuk data nilai yang ditandai:
                     </span>
+                    {selectedSubmissionIds.length < relevantSubmissions.length && (
+                      <button
+                        type="button"
+                        onClick={selectAllFilteredSubmissions}
+                        className="text-xs text-blue-700 dark:text-blue-300 underline font-semibold hover:text-blue-900 dark:hover:text-white cursor-pointer ml-1"
+                      >
+                        (Pilih semua {relevantSubmissions.length} riwayat terfilter)
+                      </button>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -1463,10 +1721,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <th className="py-3 px-3 text-center w-10">
                         <input
                           type="checkbox"
-                          checked={isAllFilteredSubmissionsSelected}
-                          onChange={toggleSelectAllFilteredSubmissions}
+                          checked={isAllCurrentPageSubmissionsSelected}
+                          onChange={toggleSelectCurrentPageSubmissions}
                           className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
-                          title={isAllFilteredSubmissionsSelected ? 'Batal pilih semua' : 'Pilih semua riwayat yang tampil'}
+                          title={isAllCurrentPageSubmissionsSelected ? 'Batal pilih semua di halaman ini' : 'Pilih semua riwayat di halaman ini'}
                         />
                       </th>
                       <th className="py-3 px-3.5 text-center w-12">No</th>
@@ -1482,10 +1740,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {relevantSubmissions.length > 0 ? (
-                      relevantSubmissions.map((sub, idx) => {
+                    {paginatedSubmissions.length > 0 ? (
+                      paginatedSubmissions.map((sub, idx) => {
                         const isChecked = selectedSubmissionIds.includes(sub.id);
                         const isPassed = sub.isPassed ?? (sub.finalScoreScale100 >= (currentExam?.passingGrade || 75));
+                        const rowNum = (safeSubmissionsPage - 1) * submissionsPerPage + idx + 1;
                         return (
                           <tr
                             key={sub.id}
@@ -1502,7 +1761,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               />
                             </td>
                             <td className="py-3 px-3.5 text-center font-semibold text-slate-500 dark:text-slate-400">
-                              {idx + 1}
+                              {rowNum}
                             </td>
                             <td className="py-3 px-3.5 font-bold text-slate-900 dark:text-white">{sub.studentName}</td>
                             <td className="py-3 px-3.5 font-mono text-slate-600 dark:text-slate-400">{sub.studentNisn}</td>
@@ -1586,6 +1845,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </tbody>
                 </table>
               </div>
+
+              <Pagination
+                currentPage={safeSubmissionsPage}
+                totalItems={relevantSubmissions.length}
+                pageSize={submissionsPerPage}
+                pageSizeOptions={[10, 25, 50, 100]}
+                onPageChange={(page) => setSubmissionsPage(page)}
+                onPageSizeChange={(size) => {
+                  setSubmissionsPerPage(size);
+                  setSubmissionsPage(1);
+                }}
+                itemLabel="lembar jawaban"
+                className="pt-2"
+              />
             </div>
           )}
 
@@ -1621,7 +1894,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       type="text"
                       placeholder="Cari nama, username, atau peran..."
                       value={searchAccount}
-                      onChange={(e) => setSearchAccount(e.target.value)}
+                      onChange={(e) => {
+                        setSearchAccount(e.target.value);
+                        setAccountsPage(1);
+                      }}
                       className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     />
                   </div>
@@ -1646,10 +1922,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {filteredAccounts.length > 0 ? (
-                        filteredAccounts.map((acc, idx) => {
+                      {paginatedAccounts.length > 0 ? (
+                        paginatedAccounts.map((acc, idx) => {
                           const isShowingPass = !!showPasswordsMap[acc.id];
                           const isCurrentActiveUser = currentAdmin?.username === acc.username;
+                          const rowNum = (safeAccountsPage - 1) * accountsPerPage + idx + 1;
                           return (
                             <tr
                               key={acc.id}
@@ -1660,7 +1937,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               }`}
                             >
                               <td className="py-3 px-3.5 text-center font-semibold text-slate-500 dark:text-slate-400">
-                                {idx + 1}
+                                {rowNum}
                               </td>
                               <td className="py-3 px-3.5 font-bold text-slate-900 dark:text-white">
                                 <div className="flex items-center gap-2">
@@ -1753,6 +2030,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </tbody>
                   </table>
                 </div>
+
+                <Pagination
+                  currentPage={safeAccountsPage}
+                  totalItems={filteredAccounts.length}
+                  pageSize={accountsPerPage}
+                  pageSizeOptions={[5, 10, 25]}
+                  onPageChange={(page) => setAccountsPage(page)}
+                  onPageSizeChange={(size) => {
+                    setAccountsPerPage(size);
+                    setAccountsPage(1);
+                  }}
+                  itemLabel="akun admin/guru"
+                  className="pt-2"
+                />
               </div>
             </div>
           )}

@@ -23,6 +23,7 @@ import {
   parseTargetClasses,
   sortClassList
 } from '../../utils/constants';
+import { Pagination } from '../common/Pagination';
 
 interface ExamEditorModalProps {
   isOpen: boolean;
@@ -59,6 +60,19 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
   const [shuffleOptions, setShuffleOptions] = useState<boolean>(false);
   const [blockEarlyExit, setBlockEarlyExit] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<'settings' | 'questions'>('settings');
+
+  const [questionsPage, setQuestionsPage] = useState(1);
+  const [questionsPerPage, setQuestionsPerPage] = useState(5);
+
+  const totalQuestions = questions.length;
+  const safeQuestionsPage = Math.min(
+    questionsPage,
+    Math.max(1, Math.ceil(totalQuestions / questionsPerPage))
+  );
+  const paginatedQuestions = questions.slice(
+    (safeQuestionsPage - 1) * questionsPerPage,
+    safeQuestionsPage * questionsPerPage
+  );
 
   // Sync state whenever exam prop or isOpen changes so existing data is always loaded
   useEffect(() => {
@@ -135,6 +149,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
     };
 
     setQuestions([...questions, newQ]);
+    setQuestionsPage(Math.ceil((questions.length + 1) / questionsPerPage));
   };
 
   const handleRemoveQuestion = (index: number) => {
@@ -763,6 +778,22 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 </button>
               </div>
 
+              {totalQuestions > 0 && (
+                <Pagination
+                  currentPage={safeQuestionsPage}
+                  totalItems={totalQuestions}
+                  pageSize={questionsPerPage}
+                  pageSizeOptions={[5, 10, 20]}
+                  onPageChange={(page) => setQuestionsPage(page)}
+                  onPageSizeChange={(size) => {
+                    setQuestionsPerPage(size);
+                    setQuestionsPage(1);
+                  }}
+                  itemLabel="butir soal"
+                  className="pb-1"
+                />
+              )}
+
               {questions.length === 0 ? (
                 <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/40 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
                   <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Belum ada soal pada paket ini.</p>
@@ -776,7 +807,9 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 </div>
               ) : (
                 <div className="space-y-5">
-                  {questions.map((q, qIdx) => (
+                  {paginatedQuestions.map((q, pIdx) => {
+                    const qIdx = (safeQuestionsPage - 1) * questionsPerPage + pIdx;
+                    return (
                     <div
                       key={q.id || qIdx}
                       className="bg-white dark:bg-slate-850 rounded-3xl p-5 border border-slate-200 dark:border-slate-700/80 shadow-xs space-y-4 relative"
@@ -861,10 +894,27 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                         />
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {totalQuestions > questionsPerPage && (
+              <Pagination
+                currentPage={safeQuestionsPage}
+                totalItems={totalQuestions}
+                pageSize={questionsPerPage}
+                pageSizeOptions={[5, 10, 20]}
+                onPageChange={(page) => setQuestionsPage(page)}
+                onPageSizeChange={(size) => {
+                  setQuestionsPerPage(size);
+                  setQuestionsPage(1);
+                }}
+                itemLabel="butir soal"
+                className="pt-2"
+              />
+            )}
+          </div>
           )}
 
           {/* Footer Action */}
