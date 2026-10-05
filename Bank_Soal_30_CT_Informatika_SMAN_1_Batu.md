@@ -1,0 +1,723 @@
+# BANK SOAL ASESMEN BERPIKIR KOMPUTASIONAL (COMPUTATIONAL THINKING)
+## INFORMATIKA KELAS X - SMA NEGERI 1 BATU
+**Penyusun:** Abdul Aziz., S.Kom., Gr  
+**Bahan Bacaan Siswa:** `Materi_CT_Informatika_SMAN_1_Batu.pdf`  
+**Jumlah Soal:** 30 Soal Pilihan Ganda (Opsi A - E) dengan Literasi Panjang HOTS  
+**Alokasi Waktu:** 90 Menit | **KKM:** 75  
+
+---
+
+### PETUNJUK PENGERJAAN
+1. Bacalah setiap stimulus teks literasi dengan cermat sebelum menjawab pertanyaan.
+2. Setiap butir soal menguji pemahaman mendalam tentang konsep dan 4 pilar Berpikir Komputasional (*Dekomposisi*, *Pengenalan Pola*, *Abstraksi*, dan *Algoritma*), studi kasus lingkungan Kota Delta, operasi logistik darurat Garuda Rescue, serta penerapannya di lingkungan lokal Kota Batu.
+3. Pilihlah satu jawaban yang paling tepat dari opsi A, B, C, D, atau E.
+4. Kunci jawaban dan pembahasan analitis terlampir di bagian akhir dokumen ini.
+
+---
+
+## DAFTAR BUTIR SOAL
+
+### Soal No. 1 [Konsep & Filosofi CT]
+
+[STIMULUS LITERASI TEORI KOMPUTASI]
+Pada tahun 2006, Jeannette M. Wing mempublikasikan karya ilmiah seminal berjudul "Computational Thinking" yang merevolusi cara pandang dunia pendidikan terhadap ilmu komputer. Wing menegaskan bahwa Berpikir Komputasional (Computational Thinking/CT) bukanlah keahlian untuk membuat manusia berpikir layaknya sebuah komputer yang mekanis, kaku, dan serba biner. Sebaliknya, CT adalah proses pemikiran kognitif tingkat tinggi (cognitive process) yang melibatkan perumusan masalah beserta solusinya secara presisi, sedemikian rupa sehingga solusi tersebut dapat direpresentasikan dalam format yang dapat dieksekusi secara efektif oleh agen pemroses informasi—baik agen tersebut berupa manusia, mesin komputer, maupun kombinasi keduanya.
+
+Berdasarkan pemaparan mendalam di atas, manakah kesimpulan yang paling tepat mengenai hakikat sejati dari Berpikir Komputasional (CT) dalam konteks pembelajaran abad ke-21?
+
+**A.** Keahlian teknis tingkat lanjut untuk menghafal sintaks bahasa pemrograman dan merakit perangkat keras komputer secara mekanis.
+
+**B.** Keterampilan mengoperasikan berbagai aplikasi komersial perkantoran dan multimedia untuk meningkatkan kecepatan mengetik.
+
+**C.** Sebuah kerangka kerja berpikir pemecahan masalah (problem solving) yang menyusun representasi solusi secara logis agar dapat dieksekusi oleh agen pemroses informasi, baik manusia maupun komputer.
+
+**D.** Metode berpikir yang mewajibkan manusia bertindak seperti robot biner guna mengeliminasi seluruh emosi dalam pengambilan keputusan.
+
+**E.** Proses otomatisasi penuh yang bertujuan menggantikan peran akal budi manusia seutuhnya dengan algoritma kecerdasan buatan.
+
+*Kunci Jawaban:* **C**  
+*Pembahasan:* Sesuai naskah Jeannette M. Wing (2006), CT adalah proses kognitif pemecahan masalah di mana solusinya diformulasikan agar dapat dieksekusi oleh agen pemroses informasi (manusia maupun komputer), bukan sekadar mengetik kode atau berpikir mekanis seperti robot.
+
+---
+
+### Soal No. 2 [Sinergi Pilar CT]
+
+[STIMULUS LITERASI METODOLOGI KOMPUTASIONAL]
+Di era disrupsi digital saat ini, masyarakat dihadapkan pada fenomena luapan data (data deluge) dan persoalan multidimensi yang belum pernah terjadi sebelumnya. Untuk memecahkan tantangan besar tersebut, Berpikir Komputasional menyediakan empat pilar fondasi utama: Dekomposisi, Pengenalan Pola, Abstraksi, dan Berpikir Algoritma. Keempat fondasi ini bukanlah tahapan yang terpisah secara kaku, melainkan sebuah siklus sinergis.
+
+Jika seorang peneliti lingkungan langsung menyusun serangkaian instruksi operasional lapangan (Algoritma) tanpa terlebih dahulu melakukan Dekomposisi masalah dan Abstraksi data, risiko sistemik apakah yang paling mungkin terjadi?
+
+**A.** Instruksi operasional akan dibanjiri oleh variabel tidak relevan (noise), tidak fokus pada akar kausalitas, dan rentan mengalami kegagalan fatal saat diimplementasikan.
+
+**B.** Waktu eksekusi algoritma akan menjadi terlalu cepat sehingga sensor digital lapangan tidak sanggup merekam data sekunder.
+
+**C.** Algoritma secara otomatis membersihkan seluruh noise data tanpa memerlukan penalaran awal dari manusia perancangnya.
+
+**D.** Langkah penyelesaian masalah menjadi lebih hemat biaya karena melewati tahapan analisis konseptual yang memakan waktu.
+
+**E.** Komputer yang digunakan untuk menyimulasikan model akan menolak mengeksekusi instruksi karena format dokumen tidak kompatibel.
+
+*Kunci Jawaban:* **A**  
+*Pembahasan:* Tanpa dekomposisi untuk memilah akar masalah dan abstraksi untuk menyaring informasi esensial dari gangguan (noise), algoritma yang dirancang akan menjadi rumit, salah sasaran, dan gagal mengatasi titik kritis masalah.
+
+---
+
+### Soal No. 3 [Dekomposisi]
+
+[STIMULUS ANALISIS PILAR DEKOMPOSISI]
+Otak manusia memiliki kapasitas memori kerja (working memory) yang terbatas. Ketika dihadapkan pada krisis multidimensi yang masif, kecenderungan alamiah manusia yang tidak terlatih dalam CT adalah merasa kewalahan (overwhelmed) atau mengambil tindakan reaktif sesaat. Dekomposisi hadir sebagai teknik dekonstruksi masalah besar menjadi sub-komponen yang lebih kecil, independen, dan terkelola (manageable).
+
+Manakah di antara skenario berikut yang mencerminkan penerapan Dekomposisi yang paling tepat dan profesional menurut prinsip Berpikir Komputasional?
+
+**A.** Membagi bantuan sembako kepada seluruh warga secara merata tanpa memeriksa apakah mereka terdampak langsung oleh banjir atau tidak.
+
+**B.** Mengelompokkan data industri di bantaran sungai semata-mata berdasarkan warna cat pagar dan tahun berdirinya bangunan pabrik.
+
+**C.** Menginstruksikan satu orang ahli untuk menyelesaikan seluruh penyelidikan krisis hulu-hilir sendirian secara bersamaan.
+
+**D.** Memecah penanganan krisis banjir lumpur beracun kota ke dalam tiga fokus investigasi spesifik: hidrologi/cuaca, evaluasi tata guna lahan hulu, dan uji kimia limbah sedimen.
+
+**E.** Menghentikan seluruh operasional transportasi perkotaan secara mendadak tanpa menganalisis titik simpul kemacetan yang kritis.
+
+*Kunci Jawaban:* **D**  
+*Pembahasan:* Dekomposisi yang tepat memecah masalah besar menjadi sub-masalah logis dan terkelola berdasarkan domain determinan (cuaca, tata lahan, uji kimiawi) seperti yang dilakukan Dr. Aris pada materi CT.
+
+---
+
+### Soal No. 4 [Pengenalan Pola]
+
+[STIMULUS LITERASI PENGENALAN POLA]
+Dalam materi pembelajaran CT Informatika Kelas X SMAN 1 Batu, dicontohkan seorang dokter yang memeriksa pasien dengan keluhan demam tinggi, nyeri sendi persendian, dan munculnya ruam merah di kulit. Dokter tersebut tidak memperlakukan pasien itu sebagai teka-teki baru yang terisolasi, melainkan segera mengaitkannya dengan pola pasien demam berdarah dengue (DBD) yang ia tangani pada masa sebelumnya.
+
+Prinsip komputasional apakah yang mendasari proses kognitif dokter tersebut, dan mengapa hal itu sangat krusial dalam pemecahan masalah?
+
+**A.** Dekomposisi; dokter membagi tubuh pasien ke dalam organ-organ terpisah sebelum mendengarkan keluhan demam pasien.
+
+**B.** Pengenalan Pola (Pattern Recognition); memungkinkan penggunaan model solusi masa lalu untuk mempercepat diagnosis akurat dan penentuan uji laboratorium kritis.
+
+**C.** Abstraksi Buta; dokter menolak mendengarkan keluhan pasien dan langsung menyalin resep obat dari buku pedoman umum.
+
+**D.** Algoritma Acak; dokter mencoba berbagai macam obat secara bergantian hingga salah satunya menunjukkan efek penyembuhan.
+
+**E.** Automasi Robotik; dokter menyerahkan seluruh pemeriksaan fisik kepada mesin rontgen tanpa melakukan wawancara anamnesis.
+
+*Kunci Jawaban:* **B**  
+*Pembahasan:* Pengenalan Pola (Pattern Recognition) mengenali keteraturan dan kesamaan gejala saat ini dengan pengalaman historis, sehingga dokter dapat segera merekomendasikan tes trombosit darah secara efisien dan tepat sasaran.
+
+---
+
+### Soal No. 5 [Abstraksi]
+
+[STIMULUS LITERASI ABSTRAKSI SISTEM]
+Perhatikan diagram peta jaringan kereta bawah tanah (MRT) atau komuter perkotaan. Peta tersebut sengaja tidak menampilkan bentuk riil kelokan rel, pepohonan, luas bangunan gedung di atas permukaan tanah, maupun variasi kontur perbukitan. Peta hanya memvisualisasikan garis lurus berwarna, urutan nama stasiun, dan titik persimpangan transit antarlini.
+
+Mengapa penyederhanaan pada peta MRT tersebut dikategorikan sebagai bentuk Abstraksi tingkat tinggi yang berhasil?
+
+**A.** Perancang peta kekurangan waktu dan anggaran untuk menggambar gedung dan pohon di sekitar stasiun secara realistis.
+
+**B.** Jalur kereta bawah tanah tidak terikat dengan hukum gravitasi dan tata ruang permukaan bumi sehingga gedung diabaikan.
+
+**C.** Peta sengaja dibuat membingungkan agar masyarakat lebih memilih menggunakan kendaraan pribadi di jalan raya.
+
+**D.** Agar ukuran file gambar digital pada aplikasi ponsel pintar menjadi sekecil mungkin tanpa memedulikan kenyamanan pengguna.
+
+**E.** Menyaring dan mempertahankan informasi esensial yang diperlukan penumpang (rute, stasiun, transit) sembari mengeliminasi detail fisik yang tidak relevan (noise visual).
+
+*Kunci Jawaban:* **E**  
+*Pembahasan:* Abstraksi adalah seni memilah informasi esensial (stasiun & jalur) yang dibutuhkan agen pemroses (penumpang) dan mengabaikan detail tidak relevan (gedung, pohon, belokan riil) yang hanya mengotori persepsi.
+
+---
+
+### Soal No. 6 [Berpikir Algoritma]
+
+[STIMULUS HAKIKAT ALGORITMA]
+Dalam pilar Berpikir Algoritma (Algorithmic Thinking), suatu rancangan instruksi penyelesaian masalah dituntut memenuhi serangkaian syarat formal agar dapat dijalankan secara konsisten oleh manusia maupun komputer. Instruksi tersebut tidak boleh mengandalkan asumsi implisit atau interpretasi emosional pelaksananya.
+
+Manakah kriteria yang PALING MENENTUKAN bahwa suatu prosedur telah memenuhi kaidah algoritma komputasional yang berkualitas?
+
+**A.** Memiliki urutan langkah logis yang terperinci, berhingga (finite), tidak ambigu (unambiguous), dan menghasilkan luaran deterministik yang sama saat diuji ulang.
+
+**B.** Ditulis dalam bahasa Inggris tingkat tinggi dan hanya dapat dipahami oleh programmer bersertifikasi internasional.
+
+**C.** Memiliki minimal seratus tahapan kerja agar prosedur terlihat sangat rumit dan canggih di mata publik.
+
+**D.** Setiap instruksi bersifat lentur dan sengaja multitafsir agar pelaksana lapangan bebas mengubah urutan sesuka hati.
+
+**E.** Hanya dapat dijalankan jika perangkat komputer terhubung dengan jaringan internet satelit berkecepatan gigabit.
+
+*Kunci Jawaban:* **A**  
+*Pembahasan:* Algoritma yang baik wajib bersifat presisi, deterministik (tidak ambigu), memiliki batas langkah jelas (finiteness), dan menghasilkan output konsisten jika diberi input yang sama.
+
+---
+
+### Soal No. 7 [Kasus Kota Delta (Dekomposisi)]
+
+[BACAAN STUDI KASUS 1 - KOTA DELTA]
+Kota Delta adalah kawasan industri padat yang dilintasi oleh Sungai Ciliwung. Selama tiga tahun terakhir pada setiap puncak musim hujan bulan Januari, wilayah hilir Kota Delta selalu dilanda banjir bandang bercampur lumpur beracun yang melumpuhkan aktivitas ekonomi dan menyebabkan ribuan warga mengungsi. Pemerintah daerah membentuk Tim Satgas Penanggulangan Krisis yang dipimpin oleh Dr. Aris.
+
+Menghadapi krisis masif ini, Dr. Aris secara tegas menolak solusi reaktif semacam sekadar membagikan sembako atau menambal tanggul sementara. Mengapa penolakan Dr. Aris tersebut mencerminkan penerapan pola pikir Berpikir Komputasional tingkat tinggi?
+
+**A.** Karena Dr. Aris menilai anggaran belanja sembako daerah terlalu murah sehingga tidak mengangkat gengsi penelitian tim satgas.
+
+**B.** Karena warga pengungsi di hilir sungai menolak menerima bantuan logistik sebelum pabrik-pabrik ditutup secara paksa.
+
+**C.** Karena solusi reaktif hanya meredakan gejala permukaan (symptomatic) tanpa menyentuh analisis kausalitas sistemik yang menjadi akar utama bencana.
+
+**D.** Karena Dr. Aris ingin menunggu hingga banjir surut dengan sendirinya tanpa intervensi manusia sama sekali.
+
+**E.** Karena pembagian sembako secara hukum dilarang dalam undang-undang manajemen penanggulangan bencana alam darurat.
+
+*Kunci Jawaban:* **C**  
+*Pembahasan:* CT berorientasi pada pemecahan masalah berbasis akar penyebab (root-cause solving). Membagikan sembako adalah respons reaktif yang tidak menyelesaikan akar masalah hidrologi, alih fungsi lahan hulu, maupun pencemaran B3.
+
+---
+
+### Soal No. 8 [Kasus Kota Delta (Dekomposisi)]
+
+[ANALISIS METODOLOGI KOTA DELTA]
+Untuk mengungkap akar bencana banjir lumpur beracun di Kota Delta, Dr. Aris membagi investigasi ke dalam tiga area fokus yang independen namun saling melengkapi: (1) Tim Analisis Curah Hujan dan Tata Air, (2) Tim Evaluasi Tata Guna Lahan dan Deforestasi di hulu sungai, dan (3) Tim Uji Kualitas Air untuk mengidentifikasi kandungan kimiawi lumpur sedimen.
+
+Dari perspektif pemrosesan informasi, keunggulan ilmiah apakah yang diperoleh melalui dekomposisi tiga area fokus investigasi tersebut?
+
+**A.** Menghilangkan kebutuhan rapat koordinasi karena ketiga tim dilarang saling bertukar data hingga bencana tahun berikutnya tiba.
+
+**B.** Memungkinkan investigasi mendalam dan pengumpulan bukti saintifik berjalan secara paralel pada tiga determinan kritis: atmosferik, bentang lahan, dan polutan kimia.
+
+**C.** Memastikan seluruh anggaran belanja investigasi terbagi rata menjadi sepertiga bagian tanpa sisa di rekening kas daerah.
+
+**D.** Membuktikan bahwa banjir lumpur sebenarnya tidak berkaitan sama sekali dengan kondisi lingkungan di hulu sungai.
+
+**E.** Membebaskan Dr. Aris dari tanggung jawab pelaporan kepada gubernur karena investigasi telah didelegasikan kepada ketua tim.
+
+*Kunci Jawaban:* **B**  
+*Pembahasan:* Dekomposisi memecah kompleksitas krisis lingkungan menjadi 3 subsistem (atmosferik cuaca, hidrologi hulu, polutan industri) yang dapat dianalisis secara saintifik, paralel, dan mendalam.
+
+---
+
+### Soal No. 9 [Kasus Kota Delta (Pengenalan Pola)]
+
+[ANALISIS DATA HISTORIS KOTA DELTA]
+Setelah satu bulan mengumpulkan dan merekonsiliasi data, Tim Analisis membandingkan catatan cuaca, hidrologi, dan pasang surut selama 20 tahun terakhir. Mereka menemukan kecenderungan konsisten: banjir bandang besar selalu dan HANYA terjadi jika curah hujan harian melebihi 150 mm/hari berturut-turut selama tiga hari yang bertepatan dengan fenomena pasang air laut maksimum (rob).
+
+Penemuan kecenderungan konsisten tersebut merupakan manifestasi pilar Pengenalan Pola karena...
+
+**A.** Merupakan kebetulan statistik yang tidak memiliki korelasi fisika atmosfer dengan meluapnya air sungai Ciliwung.
+
+**B.** Membuktikan bahwa prediksi banjir dapat dilakukan tanpa memerlukan data kuantitatif curah hujan dari BMKG.
+
+**C.** Mengabaikan faktor pasang air laut rob karena air laut berada di hilir dan tidak memengaruhi aliran air tawar sungai.
+
+**D.** Menemukan keteraturan hubungan berulang dari rekaman data historis jangka panjang yang berfungsi sebagai kondisi batas pemicu (trigger boundary) bencana.
+
+**E.** Menunjukkan bahwa data cuaca selama 20 tahun tidak dapat dipercaya untuk menyusun model peringatan dini banjir.
+
+*Kunci Jawaban:* **D**  
+*Pembahasan:* Pengenalan Pola menemukan keteraturan (curah hujan >150mm/hari 3 hari berturut-turut + pasang rob maksimum) dari data 20 tahun sebagai pemicu deterministik bencana untuk dijadikan basis sistem deteksi dini.
+
+---
+
+### Soal No. 10 [Kasus Kota Delta (Abstraksi)]
+
+[PENELUSURAN POLUTAN KOTA DELTA]
+Tim Uji Kualitas Air mendeteksi konsentrasi tinggi logam berat berbahaya kromium dan timbal di dalam lumpur banjir. Saat mengolah peta industri di sepanjang bantaran sungai, Dr. Aris memutuskan untuk HANYA memeriksa pabrik tekstil dan pabrik aki baterai. Ia secara sadar mengabaikan ratusan pabrik makanan, pabrik kayu, dan ruko-ruko kecil, serta tidak memedulikan warna seragam pekerja maupun tahun berdiri pabrik.
+
+Alasan rasional paling mendasar mengapa pengabaian data tersebut merupakan penerapan Abstraksi yang sangat tepat adalah...
+
+**A.** Pabrik makanan dan ruko kecil membayar retribusi keamanan lebih tinggi kepada dinas perindustrian kota.
+
+**B.** Warna seragam pekerja dan tahun berdiri pabrik merupakan rahasia negara yang dilindungi undang-undang intelijen bisnis.
+
+**C.** Dr. Aris meyakini bahwa pabrik kayu dan makanan tidak menggunakan air sungai untuk membuang limbah domestik.
+
+**D.** Pabrik aki baterai dan tekstil berada di bawah naungan kementerian yang berbeda dengan pabrik makanan.
+
+**E.** Menyaring variabel yang tidak relevan (noise) agar fokus tim tercurah pada penghasil potensial kromium dan timbal, sehingga menghemat waktu dan sumber daya krusial.
+
+*Kunci Jawaban:* **E**  
+*Pembahasan:* Abstraksi mengeliminasi variabel noise (pabrik non-B3, warna seragam, usia bangunan) dan memusatkan investigasi hanya pada pabrik yang secara kimiawi memproduksi limbah kromium dan timbal.
+
+---
+
+### Soal No. 11 [Kasus Kota Delta (Algoritma)]
+
+[PROTOKOL MITIGASI KOTA DELTA]
+Pada akhirnya, Dr. Aris menyusun Protokol Mitigasi Kota Delta yang mengikat secara hukum:
+Langkah 1: Jika BMKG merilis peringatan curah hujan >150 mm/hari dan pasang laut maksimum terindikasi, maka sirine Level 1 dibunyikan.
+Langkah 2: Seluruh pabrik tekstil dan aki wajib menghentikan pembuangan limbah cair ke sungai dalam waktu 2x24 jam.
+Langkah 3: Pintu air Katulampa Utara dibuka 50% untuk memecah debit, sementara warga zona merah dievakuasi ke zona aman.
+
+Struktur kontrol logika pemrograman komputasional apakah yang paling mendasari "Langkah 1" pada Protokol Mitigasi tersebut?
+
+**A.** Perulangan tanpa henti (Infinite While Loop) yang membunyikan sirine sepanjang tahun tanpa memeriksa kondisi cuaca.
+
+**B.** Percabangan kondisional logika ganda (IF curah_hujan > 150 AND pasang_rob == TRUE THEN aktifkan_sirine_level_1).
+
+**C.** Struktur antrean berurutan (Queue - FIFO) untuk mengevakuasi seluruh warga kota tanpa memandang zonasi merah atau hijau.
+
+**D.** Fungsi rekursif yang secara terus menerus membuka dan menutup pintu air Katulampa setiap detik secara acak.
+
+**E.** Operasi logika disjungsi tunggal (OR) yang mengabaikan salah satu faktor cuaca maupun pasang air laut.
+
+*Kunci Jawaban:* **B**  
+*Pembahasan:* Langkah 1 menerapkan struktur percabangan kondisional dengan konjungsi logika AND (kedua kondisi: hujan >150mm DAN pasang rob wajib terpenuhi bersamaan untuk memicu sirine Level 1).
+
+---
+
+### Soal No. 12 [Kasus Kota Delta (Algoritma)]
+
+[ANALISIS DETERMINISTIK LANGKAH 2]
+Pada Langkah 2 Protokol Mitigasi, tertulis: "Seluruh pabrik tekstil dan aki wajib menghentikan pembuangan limbah cair ke sungai dalam waktu 2x24 jam."
+
+Mengapa pencantuman batasan waktu kuantitatif "2x24 jam" sangat penting dalam kaidah algoritma operasional, dibandingkan instruksi yang berbunyi "segera menghentikan pembuangan limbah"?
+
+**A.** Menghilangkan ambiguitas penafsiran (unambiguous) sehingga memiliki parameter batas waktu yang dapat diaudit, diukur kepatuhannya, dan ditegakkan sanksinya secara objektif.
+
+**B.** Memberikan ruang bagi pihak industri untuk membuang seluruh sisa limbah beracun sebanyak-banyaknya sebelum tenggat waktu tiba.
+
+**C.** Menyesuaikan dengan jadwal piket petugas kebersihan dinas lingkungan hidup yang bekerja dengan sistem giliran 48 jam.
+
+**D.** Memastikan agar sanksi denda finansial dapat dikumpulkan ke kas daerah sebelum akhir bulan penanggalan masehi.
+
+**E.** Mengikuti tradisi birokrasi pemerintahan daerah yang selalu menetapkan batas waktu kelipatan genap pada setiap surat edaran.
+
+*Kunci Jawaban:* **A**  
+*Pembahasan:* Algoritma menuntut instruksi yang tidak ambigu (unambiguous). Batasan "2x24 jam" memberikan parameter terukur (deterministic bound) untuk penegakan kepatuhan, berbeda dengan frasa ambigu "segera".
+
+---
+
+### Soal No. 13 [Kasus Kota Delta (HOTS Evaluasi)]
+
+[SIMULASI KASUS BATAS (EDGE CASE) KOTA DELTA]
+Perhatikan skenario kondisi ekstrem berikut: Pada suatu hari di bulan Januari, BMKG mencatat curah hujan mencapai 149 mm/hari selama 3 hari berturut-turut (hanya berselisih 1 mm di bawah batas ambang 150 mm), sementara ketinggian pasang air laut rob mencapai rekor tertinggi dalam 50 tahun terakhir.
+
+Jika sistem mitigasi otomatis Kota Delta diprogram secara kaku (hardcoded) murni menggunakan syarat logika "curah_hujan > 150", kerentanan sistemik apakah yang akan terjadi (False Negative)?
+
+**A.** Pintu air Katulampa Utara akan otomatis terbuka 100% dan menyedot air laut masuk ke dalam kawasan hulu sungai.
+
+**B.** Komputer pemantau BMKG akan mengalami crash memori karena tidak sanggup membandingkan angka desimal di bawah 150.
+
+**C.** Seluruh pabrik tekstil dan aki akan otomatis meledak karena saluran pipa limbah tidak menerima data sinyal peringatan.
+
+**D.** Sirine Level 1 tidak akan berbunyi karena curah hujan 149 mm tidak memenuhi syarat > 150, padahal kombinasi debit air dan pasang laut ekstrem tetap memicu bencana banjir besar.
+
+**E.** Warga zona merah akan secara sukarela mengungsi sendiri tanpa perlu menunggu instruksi dan bantuan dari tim satgas krisis.
+
+*Kunci Jawaban:* **D**  
+*Pembahasan:* Kelemahan sistem berbasis ambang batas kaku (hardcoded boundary) tanpa margin toleransi atau fuzzy logic adalah terjadinya False Negative (gagal membunyikan alarm padahal bahaya nyata terjadi).
+
+---
+
+### Soal No. 14 [Kasus Kota Delta (HOTS Analisis)]
+
+[EVALUASI MODEL KEBERLANJUTAN KOTA DELTA]
+Keberhasilan Protokol Mitigasi Kota Delta menjadikannya sebagai "cetak biru" (blueprint) bagi kota-kota lain di provinsi tersebut. Dalam teori rekayasa perangkat lunak dan komputasi, konsep ini dikenal dengan prinsip Reusability (kemampuan digunakan ulang).
+
+Karakteristik apakah yang menjadikan sebuah solusi komputasional seperti protokol Dr. Aris memiliki daya guna ulang (reusability) yang tinggi di lokasi lain?
+
+**A.** Protokol tersebut mewajibkan daerah lain memiliki luas wilayah, jumlah penduduk, dan letak geografis yang persis identik dengan Kota Delta.
+
+**B.** Protokol dibuat sangat rahasia sehingga hanya dapat dibeli oleh pemerintah kota yang memiliki anggaran miliaran rupiah.
+
+**C.** Protokol dirumuskan sebagai model algoritmik abstrak berbasis logika data empiris yang dapat disesuaikan parameter lokalnya di daerah lain tanpa mengubah esensi kerangka kerjanya.
+
+**D.** Protokol menolak integrasi dengan perangkat lunak komputer dan murni dijalankan menggunakan instruksi lisan turun-temurun.
+
+**E.** Protokol tersebut menjamin bahwa seluruh bencana banjir di muka bumi akan hilang seutuhnya tanpa perlu melakukan penanaman pohon kembali.
+
+*Kunci Jawaban:* **C**  
+*Pembahasan:* Reusability terjadi karena solusi telah diabstraksi menjadi kerangka kerja algoritmik parametrik yang dapat diadaptasikan ke sistem lingkungan kota lain dengan menyesuaikan variabel ambang batas lokalnya.
+
+---
+
+### Soal No. 15 [Kasus Kota Delta (Korelasi vs Kausalitas)]
+
+[UJI PENALARAN SAINS DATA KOTA DELTA]
+Dalam tahapan Pengenalan Pola, seorang peneliti komputasional harus jeli memisahkan antara korelasi nyata yang bersifat sebab-akibat (kausal) dengan korelasi semu (spurious correlation) yang muncul secara kebetulan.
+
+Di antara fenomena berikut di Kota Delta, manakah yang merupakan korelasi semu (spurious correlation) yang WAJIB disaring keluar melalui prinsip Abstraksi?
+
+**A.** Peningkatan laju erosi tanah di lereng hulu sungai Ciliwung akibat pembukaan hutan lindung menjadi kawasan villa komersial.
+
+**B.** Tingginya kadar timbal pada sedimen muara sungai yang berdekatan dengan saluran pembuangan akhir pabrik aki kendaraan.
+
+**C.** Penyempitan penampang melintang sungai akibat sedimentasi lumpur yang menurunkan daya tampung volume aliran air.
+
+**D.** Kenaikan muka air pasang rob laut Jawa yang menghambat laju pembuangan gravitasi aliran sungai menuju lepas pantai.
+
+**E.** Kenaikan drastis jumlah penjualan jas hujan dan payung di pasar swalayan Kota Delta pada setiap minggu yang bersamaan dengan terjadinya banjir lumpur.
+
+*Kunci Jawaban:* **E**  
+*Pembahasan:* Penjualan payung/jas hujan meningkat di musim hujan bersamaan dengan banjir, tetapi payung bukan penyebab banjir. Ini adalah korelasi semu (spurious correlation) yang wajib dieliminasi dalam abstraksi.
+
+---
+
+### Soal No. 16 [Kasus Kota Delta (HOTS Sintesis)]
+
+[PENGEMBANGAN SISTEM DETEKSI OTOMATIS]
+Jika Dinas Lingkungan Hidup ingin membangun sistem Internet of Things (IoT) berbasis mikrokontroler di sepanjang sungai Kota Delta untuk memicu Langkah 1 protokol mitigasi secara otomatis, komponen sensor manakah yang paling esensial dipasang di stasiun pemantau hulu dan muara?
+
+**A.** Sensor curah hujan (tipping bucket rain gauge), sensor ultrasonik ketinggian muka air pasang/surut, dan probe spektrofotometer ion logam berat B3.
+
+**B.** Kamera pengawas beresolusi tinggi yang khusus merekam pelat nomor kendaraan bermotor yang melintasi jembatan kota.
+
+**C.** Sensor pendeteksi kebisingan suara klakson kendaraan untuk mengukur tingkat kemacetan lalu lintas jalan raya.
+
+**D.** Sensor pemindai sidik jari dan biometrik wajah untuk seluruh nelayan tradisional yang melaut di pesisir teluk Delta.
+
+**E.** Antena pemancar sinyal radio amatir frekuensi tinggi tanpa dilengkapi mikrokontroler penyimpan log data digital.
+
+*Kunci Jawaban:* **A**  
+*Pembahasan:* Sensor IoT harus merefleksikan variabel kritis hasil dekomposisi Dr. Aris: curah hujan, ketinggian muka air/pasang rob, dan sensor kualitas kimiawi logam berat.
+
+---
+
+### Soal No. 17 [Kasus Kota Delta (Evaluasi Solusi)]
+
+[EVALUASI KEBIJAKAN PABRIK KOTA DELTA]
+Pada evaluasi akhir tahun, ditemukan bahwa sebuah pabrik tekstil besar tetap membuang limbah cair kromium pada malam hari saat hujan deras karena mengira petugas pengawas sedang tidur dan tidak melakukan inspeksi lapangan.
+
+Strategi algoritma pengawasan komputasional apakah yang paling efektif untuk mendeteksi pelanggaran tersembunyi tersebut secara berkelanjutan?
+
+**A.** Mengirimkan surat peringatan tertulis setiap tiga bulan sekali melalui kantor pos tanpa melakukan pengambilan sampel air.
+
+**B.** Meminta satpam pabrik untuk mengisi kuesioner kejujuran tentang volume limbah yang dibuang oleh pihak manajemen.
+
+**C.** Memasang sensor telemetri kualitas air otomatis di pipa outlet pabrik yang mengirimkan log data kadar kromium secara realtime 24 jam ke server pusat pengawas.
+
+**D.** Menutup aliran listrik ke seluruh permukiman warga sekitar pabrik pada malam hari saat hujan deras turun.
+
+**E.** Menghapus kromium dari daftar zat kimia berbahaya agar pabrik tidak dianggap melanggar regulasi lingkungan hidup.
+
+*Kunci Jawaban:* **C**  
+*Pembahasan:* Otomatisasi pengawasan telemetri 24 jam menghilangkan celah kelemahan pengawasan manual manusia dan mendeteksi anomali limbah malam hari secara presisi.
+
+---
+
+### Soal No. 18 [Kasus Garuda Rescue (Dekomposisi)]
+
+[BACAAN STUDI KASUS 2 - GARUDA RESCUE]
+Gempa bumi berkekuatan 7.2 Magnitudo melanda kawasan pegunungan Seribu Bukit. Akses jalan darat terputus total akibat longsor masif. Ribuan warga di 15 desa terisolasi tanpa makanan dan obat-obatan. Badan Nasional Penanggulangan Bencana (BNPB) harus segera mendistribusikan bantuan menggunakan 5 unit helikopter kargo yang dimiliki. Waktu sangat krusial karena kapasitas bahan bakar helikopter terbatas dan cuaca sering berubah buruk di sore hari.
+
+Komandan Logistik, Kapten Rina, menolak melihat 15 desa tersebut sebagai satu kekacauan acak. Ia mengelompokkan 15 desa ke dalam 3 Sektor Utama: Sektor Utara (kerusakan parah), Sektor Tengah (kerusakan sedang), dan Sektor Selatan (kerusakan ringan).
+
+Proses berpikir komputasional apakah yang diterapkan Kapten Rina melalui pengelompokan 15 desa tersebut?
+
+**A.** Pengenalan Pola Acak; mencampuradukkan data korban bencana tanpa memperhatikan tingkat kerusakan wilayah.
+
+**B.** Abstraksi Parsial; mengabaikan seluruh desa di Sektor Utara karena kerusakannya dianggap terlalu sulit untuk dijangkau.
+
+**C.** Algoritma Buta; memerintahkan pilot menerbangkan helikopter ke arah mana pun sesuai arah tiupan angin pagi hari.
+
+**D.** Dekomposisi; mereduksi kompleksitas tantangan logistik 15 lokasi terisolasi menjadi 3 kluster terkelola berbasis derajat keparahan kerusakan dan skala prioritas.
+
+**E.** Simulasi Fiktif; menunda pengiriman bantuan hingga seluruh jalan darat selesai diaspal kembali oleh dinas pekerjaan umum.
+
+*Kunci Jawaban:* **D**  
+*Pembahasan:* Mengelompokkan 15 desa menjadi 3 sektor berdasarkan tingkat keparahan adalah penerapan pilar Dekomposisi untuk memecah masalah besar menjadi sub-masalah logis yang terkelola.
+
+---
+
+### Soal No. 19 [Kasus Garuda Rescue (Pengenalan Pola)]
+
+[ANALISIS JENDELA CUACA GARUDA RESCUE]
+Berdasarkan evaluasi arsip misi penanggulangan bencana tahun-tahun sebelumnya di kawasan perbukitan, Kapten Rina dan tim mengenali sebuah pola mikroklimat konsisten: desa-desa yang berada di lembah curam (Sektor Utara) selalu diselimuti kabut tebal pekat setelah pukul 14.00 siang, yang membuat penerbangan helikopter menjadi mustahil dan berisiko mematikan.
+
+Bagaimanakah rekognisi pola cuaca tersebut memengaruhi konstruksi strategi penerbangan Kapten Rina?
+
+**A.** Menyebabkan operasi penerbangan ke Sektor Utara dibatalkan sama sekali demi melindungi keselamatan helikopter dari tetesan air kabut.
+
+**B.** Mendorong Kapten Rina mengalokasikan seluruh (5) helikopter secara maksimal ke Sektor Utara pada pagi hari (06.00 - 10.00) sebelum batas jendela cuaca berkabut tertutup.
+
+**C.** Membuat Kapten Rina menginstruksikan pilot untuk menembus kabut tebal pada sore hari tanpa bantuan instrumen penerbangan.
+
+**D.** Memindahkan lokasi pangkalan utama helikopter ke dasar lembah curam Sektor Utara agar lebih dekat dengan lokasi kabut.
+
+**E.** Mengubah jadwal misi sehingga penerbangan hanya dilakukan pada malam hari saat matahari telah terbenam.
+
+*Kunci Jawaban:* **B**  
+*Pembahasan:* Pengenalan pola kabut tebal setelah jam 14.00 di lembah Sektor Utara menjadi dasar penentuan urutan jadwal (algoritma): fokuskan seluruh armada di pagi hari (06.00-10.00) ke Sektor Utara.
+
+---
+
+### Soal No. 20 [Kasus Garuda Rescue (Abstraksi)]
+
+[SELEKSI MANIFES KARGO GARUDA RESCUE]
+Saat mempersiapkan pemuatan barang ke helikopter, banyak warga dan relawan donatur menitipkan barang pribadi, tumpukan pakaian bekas, buku cerita, dan mainan anak-anak. Kapten Rina dengan tegas memfilter manifes kargo. Ia menetapkan bahwa untuk 72 jam pertama, helikopter HANYA akan memuat: air bersih, terpal medis (P3K), makanan instan padat kalori, dan perangkat komunikasi darurat.
+
+Proses berpikir komputasional apakah yang diterapkan Kapten Rina, dan apakah justifikasi ilmiahnya dari sudut pandang keterbatasan sistem (system constraints)?
+
+**A.** Dekomposisi; membagikan mainan anak-anak terlebih dahulu agar korban bencana tidak mengalami kesedihan berlarut-larut.
+
+**B.** Algoritma Buta; mengabaikan seluruh permintaan bantuan dan membiarkan helikopter terbang dalam keadaan kosong tanpa muatan.
+
+**C.** Pengenalan Pola; menyimpulkan bahwa seluruh korban bencana gempa bumi tidak membutuhkan pakaian dan obat-obatan.
+
+**D.** Otomatisasi Kargo; memprogram helikopter untuk menjatuhkan barang donasi di atas perairan danau tanpa parasut penerjun.
+
+**E.** Abstraksi; membuang barang non-kritis dan memprioritaskan muatan penyelamat nyawa (life-saving) karena payload dan volume kargo helikopter sangat terbatas pada fase kritis 72 jam pertama.
+
+*Kunci Jawaban:* **E**  
+*Pembahasan:* Abstraksi menyingkirkan detail/elemen non-kritis (baju bekas, mainan) dan fokus pada prioritas keselamatan nyawa (air, medis, makanan kalori, radio) karena kapasitas angkut helikopter sangat terbatas.
+
+---
+
+### Soal No. 21 [Kasus Garuda Rescue (Algoritma)]
+
+[ANALISIS JADWAL FLIGHT PLAN]
+Perhatikan jadwal penerbangan (Flight Plan) yang dirancang oleh Kapten Rina:
+1. Pukul 06.00 - 10.00: Seluruh (5) helikopter dikerahkan hanya untuk Sektor Utara.
+2. Pukul 10.00 - 11.00: Helikopter kembali ke pangkalan untuk isi bahan bakar ulang (refueling).
+3. Pukul 11.00 - 14.00: 3 helikopter dikerahkan ke Sektor Tengah, 2 helikopter ke Sektor Selatan.
+4. Pukul 14.00 - Selesai: Operasi penerbangan dihentikan untuk inspeksi mesin harian dan menghindari cuaca buruk sore hari.
+
+Apakah jadwal penerbangan tersebut sah memenuhi syarat sebagai sebuah "Algoritma"? Berikan evaluasi rasionalnya!
+
+**A.** Ya, memenuhi syarat penuh; jadwal berupa instruksi logis, dieksekusi secara kronologis teratur, memiliki kuantitas sumber daya spesifik per jam, dan deterministik bagi seluruh pilot.
+
+**B.** Tidak memenuhi syarat; karena jadwal tersebut disusun oleh seorang perwira manusia dan tidak dieksekusi oleh bahasa pemrograman Python atau C++.
+
+**C.** Tidak memenuhi syarat; karena jadwal hanya mencakup kurun waktu dari pagi hingga sore hari dan tidak berjalan selama 24 jam nonstop.
+
+**D.** Sebagian memenuhi syarat; namun dianggap cacat logika karena membiarkan helikopter beristirahat pada pukul 10.00 - 11.00.
+
+**E.** Tidak memenuhi syarat; karena algoritma sejati harus berbentuk kode biner 0 dan 1 yang tertanam di dalam mesin helikopter.
+
+*Kunci Jawaban:* **A**  
+*Pembahasan:* Jadwal tersebut adalah algoritma valid: langkah terstruktur, spesifik dalam alokasi armada per jam dan sektor, logis, terhingga, dan siap dieksekusi oleh agen manusia (pilot).
+
+---
+
+### Soal No. 22 [Kasus Garuda Rescue (Keandalan Sistem)]
+
+[ANALISIS TAHAP REFUELING PUKUL 10.00]
+Dalam jadwal penerbangan Kapten Rina, pukul 10.00 - 11.00 ditetapkan secara ketat: "Helikopter kembali ke pangkalan untuk isi bahan bakar ulang (refueling)".
+
+Jika seorang pejabat lapangan menuntut agar tahap refueling tersebut dihilangkan demi gengsi publikasi bahwa helikopter terbang tanpa jeda, konsekuensi kegagalan sistem komputasional (system failure) apakah yang pasti terjadi?
+
+**A.** Helikopter akan terbang lebih kencang karena muatan bahan bakar di dalam tangki menjadi kosong dan ringan.
+
+**B.** Penduduk di Sektor Tengah akan menerima makanan instan dalam kondisi terlalu panas akibat panas mesin helikopter.
+
+**C.** Cuaca buruk di sore hari akan tertunda kemunculannya hingga pengisian bahan bakar dilakukan pada malam hari.
+
+**D.** Kehabisan daya sumber energi di tengah rute penerbangan sesi kedua (Resource Depletion), yang memicu insiden kecelakaan fatal dan kegagalan total seluruh misi kemanusiaan.
+
+**E.** Pilot helikopter akan kehilangan sinyal GPS satelit secara permanen akibat ketiadaan avtur di dalam karburator.
+
+*Kunci Jawaban:* **D**  
+*Pembahasan:* Dalam manajemen sistem sumber daya terbatas, proses replenishment (pengisian ulang avtur) adalah prasyarat mutlak. Menghilangkannya memicu kegagalan sistemik fatal (kehabisan bahan bakar di udara).
+
+---
+
+### Soal No. 23 [Kasus Garuda Rescue (Inspeksi Mesin)]
+
+[ANALISIS TAHAP 4: SAFETY MARGIN]
+Pada tahapan ke-4 jadwal Kapten Rina tertulis: "Pukul 14.00 - Selesai: Operasi dihentikan untuk inspeksi mesin harian dan menghindari cuaca buruk sore hari."
+
+Dari perspektif pemeliharaan sistem komputasional yang tangguh (robust & sustainable system), mengapa penghentian operasi pada pukul 14.00 merupakan keputusan yang sangat cerdas, alih-alih bentuk pemalasan?
+
+**A.** Memberi kesempatan kepada Kapten Rina untuk meninggalkan lokasi posko bencana dan berlibur ke luar kota pegunungan.
+
+**B.** Menerapkan batas toleransi keamanan (safety threshold) untuk mencegah risiko kerugian aset total akibat cuaca buruk dan menjamin kesiapan armada untuk beroperasi kembali keesokan paginya.
+
+**C.** Karena setelah pukul 14.00 seluruh korban bencana di perbukitan sudah tidak membutuhkan pertolongan medis.
+
+**D.** Menghabiskan alokasi anggaran operasional harian agar sisa saldo bahan bakar avtur hangus dan diganti anggaran baru.
+
+**E.** Agar seluruh pilot helikopter dapat menghadiri konferensi pers di kantor bupati sebelum matahari terbenam.
+
+*Kunci Jawaban:* **B**  
+*Pembahasan:* Pilar algoritma memperhitungkan batasan keselamatan lingkungan (safety margin). Menghentikan operasi pada pukul 14.00 mencegah kecelakaan di cuaca ekstrem berkabut dan memastikan kesiapan armada jangka panjang.
+
+---
+
+### Soal No. 24 [Sintesis Kasus 1 & 2 (Abstraksi)]
+
+[SINTESIS KOMPARATIF KASUS 1 & 2]
+Bandingkan tindakan Dr. Aris pada Kasus 1 (Kota Delta) dan Kapten Rina pada Kasus 2 (Garuda Rescue). Keduanya sama-sama memimpin tim penyelamat dalam situasi darurat berskala besar dengan keterbatasan sumber daya.
+
+Persamaan mendasar apakah yang dapat disintesis dari cara kedua tokoh tersebut menerapkan pilar ABSTRAKSI dalam menyelesaikan krisis masing-masing?
+
+**A.** Keduanya menolak menggunakan bantuan teknologi komputer dan hanya mengandalkan firasat batin dalam memimpin operasi penyelamatan.
+
+**B.** Keduanya membagi daerah krisis menjadi sepuluh zona acak tanpa menggunakan data historis bencana masa lalu.
+
+**C.** Keduanya secara disiplin menyaring dan membuang elemen non-kritis (pabrik non-B3 oleh Dr. Aris, dan barang non-medis oleh Kapten Rina) demi memusatkan kapasitas terbatas pada faktor penyelamat hidup utama.
+
+**D.** Keduanya membatalkan operasi evakuasi warga dan membiarkan krisis diselesaikan sendiri oleh alam.
+
+**E.** Keduanya memfokuskan seluruh bantuan logistik kepada masyarakat yang memiliki jabatan politik tertinggi di wilayah krisis.
+
+*Kunci Jawaban:* **C**  
+*Pembahasan:* Kedua tokoh mendemonstrasikan pilar Abstraksi: menyingkirkan elemen noise (pabrik non-B3 dan barang donasi sekunder) untuk memprioritaskan faktor esensial penyelamat hidup (life-saving factors).
+
+---
+
+### Soal No. 25 [Sintesis Kasus 1 & 2 (Dekomposisi)]
+
+[SINTESIS DIMENSI DEKOMPOSISI]
+Pada Kasus 1 (Kota Delta), Dr. Aris melakukan dekomposisi berdasarkan *aspek sains investigasi* (hidrologi, tata lahan, uji kimiawi). Sementara pada Kasus 2 (Garuda Rescue), Kapten Rina melakukan dekomposisi berdasarkan *kluster geografis dan tingkat kerusakan* (Sektor Utara, Tengah, Selatan).
+
+Kesimpulan konseptual apakah yang paling valid mengenai fleksibilitas pilar Dekomposisi dalam pemecahan masalah dunia nyata?
+
+**A.** Dekomposisi hanya sah dan benar jika membagi daerah menjadi tiga sektor geografis yang berbentuk bujur sangkar sempurna.
+
+**B.** Dekomposisi pada operasi tanggap bencana alam selalu gagal jika tidak menggunakan rumus matematika diferensial integral.
+
+**C.** Dekomposisi fungsional sains lingkungan tidak boleh digabungkan dengan dekomposisi geografis dalam satu sistem pemerintahan.
+
+**D.** Dekomposisi harus selalu menghasilkan bagian-bagian yang dikerjakan oleh robot tanpa keterlibatan tenaga manusia.
+
+**E.** Dekomposisi dapat diterapkan melalui berbagai dimensi pemotongan (fungsional, spasial/geografis, kronologis, atau derajat keparahan), disesuaikan dengan arsitektur masalah dan tujuan operasional.
+
+*Kunci Jawaban:* **E**  
+*Pembahasan:* Dekomposisi bersifat fleksibel dan adaptif: dapat dilakukan secara fungsional keilmuan maupun spasial geografis, disesuaikan dengan kebutuhan pemecahan masalah di lapangan.
+
+---
+
+### Soal No. 26 [Adaptasi Algoritma Dinamis]
+
+[SIMULASI KENDALA TAK TERDUGA GARUDA RESCUE]
+Pada pukul 08.00 pagi dalam misi Garuda Rescue, sebuah helikopter kargo mengalami kerusakan pompa oli darurat dan harus diistirahatkan di pangkalan, sehingga armada yang siap terbang tersisa 4 unit.
+
+Berdasarkan prinsip berpikir komputasional yang tangguh dan adaptif, modifikasi algoritma jadwal manakah yang paling rasional diambil oleh Kapten Rina?
+
+**A.** Membatalkan seluruh penerbangan hari itu dan membiarkan warga di 15 desa menunggu hingga helikopter pengganti tiba minggu depan.
+
+**B.** Menjaga prioritas penyelamatan Sektor Utara dengan mengerahkan ke-4 helikopter tersisa hingga pukul 10.00, lalu mengalokasikan masing-masing 2 helikopter untuk Sektor Tengah dan Selatan di sesi siang.
+
+**C.** Memaksa helikopter yang rusak pompa oli untuk tetap terbang membawa muatan melintasi perbukitan berkabut tebal.
+
+**D.** Mengalihkan seluruh muatan kargo ke mobil ambulans darat yang sudah terbukti tidak bisa melintas karena longsor.
+
+**E.** Memerintahkan pilot menerbangkan helikopter ke Sektor Selatan saja karena paling mudah dijangkau dan bebas resiko.
+
+*Kunci Jawaban:* **B**  
+*Pembahasan:* Algoritma yang adaptif melakukan penyesuaian parameter sumber daya (dari 5 unit menjadi 4 unit) tanpa mengorbankan prioritas keselamatan utama (Sektor Utara tetap prioritas pagi hari).
+
+---
+
+### Soal No. 27 [Kognitif & Bias Data]
+
+[ANALISIS BIAS KONFIRMASI DALAM CT]
+Dalam pengenalan pola dan analisis data, manusia rentan mengalami *Confirmation Bias* (hanya mencari atau mempercayai data yang membenarkan prasangka pribadi awal, dan mengabaikan data anomali yang bertentangan).
+
+Jika dalam Kasus Kota Delta, Dr. Aris sejak awal berprasangka buruk bahwa "seluruh pencemaran kromium pasti berasal dari pabrik makanan", kesalahan fatal apakah yang akan merusak sistem penanganan krisis?
+
+**A.** Investigasi akan menyasar target yang keliru dan menutup industri makanan yang tidak bersalah, sementara pabrik tekstil dan aki pencemar sesungguhnya terus membuang limbah B3.
+
+**B.** Lumpur sungai akan mendadak mengendap secara bersih tanpa menyisakan kandungan logam berat kromium dan timbal.
+
+**C.** Curah hujan harian Kota Delta akan otomatis turun di bawah 50 mm/hari karena pabrik makanan berhenti memproduksi uap air.
+
+**D.** Pintu air Katulampa Utara akan secara otomatis mengunci diri dan menolak dibuka hingga musim hujan Januari berakhir.
+
+**E.** Warga pengungsi di hilir sungai akan beralih mengonsumsi makanan cepat saji kalengan dari luar negeri.
+
+*Kunci Jawaban:* **A**  
+*Pembahasan:* Bias konfirmasi mendistorsi pengenalan pola ilmiah: sumber daya terbuang untuk menindak entitas yang salah (pabrik makanan), sedangkan sumber racun sesungguhnya (tekstil & aki) tetap bebas mencemari sungai.
+
+---
+
+### Soal No. 28 [Transfer Kontekstual SMAN 1 Batu]
+
+[STUDI KASUS KONTEKSTUAL LOKAL - PERTANIAN APEL KOTA BATU]
+Kawasan pertanian apel di lereng Bumiaji dan Panderman Kota Batu menghadapi tantangan serius berupa anomali cuaca mikro, serangan hama kutu sisik, dan fluktuasi kelembapan tanah yang menurunkan produksi buah apel Manalagi.
+
+Siswa Kelas X SMAN 1 Batu ditugaskan merancang solusi sistem Pertanian Presisi (Smart Precision Farming) berbasis Berpikir Komputasional. Tindakan manakah yang merepresentasikan pilar PENGENALAN POLA secara tepat dalam proyek ini?
+
+**A.** Mengecat batang pohon apel dengan warna putih agar terlihat rapi saat difoto oleh wisatawan yang berkunjung ke kebun.
+
+**B.** Membeli pompa air berkapasitas terbesar di pasaran tanpa memeriksa debit sumber mata air alami di lereng bukit.
+
+**C.** Mengganti seluruh pohon apel dengan tanaman padi sawah tanpa menguji kesesuaian jenis tanah dan ketinggian lereng.
+
+**D.** Menganalisis korelasi data histori sensor kelembapan tanah, suhu udara, dan kecepatan angin selama 5 musim panen dengan siklus kemunculan ledakan populasi hama kutu sisik.
+
+**E.** Menyemprotkan cairan pestisida kimia secara serentak setiap jam sepanjang hari tanpa memantau keberadaan hama.
+
+*Kunci Jawaban:* **D**  
+*Pembahasan:* Pengenalan Pola pada pertanian presisi mengkorelasikan variabel iklim mikro (suhu, kelembapan) dengan waktu munculnya hama selama beberapa musim panen untuk memprediksi serangan lebih dini.
+
+---
+
+### Soal No. 29 [Transfer Kontekstual SMAN 1 Batu]
+
+[STUDI KASUS KONTEKSTUAL LOKAL - MANAJEMEN LALU LINTAS WISATA BATU]
+Setiap akhir pekan panjang, kemacetan parah melanda ruas jalan protokol Kota Batu menuju kawasan wisata utama (Jalan Diponegoro, Pattimura, dan Oro-Oro Ombo). Siswa SMAN 1 Batu diminta merancang purwarupa algoritma rute alternatif cerdas (Dynamic Re-routing) untuk mengurai kepadatan kendaraan.
+
+Dalam proses memodelkan jaringan jalan Kota Batu ke dalam bentuk graf (Graph Modeling), tindakan ABSTRAKSI manakah yang paling esensial dilakukan?
+
+**A.** Menghitung secara rinci setiap helai daun dan jenis tanaman hias di median jalan sebelum menghitung volume kendaraan yang melintas.
+
+**B.** Mengharuskan setiap pengendara mobil wisata menyebutkan nama lengkap kakek-neneknya sebelum diizinkan melintasi jalan Diponegoro.
+
+**C.** Merepresentasikan persimpangan sebagai titik (Nodes) dan ruas jalan sebagai garis berbobot (Edges) yang memuat panjang jalan serta kecepatan rata-rata, sembari mengabaikan warna cat ruko atau jenis pohon di tepi jalan.
+
+**D.** Menggambar kembali seluruh reklame iklan komersial di sepanjang jalan dengan tingkat kedetilan piksel 4K ke dalam peta GPS navigasi.
+
+**E.** Menghapus nama-nama jalan di Kota Batu dan menggantinya dengan angka acak yang diundi setiap pagi hari.
+
+*Kunci Jawaban:* **C**  
+*Pembahasan:* Dalam pemodelan graf rute lalu lintas, Abstraksi mereduksi jalan menjadi simpul (nodes) persimpangan dan ruas (edges) berbobot jarak/waktu, membuang detail visual (warna toko, pohon) yang tidak relevan bagi kalkulasi rute terpendek.
+
+---
+
+### Soal No. 30 [Etika & Refleksi Rekayasa Sistem]
+
+[REFLEKSI AKHIR - ETIKA KOMPUTASIONAL & PEMBELAJARAN MENDALAM]
+Sebagai generasi muda yang mempelajari Informatika dan Berpikir Komputasional di SMAN 1 Batu, siswa kelak akan merancang dan mengoperasikan berbagai algoritma otomasi serta kecerdasan buatan yang memengaruhi hajat hidup masyarakat (seperti algoritma evakuasi bencana, kuota air irigasi, atau seleksi penerimaan beasiswa).
+
+Prinsip etis dan humanis manakah yang paling fundamental dijaga oleh seorang perancang sistem komputasi yang bertanggung jawab?
+
+**A.** Merancang algoritma sebagai kotak hitam (Black Box) yang tertutup rapat agar tidak ada warga masyarakat yang dapat memprotes keputusan sistem.
+
+**B.** Memprogram sistem agar selalu mendahulukan kepentingan kelompok elit pemilik modal terbesar dibanding keselamatan warga perkampungan kecil.
+
+**C.** Menghapus rekaman log jejak audit secara otomatis jika terindikasi sistem melakukan kesalahan fatal yang merugikan masyarakat luas.
+
+**D.** Menyerahkan seluruh keputusan etika dan moral kepada prosesor komputer tanpa menyediakan ruang banding atau pengawasan oleh manusia.
+
+**E.** Menjaga transparansi logika pengambilan keputusan (Explainability), keadilan algoritma tanpa bias diskriminatif, perlindungan privasi data warga, dan akuntabilitas moral manusia terhadap dampak keputusan sistem.
+
+*Kunci Jawaban:* **E**  
+*Pembahasan:* Prinsip etika rekayasa komputasional modern menuntut transparansi (explainable algorithms), keadilan data (fairness), keselamatan warga, dan pertanggungjawaban manusia (human accountability) sebagai pemegang kendali utama.
+
+---
+
+## TABEL KUNCI JAWABAN LENGKAP (1 - 30)
+
+| No | Kunci | Kategori Materi | Keterangan Pilar |
+|:---:|:---:|:---|:---|
+| 1 | **C** | Konsep & Filosofi CT | Sesuai naskah Jeannette M. Wing (2006), CT adalah proses kognitif peme... |
+| 2 | **A** | Sinergi Pilar CT | Tanpa dekomposisi untuk memilah akar masalah dan abstraksi untuk menya... |
+| 3 | **D** | Dekomposisi | Dekomposisi yang tepat memecah masalah besar menjadi sub-masalah logis... |
+| 4 | **B** | Pengenalan Pola | Pengenalan Pola (Pattern Recognition) mengenali keteraturan dan kesama... |
+| 5 | **E** | Abstraksi | Abstraksi adalah seni memilah informasi esensial (stasiun & jalur) yan... |
+| 6 | **A** | Berpikir Algoritma | Algoritma yang baik wajib bersifat presisi, deterministik (tidak ambig... |
+| 7 | **C** | Kasus Kota Delta (Dekomposisi) | CT berorientasi pada pemecahan masalah berbasis akar penyebab (root-ca... |
+| 8 | **B** | Kasus Kota Delta (Dekomposisi) | Dekomposisi memecah kompleksitas krisis lingkungan menjadi 3 subsistem... |
+| 9 | **D** | Kasus Kota Delta (Pengenalan Pola) | Pengenalan Pola menemukan keteraturan (curah hujan >150mm/hari 3 hari ... |
+| 10 | **E** | Kasus Kota Delta (Abstraksi) | Abstraksi mengeliminasi variabel noise (pabrik non-B3, warna seragam, ... |
+| 11 | **B** | Kasus Kota Delta (Algoritma) | Langkah 1 menerapkan struktur percabangan kondisional dengan konjungsi... |
+| 12 | **A** | Kasus Kota Delta (Algoritma) | Algoritma menuntut instruksi yang tidak ambigu (unambiguous). Batasan ... |
+| 13 | **D** | Kasus Kota Delta (HOTS Evaluasi) | Kelemahan sistem berbasis ambang batas kaku (hardcoded boundary) tanpa... |
+| 14 | **C** | Kasus Kota Delta (HOTS Analisis) | Reusability terjadi karena solusi telah diabstraksi menjadi kerangka k... |
+| 15 | **E** | Kasus Kota Delta (Korelasi vs Kausalitas) | Penjualan payung/jas hujan meningkat di musim hujan bersamaan dengan b... |
+| 16 | **A** | Kasus Kota Delta (HOTS Sintesis) | Sensor IoT harus merefleksikan variabel kritis hasil dekomposisi Dr. A... |
+| 17 | **C** | Kasus Kota Delta (Evaluasi Solusi) | Otomatisasi pengawasan telemetri 24 jam menghilangkan celah kelemahan ... |
+| 18 | **D** | Kasus Garuda Rescue (Dekomposisi) | Mengelompokkan 15 desa menjadi 3 sektor berdasarkan tingkat keparahan ... |
+| 19 | **B** | Kasus Garuda Rescue (Pengenalan Pola) | Pengenalan pola kabut tebal setelah jam 14.00 di lembah Sektor Utara m... |
+| 20 | **E** | Kasus Garuda Rescue (Abstraksi) | Abstraksi menyingkirkan detail/elemen non-kritis (baju bekas, mainan) ... |
+| 21 | **A** | Kasus Garuda Rescue (Algoritma) | Jadwal tersebut adalah algoritma valid: langkah terstruktur, spesifik ... |
+| 22 | **D** | Kasus Garuda Rescue (Keandalan Sistem) | Dalam manajemen sistem sumber daya terbatas, proses replenishment (pen... |
+| 23 | **B** | Kasus Garuda Rescue (Inspeksi Mesin) | Pilar algoritma memperhitungkan batasan keselamatan lingkungan (safety... |
+| 24 | **C** | Sintesis Kasus 1 & 2 (Abstraksi) | Kedua tokoh mendemonstrasikan pilar Abstraksi: menyingkirkan elemen no... |
+| 25 | **E** | Sintesis Kasus 1 & 2 (Dekomposisi) | Dekomposisi bersifat fleksibel dan adaptif: dapat dilakukan secara fun... |
+| 26 | **B** | Adaptasi Algoritma Dinamis | Algoritma yang adaptif melakukan penyesuaian parameter sumber daya (da... |
+| 27 | **A** | Kognitif & Bias Data | Bias konfirmasi mendistorsi pengenalan pola ilmiah: sumber daya terbua... |
+| 28 | **D** | Transfer Kontekstual SMAN 1 Batu | Pengenalan Pola pada pertanian presisi mengkorelasikan variabel iklim ... |
+| 29 | **C** | Transfer Kontekstual SMAN 1 Batu | Dalam pemodelan graf rute lalu lintas, Abstraksi mereduksi jalan menja... |
+| 30 | **E** | Etika & Refleksi Rekayasa Sistem | Prinsip etika rekayasa komputasional modern menuntut transparansi (exp... |
+
+
+*Dokumen Asli CBT SMAN 1 Batu - Disusun untuk Ujian Berpikir Komputasional Kelas X*

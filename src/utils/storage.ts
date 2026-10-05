@@ -54,11 +54,15 @@ export const getStoredExams = (): Exam[] => {
       return INITIAL_EXAMS;
     }
     const parsed: Exam[] = JSON.parse(raw);
-    const hasCtExam = parsed.some((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
-    if (!hasCtExam) {
+    const ctIdx = parsed.findIndex((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
+    if (ctIdx === -1) {
       const merged = [CT_INFORMATIKA_30_EXAM, ...parsed];
       localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(merged));
       return merged;
+    } else if (parsed[ctIdx].createdAt !== CT_INFORMATIKA_30_EXAM.createdAt) {
+      parsed[ctIdx] = CT_INFORMATIKA_30_EXAM;
+      localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(parsed));
+      return parsed;
     }
     return parsed;
   } catch {
