@@ -229,16 +229,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const handleDeleteExam = (examId: string) => {
-    if (exams.length <= 1) {
-      alert('Minimal harus ada 1 paket ujian.');
-      return;
-    }
-    if (confirm('Apakah Anda yakin ingin menghapus paket ujian ini?')) {
+    const targetExam = exams.find((e) => e.id === examId);
+    const examName = targetExam ? `"${targetExam.subject}"` : 'ini';
+    if (
+      confirm(
+        `Apakah Anda yakin ingin menghapus paket ujian ${examName}?\n\nSemua butir soal di dalam paket ini akan dihapus.`
+      )
+    ) {
       const updated = exams.filter((e) => e.id !== examId);
       onUpdateExams(updated);
       if (selectedExamId === examId) {
         setSelectedExamId(updated[0]?.id || '');
+        setQuestionsPage(1);
+        setSubmissionsPage(1);
       }
+    }
+  };
+
+  const handleDeleteAllExams = () => {
+    if (exams.length === 0) {
+      alert('Belum ada paket ujian untuk dihapus.');
+      return;
+    }
+    if (
+      confirm(
+        `⚠️ PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA (${exams.length}) paket ujian?\n\nTindakan ini akan menghapus seluruh paket ujian beserta seluruh bank soal di dalamnya dari sistem dan Cloud Firestore.`
+      )
+    ) {
+      onUpdateExams([]);
+      setSelectedExamId('');
+      setQuestionsPage(1);
+      setSubmissionsPage(1);
     }
   };
 
@@ -785,22 +806,39 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               )}
 
               {activeTab === 'exams' && (
-                <button
-                  onClick={() => {
-                    setEditingExam(null);
-                    setIsEditorOpen(true);
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">Buat Ujian Baru</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleDeleteAllExams}
+                    disabled={exams.length === 0}
+                    className={`text-xs font-semibold px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${
+                      exams.length === 0
+                        ? 'text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800 cursor-not-allowed'
+                        : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border-rose-200 dark:border-rose-800 hover:border-rose-300 cursor-pointer'
+                    }`}
+                    title="Hapus seluruh paket ujian di sistem"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Hapus All</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setEditingExam(null);
+                      setIsEditorOpen(true);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Buat Ujian Baru</span>
+                  </button>
+                </div>
               )}
 
               {activeTab === 'questions' && (
                 <button
                   onClick={() => setIsWordImportOpen(true)}
-                  className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs"
+                  disabled={!currentExam}
+                  className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span className="hidden sm:inline">Import Word (.docx)</span>
@@ -849,7 +887,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* TAB 1: MANAJEMEN PAKET UJIAN */}
           {activeTab === 'exams' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              {exams.length === 0 ? (
+                <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800 shadow-xs">
+                  <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <BookOpen className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
+                    Belum Ada Paket Ujian
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
+                    Semua paket ujian telah dihapus atau belum dibuat. Klik tombol di bawah untuk membuat paket ujian baru.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setEditingExam(null);
+                      setIsEditorOpen(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Buat Paket Ujian Baru
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {paginatedExams.map((exam) => {
                   const count = exam.questions.length;
                   const examSubmissions = submissions.filter((s) => s.examId === exam.id);
@@ -1010,6 +1072,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   itemLabel="paket ujian"
                   className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs"
                 />
+              )}
+                </>
               )}
             </div>
           )}
@@ -1264,6 +1328,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   className="bg-white dark:bg-slate-900 px-5 py-3.5 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs"
                 />
               )}
+            </div>
+          )}
+
+          {activeTab === 'questions' && !currentExam && (
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800 shadow-xs">
+              <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <ListOrdered className="w-8 h-8" />
+              </div>
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
+                Belum Ada Paket Ujian Tersedia
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
+                Tidak ada paket ujian aktif atau tersimpan. Silakan buat paket ujian baru terlebih dahulu untuk mulai menyusun butir soal.
+              </p>
+              <button
+                onClick={() => {
+                  setActiveTab('exams');
+                  setEditingExam(null);
+                  setIsEditorOpen(true);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                Buat Paket Ujian Baru
+              </button>
             </div>
           )}
 
