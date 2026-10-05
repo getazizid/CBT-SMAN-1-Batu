@@ -380,19 +380,10 @@ export default function App() {
         onLoginSuccess={handleAdminLoginSuccess}
       />
 
-      {/* Simplified Concise Footer (hidden during active exam and print) */}
+      {/* Minimal Footer */}
       {studentFlow.phase !== 'exam' && (
-        <footer className="print:hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-slate-500 dark:text-slate-400 text-xs py-4 border-t border-slate-200/80 dark:border-slate-800 transition-colors duration-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-            <p className="font-semibold text-slate-700 dark:text-slate-300">
-              &copy; {new Date().getFullYear()} CBT SMAN 1 Batu &bull; Created by TIM IT SMAN 1 Batu
-            </p>
-            <div className="flex items-center gap-3 text-[11px] text-slate-400 dark:text-slate-500">
-              <span>Aplikasi Ujian Berstandar</span>
-              <span>&bull;</span>
-              <span className="text-blue-600 dark:text-blue-400 font-medium">v2.5 Modern</span>
-            </div>
-          </div>
+        <footer className="print:hidden text-center text-slate-400 dark:text-slate-500 text-xs py-3 border-t border-slate-200/60 dark:border-slate-800/80">
+          <p>&copy; {new Date().getFullYear()} SMAN 1 Batu &bull; CBT Portal</p>
         </footer>
       )}
     </div>

@@ -195,7 +195,7 @@ export const StudentBatchImportModal: React.FC<StudentBatchImportModalProps> = (
           <button
             type="button"
             onClick={handleImport}
-            className="px-4 py-2 text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Tambahkan {parsedPreview.length} Siswa ke Sistem</span>

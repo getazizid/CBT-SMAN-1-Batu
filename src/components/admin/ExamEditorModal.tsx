@@ -725,7 +725,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 <button
                   type="button"
                   onClick={handleAddQuestion}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah Soal Baru</span>
@@ -848,7 +848,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
 
             <button
               type="submit"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-2 cursor-pointer transition-all"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs flex items-center gap-2 cursor-pointer transition-colors"
             >
               <Save className="w-4 h-4" />
               <span>Simpan Pengaturan Ujian</span>

@@ -274,9 +274,9 @@ BOBOT: A=10, B=5, C=4, D=3, E=2"
           <button
             disabled={parsedPreview.length === 0}
             onClick={handleConfirmImport}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all ${
+            className={`px-5 py-2.5 rounded-xl font-semibold text-xs flex items-center gap-2 transition-colors ${
               parsedPreview.length > 0
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md cursor-pointer'
+                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed border border-slate-200 dark:border-slate-700'
             }`}
           >

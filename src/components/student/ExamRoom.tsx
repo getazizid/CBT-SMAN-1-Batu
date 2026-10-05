@@ -748,7 +748,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                 <button
                   id="finish-exam-btn"
                   onClick={() => setShowSubmitModal(true)}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Selesai & Kumpulkan</span>
@@ -904,7 +904,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               <button
                 id="confirm-final-submit-btn"
                 onClick={handleManualSubmit}
-                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-sm transition-all cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs transition-colors cursor-pointer"
               >
                 Ya, Kumpulkan
               </button>

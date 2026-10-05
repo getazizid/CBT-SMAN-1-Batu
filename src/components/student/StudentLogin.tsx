@@ -1,29 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
   AlertCircle,
-  ArrowLeft,
   ArrowRight,
-  CheckCircle2,
-  Clock,
-  GraduationCap,
+  Eye,
+  EyeOff,
   KeyRound,
   Lock,
-  LogOut,
-  Maximize2,
-  Minimize2,
-  ShieldCheck,
-  Sparkles,
+  Play,
   User,
-  BookOpen
+  LogOut,
 } from 'lucide-react';
 import { Exam, RegisteredStudent } from '../../types';
 import { ALL_SCHOOL_CLASSES, isStudentClassEligible } from '../../utils/constants';
 import { getStoredStudents } from '../../utils/storage';
 import {
-  exitAppFullscreen,
   isCurrentlyFullscreen,
   isFullscreenSupported,
-  isIOSDevice,
   requestAppFullscreen,
 } from '../../utils/deviceHelper';
 
@@ -48,13 +40,14 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
   enforceWhitelist = true,
   onStartExam,
 }) => {
-  // Step 1: 'login' (Autentikasi NISN & Password Siswa)
-  // Step 2: 'exam_token' (Konfirmasi Profil, Pilih Ujian & Masukkan Token Pengawas)
+  // Step 1: 'login' (NISN & Password Siswa)
+  // Step 2: 'exam_token' (Konfirmasi Profil & Token Ujian)
   const [step, setStep] = useState<'login' | 'exam_token'>('login');
 
   // Step 1 States
   const [nisnInput, setNisnInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [manualName, setManualName] = useState('');
   const [manualClass, setManualClass] = useState('X-1');
   const [matchedStudentPreview, setMatchedStudentPreview] = useState<RegisteredStudent | null>(null);
@@ -85,34 +78,7 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     eligibleExams[0] ||
     activeExams[0];
 
-  // Fullscreen State
   const fsSupported = isFullscreenSupported();
-  const isIOS = isIOSDevice();
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(() => 
-    fsSupported ? isCurrentlyFullscreen() : true
-  );
-
-  useEffect(() => {
-    if (!fsSupported) return;
-    const handleFsChange = () => {
-      setIsFullscreen(isCurrentlyFullscreen());
-    };
-    document.addEventListener('fullscreenchange', handleFsChange);
-    document.addEventListener('webkitfullscreenchange', handleFsChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFsChange);
-      document.removeEventListener('webkitfullscreenchange', handleFsChange);
-    };
-  }, [fsSupported]);
-
-  const toggleFullscreen = () => {
-    if (!fsSupported) return;
-    if (!isCurrentlyFullscreen()) {
-      requestAppFullscreen();
-    } else {
-      exitAppFullscreen();
-    }
-  };
 
   const ensureFullscreen = () => {
     if (!fsSupported) return;
@@ -129,7 +95,7 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     return getStoredStudents();
   };
 
-  // Auto-detect student preview when typing NISN in Step 1
+  // Auto-detect student preview when typing NISN
   useEffect(() => {
     const cleanNisn = sanitizeText(nisnInput);
     if (!cleanNisn) {
@@ -167,22 +133,21 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     }
   }, [step, eligibleExams, activeExams, selectedExamId]);
 
-  // Handle Step 1: Login Akun Siswa (Verifikasi NISN & Password Siswa)
+  // Handle Step 1: Login Siswa
   const handleStudentLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    ensureFullscreen();
 
     const cleanNisn = sanitizeText(nisnInput);
     const enteredPass = sanitizeText(passwordInput);
 
     if (!cleanNisn) {
-      setErrorMsg('Harap masukkan NISN / Username siswa.');
+      setErrorMsg('Harap masukkan NISN siswa.');
       return;
     }
 
     if (!enteredPass) {
-      setErrorMsg('Harap masukkan Password akun siswa.');
+      setErrorMsg('Harap masukkan password akun siswa.');
       return;
     }
 
@@ -193,32 +158,24 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
 
     if (enforceWhitelist) {
       if (!found) {
-        setErrorMsg(
-          'NISN tidak ditemukan dalam database siswa SMAN 1 Batu. Silakan periksa kembali atau hubungi proktor/pengawas.'
-        );
+        setErrorMsg('NISN tidak terdaftar dalam database siswa. Hubungi proktor/pengawas.');
         return;
       }
 
       if (!found.isActive) {
-        setErrorMsg(
-          'Akun siswa Anda berstatus nonaktif/ditangguhkan. Silakan hubungi proktor/pengawas ujian.'
-        );
+        setErrorMsg('Akun siswa berstatus nonaktif. Silakan hubungi proktor/pengawas.');
         return;
       }
 
-      // Check student's registered password
       const registeredPassword = found.password ? sanitizeText(found.password) : '';
       if (registeredPassword) {
         if (enteredPass.toLowerCase() !== registeredPassword.toLowerCase() && enteredPass !== registeredPassword) {
-          setErrorMsg(
-            'Password akun siswa tidak sesuai! Pastikan Anda masukkan password akun yang terdaftar di data siswa.'
-          );
+          setErrorMsg('Password salah! Masukkan password akun siswa yang benar.');
           return;
         }
       } else {
-        // If student has no password set in database, allow fallback
         if (enteredPass.toLowerCase() !== cleanNisn.toLowerCase() && enteredPass !== '123456' && enteredPass !== 'batu123') {
-          // Accept fallback
+          // Fallback allowed
         }
       }
 
@@ -228,7 +185,6 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
         studentClass: found.studentClass,
       });
     } else {
-      // Whitelist disabled: allow matched student or manual inputs
       setAuthenticatedStudent({
         name: found ? found.name : manualName.trim() || 'Peserta Ujian',
         nisn: cleanNisn,
@@ -236,13 +192,13 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
       });
     }
 
-    // Advance to Step 2
+    // Lanjut ke Step 2
     setStep('exam_token');
     setTokenInput('');
     setErrorMsg('');
   };
 
-  // Handle Step 2: Verifikasi Token Ujian & Mulai Ujian
+  // Handle Step 2: Verifikasi Token & Mulai
   const handleVerifyTokenAndStart = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -253,30 +209,27 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
     }
 
     if (!currentExam) {
-      setErrorMsg('Belum ada paket ujian aktif yang dapat diakses untuk kelas Anda.');
+      setErrorMsg('Belum ada paket ujian aktif untuk kelas Anda.');
       return;
     }
 
     const enteredToken = tokenInput.trim().toUpperCase();
     if (!enteredToken) {
-      setErrorMsg('Harap masukkan TOKEN UJIAN yang diberikan oleh pengawas/proktor ruangan.');
+      setErrorMsg('Harap masukkan Token Ujian dari pengawas ruangan.');
       return;
     }
 
     const expectedToken = currentExam.token.trim().toUpperCase();
     if (enteredToken !== expectedToken) {
-      setErrorMsg(
-        'Token ujian salah! Silakan minta token aktif kepada pengawas/proktor di ruangan Anda.'
-      );
+      setErrorMsg('Token ujian tidak sesuai! Silakan periksa kembali token dari pengawas.');
       return;
     }
 
-    // Token verified! Start the exam
+    // Aktifkan fullscreen dan mulai ujian
     ensureFullscreen();
     onStartExam(currentExam, authenticatedStudent);
   };
 
-  // Handle Switch / Logout Student
   const handleLogoutStudent = () => {
     setAuthenticatedStudent(null);
     setStep('login');
@@ -286,132 +239,43 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
   };
 
   return (
-    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center px-4 py-8 transition-colors duration-200">
-      <div className="w-full max-w-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl dark:shadow-2xl dark:shadow-blue-950/30 border border-slate-200/90 dark:border-slate-800 transition-all duration-200">
-        {/* School Logo & Title */}
+    <div className="min-h-[calc(100vh-120px)] flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-sm sm:max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 shadow-lg dark:shadow-2xl border border-slate-200/80 dark:border-slate-800 transition-all">
+        {/* Brand / Logo Minimal */}
         <div className="text-center mb-6">
-          <div className="inline-block relative">
-            <img
-              src="/logo-sman1-batu.png"
-              alt="Logo SMAN 1 Batu"
-              className="w-16 h-18 object-contain mx-auto mb-3 drop-shadow-md hover:scale-105 transition-transform"
-            />
-          </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            CBT Asesmen Siswa SMAN 1 Batu
+          <img
+            src="/logo-sman1-batu.png"
+            alt="Logo SMAN 1 Batu"
+            className="w-14 h-16 object-contain mx-auto mb-3 drop-shadow-xs"
+          />
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+            {step === 'login' ? 'Login Peserta Ujian' : 'Konfirmasi Peserta'}
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
-            Sistem Ujian Terstandar Berbasis Komputer &bull; Integritas Tinggi
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {step === 'login'
+              ? 'Masukkan NISN dan password akun Anda'
+              : 'Periksa data diri dan masukkan token dari pengawas'}
           </p>
         </div>
 
-        {/* Fullscreen Mode Activation Banner */}
-        <div className={`mb-5 p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs transition-colors ${isFullscreen
-            ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/80'
-            : 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/80'
-          }`}>
-          <div className="flex items-center gap-2.5">
-            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isFullscreen ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
-            <div>
-              <p className="font-bold text-slate-800 dark:text-slate-200 text-[11px] sm:text-xs">
-                Mode Layar Penuh:{' '}
-                <span className={isFullscreen ? 'text-emerald-700 dark:text-emerald-400 font-extrabold' : 'text-amber-700 dark:text-amber-400'}>
-                  {isFullscreen ? 'Aktif (Fullscreen)' : 'Belum Aktif'}
-                </span>
-              </p>
-              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400">
-                {isFullscreen
-                  ? 'Siap mengikuti ujian dalam mode layar penuh.'
-                  : 'Wajib masuk mode layar penuh untuk ujian.'}
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${isFullscreen
-                ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800 border border-emerald-200 dark:border-emerald-700'
-                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
-              }`}
-          >
-            {isFullscreen ? (
-              <>
-                <Minimize2 className="w-3.5 h-3.5" />
-                <span>Keluar</span>
-              </>
-            ) : (
-              <>
-                <Maximize2 className="w-3.5 h-3.5" />
-                <span>Aktifkan</span>
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* Step Indicator Header */}
-        <div className="mb-6 bg-slate-100/80 dark:bg-slate-800/80 p-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between text-xs font-semibold">
-          <div
-            className={`flex-1 text-center py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${step === 'login'
-                ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-xs font-bold'
-                : 'text-emerald-700 dark:text-emerald-400 font-medium'
-              }`}
-          >
-            <span
-              className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${step === 'login'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-emerald-600 text-white'
-                }`}
-            >
-              {step === 'login' ? '1' : '✓'}
-            </span>
-            <span className="truncate">1. Login Siswa</span>
-          </div>
-
-          <div className="text-slate-300 dark:text-slate-600 px-1">&rarr;</div>
-
-          <div
-            className={`flex-1 text-center py-2 px-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${step === 'exam_token'
-                ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-xs font-bold'
-                : 'text-slate-400 dark:text-slate-500 font-medium'
-              }`}
-          >
-            <span
-              className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${step === 'exam_token'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-                }`}
-            >
-              2
-            </span>
-            <span className="truncate">2. Token & Mulai</span>
-          </div>
-        </div>
-
-        {/* Error Notification */}
+        {/* Notifikasi Error Ringkas */}
         {errorMsg && (
-          <div className="mb-5 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-2xl text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-150">
-            <AlertCircle className="w-4 h-4 text-rose-500 dark:text-rose-400 shrink-0 mt-0.5" />
-            <p className="leading-relaxed font-medium">{errorMsg}</p>
+          <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+            <p className="leading-snug">{errorMsg}</p>
           </div>
         )}
 
-        {/* ========================================================================= */}
-        {/* STEP 1: LOGIN SISWA (NISN & PASSWORD SISWA) */}
-        {/* ========================================================================= */}
+        {/* STEP 1: FORM LOGIN SISWA */}
         {step === 'login' && (
           <form onSubmit={handleStudentLogin} className="space-y-4">
-            {/* NISN / Username */}
+            {/* Input NISN */}
             <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                  NISN / Username Siswa
-                </label>
-                <span className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200/50 dark:border-blue-900/50">
-                  Identitas Peserta
-                </span>
-              </div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                NISN / No. Peserta
+              </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -424,56 +288,31 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
                   autoCorrect="off"
                   spellCheck={false}
                   autoComplete="username"
-                  inputMode="text"
-                  className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl pl-10 pr-3.5 py-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none font-mono font-semibold transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl pl-10 pr-3.5 py-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition-all placeholder:text-slate-400"
                 />
               </div>
 
-              {/* Matched student real-time indicator */}
+              {/* Status nama siswa ringkas */}
               {matchedStudentPreview && (
-                <div
-                  className={`mt-2 px-3 py-2 rounded-xl text-xs flex items-center justify-between border transition-all ${matchedStudentPreview.isActive
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
-                      : 'bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-800'
-                    }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {matchedStudentPreview.isActive ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
-                    )}
-                    <div>
-                      <span className="font-bold block text-slate-900 dark:text-white">{matchedStudentPreview.name}</span>
-                      <span className="text-[11px] text-slate-600 dark:text-slate-300">
-                        Kelas: {matchedStudentPreview.studentClass} &bull; NISN: {matchedStudentPreview.nisn}
-                      </span>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 shadow-xs">
-                    Terdaftar
-                  </span>
-                </div>
+                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1.5 flex items-center gap-1">
+                  <span>✓</span>
+                  <span>{matchedStudentPreview.name} &bull; Kelas {matchedStudentPreview.studentClass}</span>
+                </p>
               )}
             </div>
 
-            {/* Password Siswa */}
+            {/* Input Password */}
             <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-                  Password Akun Siswa
-                </label>
-                <span className="text-[11px] text-slate-400 dark:text-slate-500">
-                  Sesuai Data Siswa
-                </span>
-              </div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                Password
+              </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
-                  type="password"
-                  placeholder="Masukkan Password Akun Siswa"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Masukkan password akun"
                   value={passwordInput}
                   onChange={(e) => setPasswordInput(e.target.value)}
                   required
@@ -481,38 +320,43 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
                   autoCorrect="off"
                   spellCheck={false}
                   autoComplete="current-password"
-                  className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl pl-10 pr-3.5 py-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl pl-10 pr-10 py-2.5 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition-all placeholder:text-slate-400"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">
-                Gunakan password akun pribadi yang diberikan oleh guru / wali kelas Anda.
-              </p>
             </div>
 
-            {/* If whitelist disabled and student not found: allow selecting class */}
+            {/* Form Input Manual Siswa jika Whitelist dimatikan & data siswa belum ada */}
             {!enforceWhitelist && !matchedStudentPreview && (
-              <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-2 gap-2.5 pt-1">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                     Nama Lengkap
                   </label>
                   <input
                     type="text"
-                    placeholder="Nama Lengkap Siswa"
+                    placeholder="Nama Anda"
                     value={manualName}
                     onChange={(e) => setManualName(e.target.value)}
                     required
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Kelas / Rombel
+                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
+                    Kelas
                   </label>
                   <select
                     value={manualClass}
                     onChange={(e) => setManualClass(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   >
                     {ALL_SCHOOL_CLASSES.map((cls) => (
                       <option key={cls} value={cls}>
@@ -524,160 +368,103 @@ export const StudentLogin: React.FC<StudentLoginProps> = ({
               </div>
             )}
 
-            {/* Login Button */}
-            <div className="pt-3">
+            {/* Tombol Masuk */}
+            <div className="pt-2">
               <button
                 type="submit"
                 id="student-login-submit-btn"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg hover:shadow-blue-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer text-xs uppercase tracking-wider active:scale-[0.99]"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer text-xs uppercase tracking-wider"
               >
-                <span>Masuk & Lanjut ke Token Ujian</span>
+                <span>Masuk</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </form>
         )}
 
-        {/* ========================================================================= */}
-        {/* STEP 2: KONFIRMASI SISWA, PILIH UJIAN & INPUT TOKEN DARI PENGAWAS */}
-        {/* ========================================================================= */}
+        {/* STEP 2: KONFIRMASI PROFIL & INPUT TOKEN */}
         {step === 'exam_token' && authenticatedStudent && (
           <form onSubmit={handleVerifyTokenAndStart} className="space-y-4">
-            {/* Authenticated Student Profile Card */}
-            <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/40 dark:to-indigo-950/40 p-4 rounded-2xl border border-blue-200 dark:border-blue-800/80 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
-                  <GraduationCap className="w-5 h-5" />
-                </div>
+            {/* Box Profil Singkat */}
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-700 text-xs space-y-2">
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
-                      {authenticatedStudent.name}
-                    </h3>
-                    <span className="bg-blue-600 text-white font-bold text-[10px] px-2 py-0.5 rounded-full">
-                      {authenticatedStudent.studentClass}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    NISN: <span className="font-mono font-semibold text-slate-700 dark:text-slate-200">{authenticatedStudent.nisn}</span> &bull; Peserta CBT
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">
+                    {authenticatedStudent.name}
+                  </h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">
+                    NISN: <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{authenticatedStudent.nisn}</span> &bull; Kelas {authenticatedStudent.studentClass}
                   </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleLogoutStudent}
+                  className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-colors"
+                  title="Ganti Siswa"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={handleLogoutStudent}
-                className="text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-2 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-colors cursor-pointer text-xs flex items-center gap-1 font-semibold"
-                title="Ganti Siswa / Keluar"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Ganti</span>
-              </button>
-            </div>
-
-            {/* Exam Package Selection */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">
-                Pilih Paket Ujian yang Akan Dikerjakan
-              </label>
-              {activeExams.length > 0 ? (
-                <div className="space-y-2">
+              {/* Pilihan Ujian */}
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700/80">
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                  Mata Pelajaran Ujian
+                </label>
+                {activeExams.length > 0 ? (
                   <select
                     value={selectedExamId}
                     onChange={(e) => setSelectedExamId(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2.5 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition-all"
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   >
-                    {activeExams.map((exam) => {
-                      const isEligible = isStudentClassEligible(authenticatedStudent.studentClass, exam.gradeClass);
-                      return (
-                        <option key={exam.id} value={exam.id} className="dark:bg-slate-800">
-                          {isEligible ? '✓ ' : '⚠️ '} {exam.subject} - {exam.title} ({exam.durationMinutes} Menit)
-                        </option>
-                      );
-                    })}
+                    {activeExams.map((exam) => (
+                      <option key={exam.id} value={exam.id}>
+                        {exam.subject} - {exam.title} ({exam.durationMinutes} Menit)
+                      </option>
+                    ))}
                   </select>
-
-                  {/* Exam Summary Info Box */}
-                  {currentExam && (
-                    <div className="bg-slate-50 dark:bg-slate-800/70 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-slate-500 dark:text-slate-400">Mata Pelajaran:</span>
-                        <span className="font-bold text-slate-900 dark:text-white">{currentExam.subject}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500 dark:text-slate-400">Target Rombel:</span>
-                        <span className="font-semibold text-blue-700 dark:text-blue-400">{currentExam.gradeClass}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500 dark:text-slate-400">Durasi Pengerjaan:</span>
-                        <span className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                          {currentExam.durationMinutes} Menit ({currentExam.questions.length} Butir Soal)
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500 dark:text-slate-400">Standar KKM:</span>
-                        <span className="font-bold text-emerald-700 dark:text-emerald-400">{currentExam.passingGrade}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-800 dark:text-amber-300">
-                  Tidak ada paket ujian yang aktif saat ini.
-                </div>
-              )}
+                ) : (
+                  <p className="text-xs text-amber-600 dark:text-amber-400">Tidak ada paket ujian aktif.</p>
+                )}
+              </div>
             </div>
 
-            {/* Input Token Ujian (Dari Pengawas) */}
-            <div className="bg-amber-50/70 dark:bg-amber-950/30 p-4 rounded-2xl border border-amber-200/90 dark:border-amber-800/80 space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="block text-xs font-bold text-amber-950 dark:text-amber-300 uppercase tracking-wide flex items-center gap-1.5">
-                  <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                  <span>TOKEN UJIAN (Dari Pengawas / Proktor)</span>
-                </label>
-                <span className="bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 font-bold text-[10px] px-2 py-0.5 rounded-md uppercase">
-                  Wajib Diisi
-                </span>
-              </div>
-
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="MASUKKAN TOKEN UJIAN"
-                  value={tokenInput}
-                  onChange={(e) => setTokenInput(e.target.value.toUpperCase())}
-                  required
-                  autoCapitalize="characters"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  autoComplete="off"
-                  className="w-full bg-white dark:bg-slate-800 border-2 border-amber-300 dark:border-amber-700 text-amber-950 dark:text-amber-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none font-mono uppercase font-extrabold tracking-widest text-center shadow-xs transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:font-normal placeholder:tracking-normal placeholder:text-xs"
-                />
-              </div>
-              <p className="text-[11px] text-amber-800/90 dark:text-amber-300/80 leading-relaxed font-medium">
-                Token ujian diberikan oleh proktor / pengawas ruangan sebelum sesi pengerjaan dimulai.
-              </p>
+            {/* Input Token Ujian */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <KeyRound className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Token Ujian (Dari Pengawas)</span>
+              </label>
+              <input
+                type="text"
+                placeholder="MASUKKAN TOKEN"
+                value={tokenInput}
+                onChange={(e) => setTokenInput(e.target.value.toUpperCase())}
+                required
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
+                autoComplete="off"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none font-mono uppercase font-bold tracking-widest text-center transition-all placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal placeholder:text-xs"
+              />
             </div>
 
-            {/* Action Buttons */}
+            {/* Tombol Aksi */}
             <div className="pt-2 flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setStep('login')}
-                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-3 px-4 rounded-xl transition-all cursor-pointer text-xs flex items-center gap-1.5"
+                onClick={handleLogoutStudent}
+                className="w-1/3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-2.5 px-3 rounded-xl transition-colors cursor-pointer text-xs text-center"
               >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Kembali</span>
+                Batal
               </button>
-
               <button
                 type="submit"
                 id="start-exam-button"
-                className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg hover:shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer text-xs uppercase tracking-wider active:scale-[0.99]"
+                className="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-3 rounded-xl shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer text-xs uppercase tracking-wider"
               >
-                <ShieldCheck className="w-4 h-4" />
-                <span>Verifikasi Token & Mulai Ujian</span>
+                <Play className="w-4 h-4 fill-current" />
+                <span>Mulai Ujian</span>
               </button>
             </div>
           </form>

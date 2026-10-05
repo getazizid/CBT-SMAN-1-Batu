@@ -473,7 +473,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }}
             className={`w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center justify-between gap-3 text-xs transition-all cursor-pointer ${
               isActive
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20'
+                ? 'bg-blue-600 text-white font-semibold shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium'
             }`}
           >
@@ -667,7 +667,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     setEditingExam(null);
                     setIsEditorOpen(true);
                   }}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-1.5 cursor-pointer transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span className="hidden sm:inline">Buat Ujian Baru</span>
@@ -700,7 +700,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       setEditingStudent(null);
                       setIsStudentEditorOpen(true);
                     }}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-1.5 cursor-pointer transition-all"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                   >
                     <UserPlus className="w-4 h-4" />
                     <span>Tambah Siswa</span>
@@ -714,7 +714,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     setEditingAccount(null);
                     setIsAccountEditorOpen(true);
                   }}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md hover:shadow-lg hover:shadow-blue-500/20 flex items-center gap-1.5 cursor-pointer transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tambah Akun Baru</span>
@@ -951,7 +951,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-2">
-                          <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-xs">
+                          <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-xs">
                             Soal No. {question.number || qIdx + 1}
                           </span>
                           {question.category && (
@@ -1156,7 +1156,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         setEditingStudent(null);
                         setIsStudentEditorOpen(true);
                       }}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer transition-all"
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       <span>Tambah Siswa</span>
@@ -1413,7 +1413,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                   <button
                     onClick={handleExportExcel}
-                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer transition-all"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                   >
                     <FileSpreadsheet className="w-4 h-4" />
                     <span>Ekspor Excel (.xlsx)</span>

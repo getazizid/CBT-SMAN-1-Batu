@@ -242,7 +242,7 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-4 py-2.5 text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-4 py-2.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Simpan Data Siswa</span>
