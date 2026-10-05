@@ -16,6 +16,7 @@
 
   button, input, select, textarea {
     @apply font-sans;
+    touch-action: manipulation;
   }
 
   /* Custom Clean Scrollbars */
@@ -68,14 +69,19 @@
   }
 }
 
-/* iOS Safari Fullscreen Simulation and Viewport Lockdown */
+/* iOS Safari Smooth Scrolling and Anti-Cheat Viewport */
+html,
+body {
+  -webkit-overflow-scrolling: touch;
+}
+
 html.cbt-ios-fullscreen,
 html.cbt-ios-fullscreen body {
-  position: fixed;
-  width: 100vw;
-  height: 100dvh;
-  overflow: hidden;
-  overscroll-behavior: none;
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   -webkit-user-select: none;
   user-select: none;

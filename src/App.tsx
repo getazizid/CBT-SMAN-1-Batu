@@ -93,6 +93,13 @@ export default function App() {
     }
   }, []);
 
+  // Ensure cbt-ios-fullscreen class is removed when not in exam phase
+  useEffect(() => {
+    if (studentFlow.phase !== 'exam') {
+      document.documentElement.classList.remove('cbt-ios-fullscreen');
+    }
+  }, [studentFlow.phase]);
+
   // Connect Firebase & Real-time Firestore synchronization
   useEffect(() => {
     if (!isFirebaseConfigured()) {

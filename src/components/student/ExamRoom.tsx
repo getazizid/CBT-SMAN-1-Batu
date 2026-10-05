@@ -364,7 +364,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   useEffect(() => {
     if (isIOS) {
       document.documentElement.classList.add('cbt-ios-fullscreen');
-      window.scrollTo(0, 1);
+      window.scrollTo(0, 0);
     }
     return () => {
       if (isIOS) {
@@ -372,6 +372,11 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
   }, [isIOS]);
+
+  // Auto-scroll to top smoothly whenever moving between questions (especially helpful on mobile / iPhone)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentIndex]);
 
   const toggleFullscreen = () => {
     if (!fsSupported) return;
@@ -825,7 +830,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       )}
 
       {/* Main Exam Area */}
-      <div className="max-w-7xl mx-auto w-full p-4 sm:p-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="max-w-7xl mx-auto w-full p-4 sm:p-6 pb-28 sm:pb-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Question Panel (Left - 8/12) */}
         <div className="lg:col-span-8 space-y-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-200/90 dark:border-slate-800 min-h-[500px] flex flex-col justify-between transition-colors duration-200 relative overflow-hidden">
@@ -879,7 +884,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
                       key={opt.displayKey}
                       id={`option-btn-${opt.displayKey}`}
                       onClick={() => handleSelectOption(opt)}
-                      className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-4 cursor-pointer group ${isSelected
+                      className={`w-full text-left p-4 rounded-2xl border transition-all flex items-start gap-4 cursor-pointer group touch-manipulation ${isSelected
                           ? 'border-blue-600 dark:border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 shadow-xs text-slate-900 dark:text-white ring-2 ring-blue-500/20'
                           : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-800/80'
                         }`}
@@ -1064,7 +1069,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       {/* Confirmation Submit Modal */}
       {showSubmitModal && (
         <div className="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
             <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-4 border border-blue-100 dark:border-blue-900">
               <CheckCircle2 className="w-6 h-6" />
             </div>
@@ -1154,7 +1159,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       {/* Anti-Cheat Alert Modal */}
       {showCheatWarning && (
         <div className="fixed inset-0 bg-slate-900/70 dark:bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-200 dark:border-rose-900 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-200 dark:border-rose-900 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
             <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-4 border border-rose-100 dark:border-rose-900">
               <ShieldAlert className="w-6 h-6" />
             </div>

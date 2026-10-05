@@ -115,7 +115,7 @@ export const requestAppFullscreen = async (): Promise<boolean> => {
   if (isIOSDevice()) {
     try {
       document.documentElement.classList.add('cbt-ios-fullscreen');
-      window.scrollTo(0, 1);
+      window.scrollTo(0, 0);
       return true;
     } catch {
       return false;
