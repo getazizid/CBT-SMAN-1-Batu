@@ -23,7 +23,6 @@ import {
 import { Exam, LiveStudentSession, OptionKey, Question, StudentAnswerDetail, StudentExamSubmission } from '../../types';
 import { useTheme } from '../../context/ThemeContext';
 import {
-  INITIAL_EXAMS,
   clearStoredExamProgress,
   getStoredExamProgress,
   saveStoredActiveStudentSession,
@@ -92,9 +91,9 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     }
 
     const rawQuestions =
-      exam && Array.isArray(exam.questions) && exam.questions.length > 0
+      exam && Array.isArray(exam.questions)
         ? exam.questions
-        : INITIAL_EXAMS[0]?.questions || [];
+        : [];
 
     let qList = [...rawQuestions];
     if (exam?.shuffleQuestions) {
@@ -224,9 +223,9 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     let max = 0;
 
     const masterQuestions =
-      exam?.questions && Array.isArray(exam.questions) && exam.questions.length > 0
+      exam?.questions && Array.isArray(exam.questions)
         ? exam.questions
-        : INITIAL_EXAMS[0]?.questions || [];
+        : [];
 
     masterQuestions.forEach((q) => {
       const scores = q.optionScores || {};
@@ -869,9 +868,9 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
     // Synchronize 100% with master questions (original number 1..50 & original answer key)
     const masterQuestions =
-      exam && Array.isArray(exam.questions) && exam.questions.length > 0
+      exam && Array.isArray(exam.questions)
         ? exam.questions
-        : INITIAL_EXAMS[0]?.questions || [];
+        : [];
 
     const isWeighted = exam.useWeightedScoring !== false;
 

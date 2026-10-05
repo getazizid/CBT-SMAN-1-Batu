@@ -42,66 +42,62 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
   try {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
     const settingsSnap = await getDoc(settingsRef);
-    const isV8Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'ct_v8_36_students_x2';
 
-    if (!isV8Updated) {
-      console.log('🔄 Memperbarui dataset Ujian CT Informatika (30 Soal HOTS) & 36 Siswa Kelas X SMAN 1 Batu ke Cloud Firestore...');
-      const batch = writeBatch(db);
+    // Jika database sudah pernah diinisialisasi, jangan pernah menimpa atau mengembalikan data ujian yang dihapus admin
+    if (settingsSnap.exists() && settingsSnap.data()?.isInitialized) {
+      return true;
+    }
 
-      // Hapus dokumen duplikat paket lama jika ada
-      batch.delete(doc(db, COLLECTIONS.EXAMS, 'exam-ct-informatika-30'));
+    console.log('🔄 Menginisialisasi dataset awal CBT SMAN 1 Batu ke Cloud Firestore...');
+    const batch = writeBatch(db);
 
-      // 1. Seed CT Informatika 30 Exam and MPK OSIS 50 Exam
+    // Hapus dokumen duplikat paket lama jika ada
+    batch.delete(doc(db, COLLECTIONS.EXAMS, 'exam-ct-informatika-30'));
+
+    // 1. Seed paket ujian awal HANYA jika koleksi ujian masih kosong
+    const examsSnap = await getDocs(collection(db, COLLECTIONS.EXAMS));
+    if (examsSnap.empty) {
       batch.set(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), cleanForFirestore(CT_INFORMATIKA_30_EXAM));
       batch.set(doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id), cleanForFirestore(MPK_OSIS_50_EXAM));
+    }
 
-      // Hapus data siswa dummy lama dari Firestore jika ada
-      ['std-ct-x1-01', 'std-ct-x2-01', 'std-ct-x3-01', 'std-ct-x4-01', 'std-ct-x5-01'].forEach((oldId) => {
-        batch.delete(doc(db, COLLECTIONS.STUDENTS, oldId));
-      });
-
-      // 2. Seed 36 Siswa Kelas X + Siswa MPK OSIS
+    // 2. Seed data siswa jika koleksi masih kosong
+    const studentsSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+    if (studentsSnap.empty) {
       const allStudents = [...STUDENTS_KELAS_X, ...REAL_STUDENTS_MPK_OSIS];
       allStudents.forEach((student) => {
         batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
       });
-
-      // 3. JANGAN PERNAH HAPUS data submission siswa! Hanya inisialisasi jika koleksi submissions benar-benar kosong
-      const subsSnap = await getDocs(collection(db, COLLECTIONS.SUBMISSIONS));
-      if (subsSnap.empty) {
-        REAL_SUBMISSIONS_MPK_OSIS.forEach((sub) => {
-          batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), cleanForFirestore(sub));
-        });
-      }
-
-      // 4. Admin accounts: if only demo accounts existed, harmonize to 1 primary admin account (preserves custom edits)
-      const accountsSnap = await getDocs(collection(db, COLLECTIONS.ADMIN_ACCOUNTS));
-      if (accountsSnap.empty) {
-        INITIAL_ADMIN_ACCOUNTS.forEach((account) => {
-          batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), cleanForFirestore(account));
-        });
-      } else {
-        // Remove unneeded default demo accounts (adm-002, adm-003) if they were not modified
-        accountsSnap.forEach((d) => {
-          if (d.id === 'adm-002' || d.id === 'adm-003') {
-            batch.delete(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, d.id));
-          }
-        });
-      }
-
-      batch.set(settingsRef, {
-        enforceWhitelist: true,
-        isInitialized: true,
-        version: 'ct_v8_36_students_x2',
-        updatedAt: new Date().toISOString(),
-      }, { merge: true });
-
-      await batch.commit();
-      console.log('✅ Dataset Ujian CT Informatika & 36 Siswa Kelas X SMAN 1 Batu berhasil disinkronkan ke Cloud Firestore!');
     }
+
+    // 3. Submissions
+    const subsSnap = await getDocs(collection(db, COLLECTIONS.SUBMISSIONS));
+    if (subsSnap.empty) {
+      REAL_SUBMISSIONS_MPK_OSIS.forEach((sub) => {
+        batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), cleanForFirestore(sub));
+      });
+    }
+
+    // 4. Admin accounts
+    const accountsSnap = await getDocs(collection(db, COLLECTIONS.ADMIN_ACCOUNTS));
+    if (accountsSnap.empty) {
+      INITIAL_ADMIN_ACCOUNTS.forEach((account) => {
+        batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), cleanForFirestore(account));
+      });
+    }
+
+    batch.set(settingsRef, {
+      enforceWhitelist: true,
+      isInitialized: true,
+      version: 'ct_v8_36_students_x2',
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+
+    await batch.commit();
+    console.log('✅ Inisialisasi awal database Firestore berhasil!');
     return true;
   } catch (error) {
-    console.warn('⚠️ Gagal sinkronisasi Firestore:', error);
+    console.warn('⚠️ Gagal inisialisasi Firestore:', error);
     return false;
   }
 };
@@ -133,26 +129,10 @@ export const subscribeToExams = (
         if (legacyDoc) {
           deleteDoc(doc(db, COLLECTIONS.EXAMS, legacyDoc.id)).catch(console.warn);
         }
-        let cleanList = list.filter((e) => e.id !== 'exam-ct-informatika-30' && e.token !== 'CTBATU');
+        const cleanList = list.filter((e) => e.id !== 'exam-ct-informatika-30' && e.token !== 'CTBATU');
 
-        // Ensure CT exam is in the list and matches latest version
-        const ctExam = cleanList.find((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
-        if (!ctExam || (ctExam.questions?.length ?? 0) !== 30 || ctExam.createdAt !== CT_INFORMATIKA_30_EXAM.createdAt) {
-          setDoc(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), cleanForFirestore(CT_INFORMATIKA_30_EXAM)).catch(console.warn);
-          if (!ctExam) {
-            cleanList.unshift(CT_INFORMATIKA_30_EXAM);
-          } else {
-            const idx = cleanList.findIndex((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
-            cleanList[idx] = CT_INFORMATIKA_30_EXAM;
-          }
-        }
-
-        // Prioritize CT Informatika exam first
-        cleanList.sort((a, b) => {
-          if (a.id === CT_INFORMATIKA_30_EXAM.id) return -1;
-          if (b.id === CT_INFORMATIKA_30_EXAM.id) return 1;
-          return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
-        });
+        // Urutkan paket ujian berdasarkan tanggal pembuatan terbaru tanpa memaksakan paket lama kembali
+        cleanList.sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
 
         onUpdate(cleanList);
       },

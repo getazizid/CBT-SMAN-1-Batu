@@ -10,7 +10,6 @@ interface HeaderProps {
   onOpenAdminLogin: () => void;
   onLogoutAdmin: () => void;
   activeExam?: Exam | null;
-  onResetDemo?: () => void;
   isCloudConnected?: boolean;
 }
 

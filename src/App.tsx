@@ -30,7 +30,7 @@ import {
   getStoredExams,
   getStoredStudents,
   getStoredSubmissions,
-  resetToInitialDemoData,
+  restoreExamsFromLocalStorage,
   saveCurrentAdminSession,
   saveStoredActiveStudentSession,
   saveStoredAdminAccounts,
@@ -261,32 +261,17 @@ export default function App() {
     handleBackToStudentHome();
   };
 
-  const handleResetDemoData = async () => {
-    if (confirm('Reset ulang data ujian, siswa, akun & nilai ke pengaturan awal contoh SMAN 1 Batu? (Data di Cloud Firestore juga akan disinkronkan)')) {
-      const reset = resetToInitialDemoData();
-      setExams(reset.exams);
-      setSubmissions(reset.submissions);
-      setStudents(reset.students);
-      setAdminAccounts(reset.adminAccounts);
-      setEnforceWhitelist(true);
-      setCurrentAdmin(null);
-      saveCurrentAdminSession(null);
-      setRole('student');
-      setStudentFlow({
-        phase: 'login',
-        activeExam: null,
-        studentData: null,
-        latestSubmission: null,
-      });
-
-      // Sync reset to Firestore
-      await syncAllExamsToFirestore(reset.exams);
-      await syncAllSubmissionsToFirestore(reset.submissions);
-      await syncAllStudentsToFirestore(reset.students);
-      await syncAllAdminAccountsToFirestore(reset.adminAccounts);
-      await saveSettingsToFirestore({ enforceWhitelist: true });
-    }
-  };
+  // Global hook if user asks to restore exams from local storage
+  useEffect(() => {
+    (window as any).restoreExamsFromLocalStorage = async () => {
+      const restored = restoreExamsFromLocalStorage();
+      setExams(restored);
+      saveStoredExams(restored);
+      await syncAllExamsToFirestore(restored);
+      console.log('✅ Paket ujian berhasil dipulihkan dari penyimpanan lokal!');
+      return restored;
+    };
+  }, []);
 
   // Student Starts Exam
   const handleStartExam = (
@@ -376,7 +361,6 @@ export default function App() {
           onOpenAdminLogin={() => setIsAdminLoginModalOpen(true)}
           onLogoutAdmin={handleLogoutAdmin}
           activeExam={activePublicExam}
-          onResetDemo={handleResetDemoData}
           isCloudConnected={isCloudConnected}
         />
       )}
@@ -429,7 +413,6 @@ export default function App() {
             onUpdateAdminAccounts={handleUpdateAdminAccounts}
             onToggleEnforceWhitelist={handleToggleEnforceWhitelist}
             onLogoutAdmin={handleLogoutAdmin}
-            onResetDemoData={handleResetDemoData}
           />
         )}
       </main>

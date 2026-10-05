@@ -4,6 +4,7 @@ import { CT_INFORMATIKA_30_EXAM, STUDENTS_KELAS_X } from '../data/ctInformatikaE
 
 const STORAGE_KEYS = {
   EXAMS: 'cbt_sman1batu_exams',
+  EXAMS_BACKUP: 'cbt_sman1batu_exams_backup',
   SUBMISSIONS: 'cbt_sman1batu_submissions',
   STUDENTS: 'cbt_sman1batu_students',
   ADMIN_ACCOUNTS: 'cbt_sman1batu_admin_accounts',
@@ -49,50 +50,63 @@ export const INITIAL_ADMIN_ACCOUNTS: AdminAccount[] = [
 export const getStoredExams = (): Exam[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.EXAMS);
-    if (!raw) {
+    if (raw === null) {
       localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(INITIAL_EXAMS));
+      localStorage.setItem(STORAGE_KEYS.EXAMS_BACKUP, JSON.stringify(INITIAL_EXAMS));
       return INITIAL_EXAMS;
     }
-    let parsed: Exam[] = JSON.parse(raw);
+    const parsed: Exam[] = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
     // Hapus duplikat paket lama (CTBATU / exam-ct-informatika-30) jika ada
-    parsed = parsed.filter((e) => e.id !== 'exam-ct-informatika-30' && e.token !== 'CTBATU');
-
-    const ctIdx = parsed.findIndex((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
-    if (ctIdx === -1) {
-      parsed.unshift(CT_INFORMATIKA_30_EXAM);
-      localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(parsed));
-    } else if (parsed[ctIdx].createdAt !== CT_INFORMATIKA_30_EXAM.createdAt || (parsed[ctIdx].questions?.length ?? 0) !== 30) {
-      parsed[ctIdx] = CT_INFORMATIKA_30_EXAM;
-      localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(parsed));
-    } else {
-      localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(parsed));
-    }
-    // Prioritize CT Informatika exam first
-    parsed.sort((a, b) => (a.id === CT_INFORMATIKA_30_EXAM.id ? -1 : b.id === CT_INFORMATIKA_30_EXAM.id ? 1 : 0));
-    return parsed;
+    return parsed.filter((e) => e.id !== 'exam-ct-informatika-30' && e.token !== 'CTBATU');
   } catch {
-    return INITIAL_EXAMS;
+    return [];
   }
 };
 
 export const saveStoredExams = (exams: Exam[]): void => {
   try {
     localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(exams));
+    if (Array.isArray(exams) && exams.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.EXAMS_BACKUP, JSON.stringify(exams));
+    }
   } catch (e) {
     console.error('Failed to save exams to localStorage', e);
   }
 };
 
+export const restoreExamsFromLocalStorage = (): Exam[] => {
+  try {
+    const backupRaw = localStorage.getItem(STORAGE_KEYS.EXAMS_BACKUP);
+    if (backupRaw) {
+      const parsed: Exam[] = JSON.parse(backupRaw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        localStorage.setItem(STORAGE_KEYS.EXAMS, backupRaw);
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error('Failed to restore exams from localStorage backup', e);
+  }
+  localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(INITIAL_EXAMS));
+  return INITIAL_EXAMS;
+};
+
+if (typeof window !== 'undefined') {
+  (window as any).restoreExamsFromLocalStorage = restoreExamsFromLocalStorage;
+}
+
 export const getStoredSubmissions = (): StudentExamSubmission[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.SUBMISSIONS);
-    if (!raw) {
+    if (raw === null) {
       localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(INITIAL_SUBMISSIONS));
       return INITIAL_SUBMISSIONS;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return INITIAL_SUBMISSIONS;
+    return [];
   }
 };
 
@@ -113,12 +127,13 @@ export const addStudentSubmission = (submission: StudentExamSubmission): void =>
 export const getStoredStudents = (): RegisteredStudent[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.STUDENTS);
-    if (!raw) {
+    if (raw === null) {
       localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(INITIAL_STUDENTS));
       return INITIAL_STUDENTS;
     }
     const parsed: RegisteredStudent[] = JSON.parse(raw);
-    
+    if (!Array.isArray(parsed)) return [];
+
     // Bersihkan dummy lama std-ct-x1-*, std-ct-x2-*, dst jika ada
     const cleaned = parsed.filter(
       (s) => !s.id.startsWith('std-ct-x1-') && 
@@ -127,23 +142,9 @@ export const getStoredStudents = (): RegisteredStudent[] => {
              !s.id.startsWith('std-ct-x4-') && 
              !s.id.startsWith('std-ct-x5-')
     );
-
-    // Sinkronkan 36 siswa kelas X terbaru
-    const ctStudentMap = new Map(STUDENTS_KELAS_X.map((s) => [s.nisn, s]));
-    const nonCtStudents = cleaned.filter((s) => !ctStudentMap.has(s.nisn) && !s.id.startsWith('std-ct-x-'));
-    const merged = [...STUDENTS_KELAS_X, ...nonCtStudents];
-
-    // Simpan jika ada perubahan data siswa atau perubahan kelas ke X-2
-    if (
-      merged.length !== parsed.length ||
-      !parsed.some((s) => s.id === 'std-ct-x-36') ||
-      parsed.some((s) => s.id === 'std-ct-x-01' && s.studentClass !== 'X-2')
-    ) {
-      localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(merged));
-    }
-    return merged;
+    return cleaned;
   } catch {
-    return INITIAL_STUDENTS;
+    return [];
   }
 };
 
