@@ -4,12 +4,12 @@
 **Bahan Acuan Siswa:** `Materi_CT_Informatika_SMAN_1_Batu.pdf`  
 **Jumlah Soal:** 30 Butir Pilihan Ganda (Opsi A - E) dengan Literasi Panjang HOTS Kontekstual  
 **Alokasi Waktu:** 90 Menit | **KKM:** 75  
-**Karakteristik Soal:**
-- Berdasarkan materi resmi Berpikir Komputasional SMAN 1 Batu
-- Menggunakan bahasa Indonesia yang mudah dipahami, bebas istilah asing yang berbelit-belit
+**Kaidah Penulisan Opsi Jawaban:**
+- Panjang teks opsi A, B, C, D, dan E dibuat **RATA dan SEIMBANG** (tidak ada opsi yang mencolok lebih panjang)
+- Opsi pengecoh (B, C, D, E) disusun dengan kedalaman nalar yang setara dengan kunci jawaban
 - Berorientasi pada penerapan nyata dalam kehidupan sehari-hari (rumah, sekolah, masyarakat, studi kasus Delta & Garuda Rescue)
-- Menguji pemecahan masalah (Problem Solving), bukan sekadar hafalan pengertian
-- **Master Admin/Guru:** Kunci jawaban selalu berada di opsi **A** (Pilihan Benar bernilai 10, pengecoh B-E bernilai 0)
+- Bebas istilah bahasa Inggris rumit, menggunakan bahasa Indonesia baku yang mudah dipahami siswa SMA
+- **Master Admin/Guru:** Kunci jawaban selalu berada di opsi **A** (Nilai 10, pengecoh B-E bernilai 0)
 - **Tampilan Siswa di CBT:** Urutan nomor soal dan opsi jawaban diacak secara dinamis
 
 ---
@@ -30,15 +30,15 @@ Kota Delta yang padat penduduk dilanda banjir lumpur beracun setiap puncak musim
 
 Berdasarkan prinsip kerja berpikir komputasional, apakah tujuan utama Dr. Aris memecah krisis besar tersebut menjadi tiga bidang penyelidikan yang terpisah?
 
-**A.** Membuat masalah besar yang rumit menjadi bagian-bagian kecil yang terkelola sehingga setiap tim ahli dapat fokus bekerja secara mendalam dan terarah.
+**A.** Mengurai persoalan rumit menjadi bagian terkelola agar setiap tim ahli dapat fokus bekerja secara mendalam dan terarah.
 
-**B.** Memperpanjang durasi penyelidikan agar pemerintah daerah memiliki alasan untuk menambah alokasi anggaran proyek penanganan bencana.
+**B.** Menunda pengambilan tindakan penyelamatan agar pemerintah daerah memiliki waktu cukup untuk menambah anggaran penanggulangan.
 
-**C.** Menghindari tanggung jawab langsung atas kegagalan penanganan banjir dengan menyerahkan keputusan sepenuhnya kepada kelompok kerja.
+**C.** Menghindari beban tanggung jawab langsung dengan menyerahkan keputusan penanganan sepenuhnya kepada masing-masing tim kerja.
 
-**D.** Mengalihkan perhatian warga dari bahaya limbah beracun dengan menyibukkan relawan pada pencatatan ketinggian air sungai.
+**D.** Mengalihkan perhatian warga dari bahaya limbah beracun dengan menyibukkan relawan pada pencatatan ketinggian muka air sungai.
 
-**E.** Memastikan seluruh warga di sepanjang bantaran sungai terlibat langsung sebagai peneliti lapangan tanpa memandang keahlian mereka.
+**E.** Melibatkan seluruh masyarakat di sepanjang bantaran sungai sebagai tenaga peneliti lapangan tanpa memandang keahlian khusus.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Tindakan Dr. Aris mencerminkan pilar Dekomposisi. Tujuan utama dekomposisi adalah memecah masalah yang rumit dan besar menjadi bagian-bagian yang lebih kecil dan terkelola agar dapat diselesaikan secara mendalam, efektif, dan terstruktur oleh pihak yang berkompeten.
@@ -51,15 +51,15 @@ Tim pengamat cuaca Kota Delta mengumpulkan dan membandingkan catatan data cuaca 
 
 Penerapan pilar berpikir komputasional apakah yang ditunjukkan oleh tim dalam menarik kesimpulan tersebut, dan apa manfaat praktisnya bagi warga?
 
-**A.** Pengenalan pola; membantu tim menemukan keteraturan hubungan sebab-akibat masa lalu untuk memprediksi saat bahaya akan datang di masa depan.
+**A.** Pengenalan pola; memanfaatkan keteraturan masa lalu guna memprediksi dan mengantisipasi datangnya bahaya di masa depan.
 
-**B.** Dekomposisi; memilah data cuaca menjadi dokumen digital yang tersimpan rapi di dalam arsip kantor dinas kebersihan.
+**B.** Dekomposisi; memilah tumpukan berkas data cuaca menjadi dokumen digital yang tersimpan rapi pada lemari arsip dinas kota.
 
-**C.** Abstraksi; menghapus seluruh catatan curah hujan masa lalu agar komputer tidak mengalami kelambatan memori saat bekerja.
+**C.** Abstraksi; menghapus seluruh rekaman curah hujan masa lampau agar perangkat komputer tidak mengalami kelebihan beban memori.
 
-**D.** Pemrograman mekanis; memaksa sensor cuaca untuk otomatis menurunkan curah hujan ketika angka 150 milimeter tercapai.
+**D.** Otomatisasi; memasang pintu bendungan otomatis yang sanggup menurunkan intensitas awan hujan secara langsung di angkasa.
 
-**E.** Penyusunan aturan hukum; melarang awan mendung berkumpul di atas kawasan hulu selama musim hujan berlangsung.
+**E.** Berpikir algoritma; membuat aturan hukum tertulis yang melarang berkumpulnya gumpalan awan mendung di atas kawasan hulu.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Menganalisis data selama 20 tahun untuk menemukan kecenderungan berulang adalah penerapan pilar Pengenalan Pola. Manfaatnya adalah mengubah rekaman data masa lalu menjadi model prediksi yang akurat untuk sistem peringatan dini bencana.
@@ -72,15 +72,15 @@ Hasil uji air menunjukkan adanya kandungan logam berbahaya berupa kromium dan ti
 
 Mengapa keputusan Dr. Aris mengabaikan sebagian besar bangunan dan informasi tersebut dipandang sebagai penerapan abstraksi yang sangat tepat?
 
-**A.** Karena menyaring dan membuang informasi yang tidak berkaitan dengan sumber zat beracun, sehingga tenaga dan waktu penyelidikan terpusat pada sasaran yang tepat.
+**A.** Menyaring dan menyingkirkan data yang tidak relevan agar fokus penyelidikan terpusat pada industri pembuang racun utama.
 
-**B.** Karena pabrik makanan dan toko kelontong telah membayar pajak perlindungan kepada pemerintah kota sehingga tidak boleh diperiksa.
+**B.** Melindungi tempat usaha makanan dan toko kecil warga karena pemiliknya telah membayar uang retribusi resmi kepada dinas kota.
 
-**C.** Karena tim tidak memiliki peralatan yang memadai untuk menguji sampel dari pabrik kayu dan bangunan ruko warga.
+**C.** Menutupi keterbatasan sarana laboratorium penyelidik yang tidak memiliki peralatan memadai untuk memeriksa bangunan industri.
 
-**D.** Karena Dr. Aris ingin mempercepat penutupan kasus tanpa perlu membuktikan keterkaitan kimiawi dari limbah yang dibuang.
+**D.** Mempercepat penutupan proses penyelidikan tanpa perlu membuktikan hubungan sebab-akibat pencemaran limbah secara ilmiah.
 
-**E.** Karena pilar abstraksi menuntut agar hanya pabrik berukuran paling besar yang berhak mendapatkan pemeriksaan lingkungan.
+**E.** Membatasi jangkauan pengawasan hanya pada pabrik berukuran paling luas sesuai ketentuan peraturan birokrasi pemerintahan.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Abstraksi adalah kemampuan memisahkan hal penting dari detail yang tidak penting. Mengabaikan pabrik non-logam (makanan/kayu) dan detail fisik (warna seragam/tahun berdiri) membantu tim memusatkan seluruh daya pada pabrik yang secara kimiawi membuang kromium dan timbal.
@@ -93,15 +93,15 @@ Untuk mencegah terulangnya bencana, Dr. Aris menerbitkan pedoman kerja darurat: 
 
 Kriteria apa yang membuat rangkaian petunjuk kerja di atas memenuhi syarat sebagai sebuah algoritma yang baik?
 
-**A.** Langkah-langkahnya tersusun runtut, memiliki batasan syarat yang pasti dan tegas, serta dapat dijalankan secara konsisten oleh seluruh petugas.
+**A.** Langkah tersusun runtut, syarat kondisi bernilai pasti, dan dapat dieksekusi seragam oleh setiap petugas di lapangan.
 
-**B.** Petunjuk tersebut ditulis menggunakan bahasa pemrograman komputer tingkat tinggi yang hanya dimengerti oleh mesin pemindai.
+**B.** Perintah dirumuskan menggunakan bahasa kode mesin komputer tingkat tinggi yang hanya dimengerti oleh perangkat lunak server.
 
-**C.** Instruksi di dalamnya bersifat lentur dan bebas ditafsirkan berbeda-beda oleh masing-masing penjaga pintu air di lapangan.
+**C.** Instruksi bersifat lentur dan diserahkan pada tafsiran pribadi masing-masing penjaga pintu air tanpa acuan baku tertulis.
 
-**D.** Rangkaian tindakan tersebut disusun tanpa mempertimbangkan kondisi keselamatan warga dan ketersediaan petugas tanggap darurat.
+**D.** Rangkaian tindakan disusun tanpa memperhitungkan ketersediaan personel pengawas serta keselamatan warga di permukiman hilir.
 
-**E.** Aturan tersebut hanya berlaku satu kali saja dan tidak dapat digunakan kembali jika bencana banjir datang pada tahun berikutnya.
+**E.** Aturan penyelamatan dirancang hanya untuk sekali pakai dan tidak boleh diterapkan lagi pada musim penghujan tahun berikutnya.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Algoritma yang baik harus memiliki karakteristik langkah yang logis, berurutan, jelas tanpa makna ganda, memiliki kondisi bersyarat yang pasti, dan memberikan hasil yang seragam ketika dijalankan oleh siapa pun.
@@ -114,15 +114,15 @@ Bayangkan jika Dr. Aris tidak menerapkan pilar abstraksi dalam penyelidikan limb
 
 Risiko sistemik apakah yang paling mungkin terjadi terhadap operasi penanggulangan bencana akibat kelalaian tersebut?
 
-**A.** Tim penyelidik akan kehabisan waktu dan tenaga karena tenggelam dalam lautan data yang tidak penting, sehingga sumber racun utama gagal dihentikan tepat waktu.
+**A.** Waktu dan energi penyelidik terkuras oleh data yang tidak penting, sehingga sumber pencemaran utama terlambat dihentikan.
 
-**B.** Sungai Kota Delta akan secara otomatis kembali jernih karena seluruh warga merasa diawasi oleh petugas pemeriksa.
+**B.** Kawasan aliran sungai akan kembali bersih dengan sendirinya karena seluruh pengelola pabrik merasa diawasi secara mendalam.
 
-**C.** Pabrik tekstil dan aki pembuang limbah berbahaya akan secara sukarela menyerahkan diri tanpa perlu diuji sampel limbahnya.
+**C.** Seluruh pengelola pabrik pencemar bahan berbahaya akan menyerahkan diri secara sukarela tanpa perlu proses pembuktian kimia.
 
-**D.** Waktu eksekusi penanganan menjadi jauh lebih singkat karena semakin banyak informasi yang dikumpulkan maka komputer semakin cepat mengolahnya.
+**D.** Waktu penyelesaian masalah menjadi semakin cepat karena semakin lengkap data yang dihimpun maka kesimpulan kian mudah diambil.
 
-**E.** Curah hujan ekstrem akan berhenti secara mendadak karena proses pendataan administratif berlangsung sangat terperinci.
+**E.** Intensitas curah hujan tinggi di wilayah hulu sungai akan mereda secara mendadak akibat keteraturan pencatatan administrasi.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Tanpa abstraksi untuk memilah data yang relevan, penyelesaian masalah akan tertimbun oleh detail yang tidak berguna (informasi pengganggu). Akibatnya, sumber daya habis dan akar penyebab masalah gagal dituntaskan sebelum bencana berikutnya melanda.
@@ -135,15 +135,15 @@ Pedoman penanganan banjir yang dirancang di Kota Delta diadaptasi oleh pemerinta
 
 Prinsip berpikir komputasional apa yang ditunjukkan oleh tim perancang di daerah baru tersebut?
 
-**A.** Pemanfaatan kembali solusi umum dengan menyesuaikan parameter yang sesuai dengan kondisi lingkungan setempat.
+**A.** Menggunakan kembali model penyelesaian masalah dengan menyesuaikan variabel sesuai kondisi lingkungan wilayah setempat.
 
-**B.** Penyalinan tanpa modifikasi yang membuktikan bahwa seluruh bencana alam di dunia memiliki karakter yang persis sama.
+**B.** Menyalin seluruh rancangan penanganan secara mentah karena seluruh bentuk bencana alam memiliki sifat bahaya yang persis sama.
 
-**C.** Penolakan terhadap pilar algoritma karena pedoman dari daerah lain tidak boleh diterapkan di wilayah berbeda.
+**C.** Mengabaikan kaidah logika algoritma karena pedoman mitigasi bencana dari satu daerah pantang digunakan di wilayah perbukitan.
 
-**D.** Penerapan coba-coba tanpa dasar perhitungan nalar yang jelas untuk melihat apakah bencana tanah longsor bisa dicegah.
+**D.** Menjalankan strategi coba-coba tanpa perencanaan terukur untuk menguji apakah ancaman bahaya tanah longsor dapat dicegah tepat.
 
-**E.** Penghapusan seluruh data lingkungan karena penanganan tanah longsor sama sekali tidak memerlukan data masa lalu.
+**E.** Meniadakan pengumpulan data geologis sebab upaya penanganan lereng longsor sama sekali tidak membutuhkan catatan histori masa lalu.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Salah satu keunggulan berpikir komputasional adalah kemampuan menghasilkan model solusi yang dapat digunakan kembali (reusable model). Kerangka dasar algoritma tetap dipakai, sementara variabel input disesuaikan dengan kondisi setempat.
@@ -156,15 +156,15 @@ Gempa bumi besar melanda kawasan pegunungan dan memutus seluruh jalan raya darat
 
 Tindakan Kapten Rina dalam mengelompokkan desa-desa terdampak tersebut merupakan cerminan dari pilar:
 
-**A.** Dekomposisi; mengurai wilayah operasi yang luas dan rumit menjadi satuan-satuan area yang lebih teratur berdasarkan skala prioritas.
+**A.** Dekomposisi; membagi wilayah tugas yang luas menjadi bagian teratur agar alokasi bantuan dapat disalurkan tepat prioritas.
 
-**B.** Abstraksi semu; meniadakan desa-desa di Wilayah Selatan agar tim tidak perlu mengirimkan bantuan ke sana.
+**B.** Abstraksi keliru; menghapus keberadaan desa pada Wilayah Selatan agar tim penyelamat tidak terbebani kewajiban mengirim paket bantuan.
 
-**C.** Algoritma acak; memilih rute penerbangan secara mendadak tergantung pada arah hembusan angin di pagi hari.
+**C.** Pemilihan acak; menentukan jalur terbang helikopter secara mendadak mengikuti arah hembusan angin perbukitan pada pagi hari.
 
-**D.** Otomatisasi mesin; memprogram komputer helikopter agar terbang sendiri tanpa memerlukan pilot manusia.
+**D.** Otomatisasi mesin; mengaktifkan kendali jarak jauh pada komputer armada agar helikopter dapat terbang tanpa pengawasan manusia.
 
-**E.** Pengenalan pola cuaca; membuktikan bahwa gempa bumi selalu terjadi bersamaan dengan kabut tebal di pegunungan.
+**E.** Pengenalan pola cuaca; membuktikan bahwa bencana gempa bumi selalu diikuti oleh kabut tebal pada kawasan lembah perbukitan terjal.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Memetakan 15 desa menjadi 3 sektor berdasarkan tingkat keparahan adalah bentuk Dekomposisi. Masalah logistik yang luar biasa rumit diurai menjadi unit-unit kerja yang terkelola sehingga alokasi armada helikopter dapat diprioritaskan secara adil dan tepat.
@@ -177,15 +177,15 @@ Dari laporan operasi darurat tahun-tahun sebelumnya di daerah pegunungan yang sa
 
 Bagaimana Kapten Rina memanfaatkan pengenalan pola tersebut dalam menyusun strategi misi penyelamatan?
 
-**A.** Mengerahkan seluruh kekuatan armada helikopter ke Wilayah Utara sejak pagi hari sebelum jendela waktu penerbangan tertutup oleh kabut tebal.
+**A.** Mengerahkan seluruh armada ke Wilayah Utara sejak pagi hari sebelum jalur penerbangan tertutup rapat oleh kabut berbahaya.
 
-**B.** Membatalkan seluruh misi penerbangan ke Wilayah Utara dan membiarkan warga di sana menunggu hingga musim kemarau tiba.
+**B.** Menghentikan seluruh pengiriman bantuan ke Wilayah Utara dan membiarkan para korban menunggu hingga datangnya musim kemarau panjang.
 
-**C.** Memerintahkan para pilot untuk tetap nekat menerobos kabut tebal pada sore hari demi menunjukkan keberanian tim penyelamat.
+**C.** Menginstruksikan para penerbang menerobos kabut tebal pada sore hari demi menunjukkan ketangguhan mental pasukan penyelamat udara.
 
-**D.** Mengalihkan seluruh helikopter ke Wilayah Selatan di pagi hari karena wilayah tersebut tidak pernah berkabut.
+**D.** Mengalihkan seluruh helikopter menuju Wilayah Selatan pada pagi hari karena kawasan tersebut memiliki jarak tempuh yang lebih dekat.
 
-**E.** Menghapus catatan kabut masa lalu dari papan rencana operasi karena dianggap hanya perkiraan cuaca yang belum tentu terulang.
+**E.** Menghapus catatan cuaca masa lalu dari papan posko pemantau karena dianggap hanya perkiraan yang belum tentu terjadi berulang kembali.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Pengenalan pola membantu memprediksi batasan kritis lingkungan. Mengetahui bahwa kabut tebal menutup lembah utara setelah jam 14.00 siang mendasari keputusan logis untuk memfokuskan seluruh helikopter ke sektor paling berbahaya tersebut pada pagi hari (06.00-10.00).
@@ -198,15 +198,15 @@ Saat proses pemuatan barang ke helikopter, para sukarelawan menerima berbagai ma
 
 Argumentasi rasional apa yang mendasari penerapan abstraksi oleh Kapten Rina dalam situasi darurat tersebut?
 
-**A.** Mengabaikan barang-barang yang bukan kebutuhan penyelamat jiwa demi memaksimalkan muatan kebutuhan pokok yang menentukan kelangsungan hidup korban.
+**A.** Menyisihkan muatan non-darurat demi memaksimalkan kapasitas angkut terbatas pada barang penopang keselamatan nyawa korban.
 
-**B.** Menolak barang sumbangan warga karena helikopter hanya diperbolehkan membawa barang yang dibeli oleh dinas pemerintah.
+**B.** Menolak barang kiriman warga karena helikopter kargo militer hanya diizinkan memuat perbekalan yang dibeli lewat anggaran dinas.
 
-**C.** Mengurangi beban kerja petugas gudang agar mereka memiliki waktu istirahat yang lebih lama di pangkalan posko.
+**C.** Mengurangi beban kerja relawan gudang pangkalan udara agar mereka memiliki waktu istirahat lebih banyak di dalam tenda penampungan.
 
-**D.** Menyenangkan hati para penyumbang makanan dengan mendahulukan produk makanan pabrik tertentu.
+**D.** Memprioritaskan produk makanan pabrikan tertentu guna menjaga kerja sama kemitraan logistik antara pihak posko dan badan penyumbang.
 
-**E.** Menunjukkan wewenang mutlak seorang pimpinan operasi logistik tanpa perlu menjelaskan alasannya kepada sukarelawan.
+**E.** Memperlihatkan wewenang mutlak seorang pemimpin misi penyelamatan tanpa berkewajiban memberi penjelasan rasional kepada sukarelawan.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Abstraksi diterapkan dengan menyortir muatan: menyingkirkan barang non-kritis (pakaian bekas, mainan) dan memusatkan kapasitas terbatas helikopter pada kebutuhan paling esensial (air, obat, makanan bergizi, alat komunikasi) yang menyelamatkan nyawa pada 72 jam pertama.
@@ -219,15 +219,15 @@ Jadwal penerbangan yang disusun Kapten Rina memuat rincian: Pukul 06.00–10.00 
 
 Mengapa jadwal kerja terstruktur tersebut dipandang sebagai implementasi pilar algoritma yang sangat efektif?
 
-**A.** Menyediakan panduan langkah kerja yang runtut waktu, terukur alokasi sumber dayanya, dan mencegah kebingungan para pilot di lapangan.
+**A.** Menyajikan panduan kerja berurutan waktu dan terukur pemanfaatan sumber dayanya sehingga mencegah kebingungan para penerbang.
 
-**B.** Membuat helikopter dapat terbang lebih cepat melampaui batas kecepatan maksimal yang ditentukan pabrik pembuatnya.
+**B.** Memungkinkan helikopter melesat lebih cepat melampaui batas kecepatan tertinggi yang sudah ditetapkan oleh pabrik pembuat mesin.
 
-**C.** Menjamin bahwa seluruh warga di 15 desa akan mendapatkan jumlah pasokan beras yang sama persis tanpa selisih satu butir pun.
+**C.** Menjamin seluruh warga di lima belas desa menerima jatah logistik dalam takaran yang sama rata tanpa selisih berat sedikit pun.
 
-**D.** Menghilangkan kebutuhan pilot manusia karena helikopter dapat terbang secara mandiri mengikuti tulisan di papan tulis posko.
+**D.** Menggantikan peran penerbang manusia karena armada kargo dapat mengudara sendiri secara otomatis berbekal jadwal di papan posko.
 
-**E.** Memastikan seluruh anggaran operasional bahan bakar avtur habis digunakan dalam satu hari pelaksanaan misi.
+**E.** Memastikan seluruh jatah cadangan bahan bakar avtur pangkalan habis terpakai dalam satu hari pelaksanaan rangkaian misi darurat.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Algoritma memberikan petunjuk langkah demi langkah yang pasti, kronologis, dan dapat dieksekusi secara seragam oleh seluruh pilot. Ini meminimalkan kesalahan manusia dan memaksimalkan keselamatan armada.
@@ -238,15 +238,15 @@ Mengapa jadwal kerja terstruktur tersebut dipandang sebagai implementasi pilar a
 
 Pada jadwal penerbangan Kapten Rina, terdapat jeda waktu antara pukul 10.00 hingga 11.00 yang khusus dialokasikan untuk pengisian ulang bahan bakar dan pemeriksaan rotor mesin di pangkalan. Jika seorang petugas mengusulkan untuk menghapus jeda waktu tersebut agar bantuan dapat dikirim tanpa henti ke desa berikutnya, risiko fatal apakah yang akan dihadapi sistem operasi logistik tersebut?
 
-**A.** Helikopter berisiko kehabisan bahan bakar atau mengalami gangguan mesin di tengah penerbangan yang dapat menyebabkan kecelakaan mematikan.
+**A.** Helikopter berisiko kehabisan bahan bakar atau mengalami gangguan mesin di udara yang memicu kecelakaan penerbangan fatal.
 
-**B.** Warga desa penerima bantuan akan merasa bosan karena paket bantuan datang terlalu cepat dari perkiraan semula.
+**B.** Warga desa terdampak akan merasa jenuh karena paket bantuan kemanusiaan tiba di lokasi penampungan lebih cepat dari jadwal semula.
 
-**C.** Harga bahan bakar helikopter di pasaran akan melonjak tinggi karena dibeli pada waktu siang hari.
+**C.** Biaya pembelian bahan bakar avtur akan melonjak tinggi karena stasiun pengisian pangkalan menaikkan harga pada siang hari terik.
 
-**D.** Pangkalan posko akan kelebihan persediaan logistik makanan karena gudang tidak sempat menampung kiriman baru.
+**D.** Gudang penampungan posko akan kelebihan muatan barang sebab petugas logistik tidak sanggup memilah kiriman donasi yang baru masuk.
 
-**E.** Pilot helikopter akan kehilangan sinyal panduan arah karena satelit cuaca hanya bekerja pada pagi dan sore hari.
+**E.** Perangkat navigasi satelit akan kehilangan arah sebab pemancar sinyal di angkasa hanya dapat berfungsi pada pagi dan sore hari.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Dalam berpikir algoritma untuk sistem berdaya dukung terbatas, batasan sumber daya (bahan bakar dan ketahanan mesin) adalah syarat mutlak. Menghilangkan langkah pemeliharaan/pengisian bahan bakar demi kecepatan akan menyebabkan kegagalan sistem total yang fatal.
@@ -257,15 +257,15 @@ Pada jadwal penerbangan Kapten Rina, terdapat jeda waktu antara pukul 10.00 hing
 
 Pada hari kedua operasi, salah satu dari lima helikopter mengalami kebocoran oli pompa hidrolik sehingga hanya tersisa empat helikopter yang siap terbang. Dengan tetap berpegang pada prioritas keselamatan warga di Wilayah Utara sebelum kabut turun jam 14.00, bagaimanakah penyesuaian algoritma penerbangan yang paling logis dilakukan oleh Kapten Rina?
 
-**A.** Mengerahkan seluruh 4 helikopter yang siap ke Wilayah Utara pada pagi hari, lalu membagi masing-masing 2 helikopter untuk Wilayah Tengah dan Selatan pada sesi siang.
+**A.** Mengerahkan seluruh 4 helikopter ke Wilayah Utara pada pagi hari, lalu membagi masing-masing 2 helikopter ke wilayah lain saat siang.
 
-**B.** Memaksakan helikopter yang bocor oli untuk tetap terbang melintasi jurang terjal demi menjaga kuota lima armada.
+**B.** Memaksakan helikopter yang rusak oli tetap terbang melintasi jurang terjal demi menjaga target jumlah lima armada di udara perbukitan.
 
-**C.** Membatalkan seluruh penerbangan hari itu ke semua wilayah sampai helikopter pengganti datang dari ibu kota pekan depan.
+**C.** Membatalkan seluruh operasi bantuan hari itu ke semua kawasan hingga unit helikopter pengganti tiba dari ibu kota pada minggu depan.
 
-**D.** Mengalihkan seluruh penerbangan hanya ke Wilayah Selatan karena jaraknya paling dekat dari pangkalan pendaratan.
+**D.** Memindahkan seluruh fokus penerbangan ke Wilayah Selatan karena memiliki medan paling landai dan jarak terdekat dari pangkalan utama.
 
-**E.** Meminta para pilot helikopter mengangkut kargo dengan berjalan kaki mendaki gunung menuju Wilayah Utara.
+**E.** Memerintahkan kru penerbang memikul barang kargo dengan berjalan kaki menyusuri lereng terjal menuju desa terpencil di Wilayah Utara.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Algoritma yang adaptif mampu merespons perubahan kondisi parameter (jumlah unit berkurang dari 5 menjadi 4) tanpa mengorbankan sasaran prioritas utama: Wilayah Utara tetap menjadi fokus utama di pagi hari, disusul pembagian rata armada untuk wilayah lainnya di siang hari.
@@ -278,15 +278,15 @@ Menjelang hari raya, sebuah keluarga berencana membersihkan seluruh rumah bertin
 
 Penerapan pilar berpikir komputasional apakah yang dilakukan oleh keluarga tersebut dalam mengelola pekerjaan rumah yang berat?
 
-**A.** Dekomposisi; memecah beban pekerjaan rumah yang besar menjadi beberapa bagian tugas wilayah yang lebih kecil dan terkelola sesuai kemampuan masing-masing.
+**A.** Dekomposisi; memecah pekerjaan rumah tangga yang berat ke dalam bidang tugas yang lebih teratur sesuai kemampuan masing-masing.
 
-**B.** Abstraksi keliru; membiarkan ruang tamu dalam keadaan kotor karena dianggap tidak terlihat oleh tamu yang datang.
+**B.** Abstraksi keliru; membiarkan tumpukan sampah di ruang tamu karena menganggap area tersebut tidak akan diperhatikan oleh para tamu.
 
-**C.** Pengenalan pola acak; menyapu lantai rumah secara berulang-ulang tanpa memedulikan apakah lantai sudah bersih atau belum.
+**C.** Pengenalan pola acak; membersihkan lantai berulang kali tanpa memeriksa apakah permukaan keramik sudah bersih dari kotoran debu.
 
-**D.** Penyusunan aturan paksa; mewajibkan setiap anggota keluarga menggunakan pakaian dengan warna yang seragam saat menyapu.
+**D.** Aturan baku sepihak; mewajibkan setiap anggota keluarga mengenakan pakaian dengan warna serasi saat membersihkan perabot di rumah.
 
-**E.** Otomatisasi murni; menyerahkan seluruh pembersihan rumah kepada mesin penyedot debu tanpa bantuan tenaga manusia sama sekali.
+**E.** Otomatisasi total; membebankan seluruh tugas pembersihan lantai kepada robot penyedot debu tanpa bantuan tenaga manusia sama sekali.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Membagi pekerjaan membersihkan rumah besar menjadi beberapa sub-tugas spesifik berdasarkan ruangan/wilayah kepada anggota keluarga adalah penerapan nyata pilar Dekomposisi dalam kehidupan sehari-hari di rumah.
@@ -299,15 +299,15 @@ Saat akan mencuci pakaian keluarga yang menumpuk di akhir pekan, Budi memisahkan
 
 Pilar berpikir komputasional apa yang diterapkan oleh Budi saat memilah cucian tersebut?
 
-**A.** Pengenalan pola; mengenali kesamaan sifat bahan dan warna pakaian dari pengalaman masa lalu untuk mencegah kerusakan pakaian putih.
+**A.** Pengenalan pola; mengelompokkan cucian berdasarkan sifat warna dan risiko luntur dari pengalaman mencuci sebelumnya.
 
-**B.** Algoritma acak; memasukkan pakaian ke mesin cuci secara sembarangan tanpa memeriksa label petunjuk perawatan pakaian.
+**B.** Algoritma acak; mencampur seluruh pakaian kotor ke tabung mesin cuci tanpa membaca instruksi perawatan pada label pakaian.
 
-**C.** Abstraksi berlebihan; membuang seluruh pakaian berwarna ke tempat sampah agar mesin cuci hanya mencuci pakaian putih.
+**C.** Abstraksi berlebihan; membuang seluruh celana berwarna ke tempat sampah agar mesin cuci hanya membersihkan seragam putih sekolah.
 
-**D.** Dekomposisi biner; menghitung jumlah kancing pada setiap kemeja sebelum merendamnya ke dalam ember air sabun.
+**D.** Dekomposisi mekanis; menghitung jumlah kancing pada setiap baju sebelum merendamnya ke dalam larutan air detergen di ember cuci.
 
-**E.** Perancangan perangkat keras; membongkar mesin cuci keluarga untuk mengganti tabung pemutar dengan ember kayu tradisional.
+**E.** Rekayasa perangkat; membongkar tabung mesin cuci untuk mengganti motor penggerak listrik dengan tuas pemutar kayu tradisional.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Budi menggunakan Pengenalan Pola. Pengalaman masa lalu (baju luntur merusak seragam putih) dijadikan pola acuan untuk mengelompokkan pakaian berdasarkan sifat warna dan risiko kelunturan.
@@ -320,15 +320,15 @@ Rian ingin menyiapkan sarapan pagi sebelum berangkat ke sekolah. Menu sarapan te
 
 Mengapa perencanaan langkah yang disusun Rian merupakan contoh penerapan algoritma yang efisien dalam kehidupan sehari-hari?
 
-**A.** Menyusun urutan tindakan secara terperinci dan memperhitungkan pemanfaatan sumber daya kompor secara bersamaan sehingga seluruh makanan matang tepat waktu.
+**A.** Merancang urutan kerja dan memanfaatkan dua tungku secara terkoordinasi agar semua hidangan matang bersamaan sebelum berangkat.
 
-**B.** Memasak seluruh bahan makanan dalam satu panci besar tanpa memedulikan rasa dan perbedaan tingkat kematangan.
+**B.** Memasukkan semua bahan makanan ke dalam satu wadah wajan yang sama tanpa memedulikan cita rasa dan tingkat kematangan masakan.
 
-**C.** Memastikan sarapan disiapkan hanya jika ada tamu penting yang berkunjung ke rumah di pagi hari.
+**C.** Menyiapkan menu hidangan sarapan hanya apabila ada sanak keluarga penting yang datang berkunjung ke rumah pada waktu pagi hari.
 
-**D.** Mengabaikan kebersihan dapur dengan membiarkan kompor menyala tanpa ditunggui sama sekali.
+**D.** Mengabaikan keselamatan dapur dengan menyalakan api kompor berkekuatan besar tanpa ditunggui selama proses penggorengan makanan.
 
-**E.** Menghabiskan seluruh persediaan bumbu dapur keluarga hanya untuk membuat satu porsi sarapan pagi.
+**E.** Menghabiskan seluruh persediaan minyak goreng keluarga di lemari dapur hanya demi memasak sebutir telur mata sapi di wajan panas.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Algoritma yang baik mengatur urutan langkah logis serta efisiensi penggunaan sumber daya (dalam hal ini dua tungku kompor) sehingga tugas memasak selesai secara simultan dengan hasil optimal sebelum waktu berangkat sekolah.
@@ -341,15 +341,15 @@ Keluarga Pak Santoso terkejut melihat tagihan listrik rumah tangga yang melonjak
 
 Langkah Doni menemukan sumber pemborosan listrik tersebut merupakan penerapan berpikir komputasional pada pilar:
 
-**A.** Pengenalan pola; mengamati keteraturan waktu pemakaian alat listrik dan mengaitkannya dengan lonjakan biaya pada data tagihan.
+**A.** Pengenalan pola; meneliti keteraturan waktu pemakaian alat listrik dan mengaitkannya dengan lonjakan biaya tagihan bulanan.
 
-**B.** Abstraksi parsial; mematikan meteran listrik utama rumah secara permanen sehingga keluarga tidak menggunakan listrik sama sekali.
+**B.** Abstraksi parsial; mematikan sakelar listrik utama rumah tangga sehingga seluruh penghuni tidak lagi memanfaatkan energi listrik.
 
-**C.** Dekomposisi manual; membongkar mesin pendingin ruangan menjadi ratusan komponen kabel kecil di ruang tamu.
+**C.** Dekomposisi mekanik; melepas seluruh baut pendingin ruangan menjadi ratusan kabel kecil yang berserakan di atas lantai kamar tidur.
 
-**D.** Algoritma semu; membayar tagihan listrik dua kali lipat setiap bulan agar petugas listrik tidak datang memeriksa ke rumah.
+**D.** Kebiasaan boros; membayar tagihan listrik berlipat ganda setiap bulan agar petugas pencatat meteran tidak perlu datang memeriksa.
 
-**E.** Pemodelan grafis; menggambar sketsa bentuk fisik pendingin ruangan pada selembar kertas karton berwarna.
+**E.** Pemodelan visual; menggambar ulang bentuk fisik pendingin ruangan pada selembar kertas karton untuk dipajang di dinding ruang tamu.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Mencatat jam operasional alat elektronik dan menemukan kebiasaan menyalakan AC pada saat kamar kosong merupakan penerapan Pengenalan Pola untuk mencari akar penyebab masalah dalam kehidupan nyata.
@@ -362,15 +362,15 @@ Di rumahnya, Siti mendirikan tiga tempat sampah terpisah bertuliskan: "Sampah Ma
 
 Pilar berpikir komputasional apa yang ditunjukkan Siti ketika mengabaikan merek dan aroma botol sampo saat memilah sampah?
 
-**A.** Abstraksi; membuang detail yang tidak relevan (aroma dan merek) serta hanya berfokus pada informasi penting yaitu jenis bahan botol (plastik daur ulang).
+**A.** Abstraksi; mengabaikan detail aroma dan merek kemasan serta hanya berfokus pada informasi penting yaitu jenis bahan plastik.
 
-**B.** Algoritma; mengharuskan Siti membersihkan botol sampo dengan sabun mandi sebanyak sepuluh kali sebelum dibuang.
+**B.** Algoritma kaku; mewajibkan pencucian botol plastik menggunakan sabun pembersih sebanyak sepuluh kali sebelum dimasukkan ke tong sampah.
 
-**C.** Dekomposisi; memotong botol plastik menjadi serpihan berukuran satu milimeter menggunakan gunting kuku.
+**C.** Dekomposisi ekstrem; memotong kemasan botol plastik menjadi serpihan berukuran sangat kecil menggunakan gunting pemotong kuku tangan.
 
-**D.** Pengenalan pola keliru; menganggap seluruh benda cair di kamar mandi adalah racun berbahaya yang tidak boleh disentuh.
+**D.** Penilaian keliru; menganggap seluruh sisa cairan pembersih di kamar mandi sebagai racun berbahaya yang dilarang untuk disentuh tangan.
 
-**E.** Otomatisasi; membiarkan sampah menumpuk di lantai kamar mandi sampai larut sendiri ditelan air pembuangan.
+**E.** Sikap pasif; membiarkan kemasan bekas menumpuk di sudut lantai kamar mandi hingga larut dengan sendirinya terbawa arus air pembuangan.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Keputusan Siti memilah sampah berdasarkan karakteristik bahan pokoknya (plastik) sembari mengabaikan detail yang tidak berhubungan dengan pengelolaan daur ulang (merek, aroma, asal toko) adalah contoh konkret dari Abstraksi.
@@ -383,15 +383,15 @@ Ibu memiliki puluhan pot tanaman di teras rumah yang terdiri dari anggrek, kaktu
 
 Kombinasi dua pilar berpikir komputasional apakah yang paling menonjol pada cara Ibu merawat tanaman-tanaman tersebut?
 
-**A.** Pengenalan pola kebutuhan hidup tanaman dan penyusunan algoritma jadwal penyiraman yang teratur.
+**A.** Pengenalan pola kebutuhan hayati setiap tanaman dan perancangan algoritma jadwal perawatan berkala yang teratur.
 
-**B.** Penghapusan data tanaman dan pembagian pot bunga secara acak tanpa memperhatikan jenis tanamannya.
+**B.** Penyeragaman takaran air siraman tanpa membedakan daya tahan akar kaktus gurun dengan tanaman anggrek gantung.
 
-**C.** Pengabaian seluruh kebutuhan air dan penyerahan pertumbuhan tanaman sepenuhnya pada air hujan alami.
+**C.** Pengabaian seluruh kebutuhan pupuk dan membiarkan pertumbuhan pot tanaman pekarangan bergantung pada air hujan.
 
-**D.** Pembongkaran seluruh akar tanaman setiap pagi hari untuk memastikan ada cacing tanah di dalam pot.
+**D.** Pemeriksaan fisik berlebihan dengan membongkar tanah pot tanaman setiap pagi untuk menghitung jumlah cacing tanah.
 
-**E.** Pemberian pupuk kimia berdosis tinggi setiap jam agar tanaman tumbuh sepuluh kali lebih cepat dari biasanya.
+**E.** Pemberian cairan pupuk berkonsentrasi tinggi setiap beberapa jam agar bunga tanaman mekar sepuluh kali lebih cepat.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Ibu mengenali pola kebutuhan biologis masing-masing tanaman (kaktus sedikit air, anggrek lembap, cabai butuh air teratur), lalu merumuskan algoritma berupa instruksi langkah dan jadwal perawatan rutin yang deterministik.
@@ -404,15 +404,15 @@ Kelompok belajar kelas X mendapat tugas membuat video dokumenter sejarah perjuan
 
 Strategi ketua kelompok dalam mengelola tugas besar tersebut menerapkan pilar:
 
-**A.** Dekomposisi; memecah proyek besar berdurasi satu bulan ke dalam tahapan-tahapan waktu dan target kerja yang terfokus.
+**A.** Dekomposisi; mengurai proyek berdurasi satu bulan ke dalam tahapan waktu dan target kerja berkala yang lebih terfokus.
 
-**B.** Abstraksi sepihak; menolak mencantumkan nama anggota kelompok pada berkas laporan akhir tugas sekolah.
+**B.** Abstraksi sepihak; menghapus nama rekan satu kelompok pada laporan lembar penyerahan tugas agar nilai terkumpul mandiri.
 
-**C.** Algoritma jalan pintas; mengunduh video dokumenter milik orang lain di internet dan mengubah judulnya menjadi tugas sendiri.
+**C.** Langkah curang; menyalin rekaman video milik orang lain di internet kemudian mengubah judulnya menjadi karya kelompok tugas.
 
-**D.** Pengenalan pola acak; merekam gambar tanpa naskah dan berharap video akan tersusun sendiri saat diedit.
+**D.** Pemilihan acak; merekam pemandangan jalan tanpa acuan naskah cerita dan berharap rekaman tersusun padu saat tahap pengeditan.
 
-**E.** Otomatisasi tanpa batas; membiarkan kamera merekam ruang kelas kosong selama 24 jam tanpa ada kegiatan terarah.
+**E.** Pengawasan hampa; membiarkan kamera merekam ruangan kelas kosong selama seharian penuh tanpa ada arahan kegiatan yang jelas.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Memecah proyek besar (video dokumenter sejarah) menjadi sub-tahap yang memiliki target dan tenggat waktu terukur (pra-produksi, produksi, pasca-produksi) adalah penerapan nyata pilar Dekomposisi pada pembelajaran siswa di sekolah.
@@ -425,15 +425,15 @@ Setiap jam istirahat sekolah yang hanya berlangsung 30 menit, kantin sekolah sel
 
 Usulan pengurus OSIS tersebut merupakan perbaikan sistem sekolah menggunakan prinsip pilar:
 
-**A.** Algoritma; merancang alur urutan proses layanan yang teratur dan searah untuk mengurai penumpukan antrean siswa.
+**A.** Algoritma; merancang urutan langkah alur transaksi yang searah untuk mencegah penumpukan antrean siswa di kantin.
 
-**B.** Dekomposisi parsial; menutup kantin sekolah secara sepihak agar siswa membawa bekal dari rumah masing-masing.
+**B.** Penutupan sepihak; melarang seluruh kantin beroperasi agar siswa membawa kotak bekal makanan sendiri dari rumah mereka.
 
-**C.** Abstraksi berlebih; menghapus daftar harga makanan sehingga siswa tidak tahu berapa uang yang harus dibayarkan.
+**C.** Peniadaan informasi; mencopot daftar harga makanan sehingga para pembeli tidak mengetahui nominal uang yang disiapkan.
 
-**D.** Pengenalan pola negatif; menyimpulkan bahwa antrean panjang merupakan tradisi sekolah yang tidak perlu diubah.
+**D.** Pembiaran kebiasaan; menganggap kerumunan antrean padat sebagai tradisi sekolah yang wajar dan tidak perlu diperbaiki.
 
-**E.** Pemrograman manual; mewajibkan siswa menghafal kode batang setiap bungkus makanan sebelum membelinya.
+**E.** Pengujian berbelit; mengharuskan setiap siswa menghafal kode batang bungkus makanan sebelum diizinkan membeli di loket.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Merancang alur langkah yang terstruktur (pilih menu -> bayar di kasir terpusat -> ambil makanan dengan nomor antrean di meja terpisah) adalah bentuk penerapan Algoritma guna menciptakan proses transaksi yang tertib, cepat, dan bebas hambatan.
@@ -446,15 +446,15 @@ Nina mengamati hasil nilai ulangan hariannya selama satu semester. Ia menyadari 
 
 Bagaimana Nina sebaiknya menerapkan pemikiran komputasional berdasarkan pola yang ia temukan tersebut?
 
-**A.** Mengubah jadwal belajarnya menjadi rutinitas pagi hari setelah subuh dan menjauhkan gangguan ponsel pintar untuk menjaga konsentrasi optimal.
+**A.** Mengubah jadwal belajar pribadi ke waktu subuh hari dan menjauhkan gangguan ponsel pintar demi konsentrasi yang optimal.
 
-**B.** Tetap begadang hingga tengah malam karena menganggap nilai ulangan semata-mata bergantung pada keberuntungan lembar soal.
+**B.** Mempertahankan kebiasaan belajar larut malam karena menganggap hasil perolehan nilai semata-mata ditentukan oleh faktor nasib.
 
-**C.** Berhenti belajar sama sekali dan hanya mengandalkan ingatan sekilas saat guru menjelaskan materi di depan kelas.
+**C.** Menghentikan kegiatan belajar mandiri dan hanya mengandalkan penjelasan sekilas yang disampaikan oleh bapak ibu guru di kelas.
 
-**D.** Menghapus catatan nilai ulangannya agar tidak merasa terbebani oleh riwayat prestasi akademiknya.
+**D.** Membuang buku rapor berkala agar pikiran tidak terbebani oleh catatan capaian nilai ulangan yang pernah diperoleh sebelumnya.
 
-**E.** Meminta guru mengubah seluruh materi ujian menjadi lagu musik pop agar sesuai dengan kebiasaan belajarnya di malam hari.
+**E.** Mengajukan permohonan agar seluruh naskah ulangan sekolah diubah menjadi lantunan lagu pop sesuai kebiasaan mendengarkan musik.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Setelah mengenali pola korelasi antara waktu belajar, fokus mental, dan hasil nilai ujian, langkah komputasional yang logis adalah mengadaptasi algoritma jadwal belajar pribadi ke waktu yang terbukti menghasilkan performa terbaik (subuh hari tanpa distraksi).
@@ -467,15 +467,15 @@ Saat membaca buku teks Biologi setebal 40 halaman tentang "Keanekaragaman Hayati
 
 Proses yang dilakukan Farhan dalam meringkas materi pelajaran tersebut menunjukkan penerapan pilar:
 
-**A.** Abstraksi; menyaring konsep-konsep inti yang paling esensial dan mengesampingkan kalimat penjelas yang terlalu panjang lebar.
+**A.** Abstraksi; menyaring konsep-konsep inti yang penting dan mengesampingkan uraian kalimat penjelas yang berbelit-belit.
 
-**B.** Algoritma sekuensial; menghafal nomor halaman buku teks tanpa memahami makna dari materi yang dibaca.
+**B.** Algoritma sekuensial; menghafalkan urutan nomor halaman buku cetak tanpa mendalami hubungan konsep materi yang sedang dibaca.
 
-**C.** Dekomposisi destruktif; merobek halaman buku teks yang dianggap tidak akan keluar dalam lembar soal ujian.
+**C.** Dekomposisi ekstrem; menyobek lembaran buku pelajaran yang diperkirakan tidak akan diujikan pada naskah soal penilaian akhir.
 
-**D.** Pengenalan pola acak; mencoret-coret lembar buku catatan dengan gambar animasi tanpa ada teks penjelasan.
+**D.** Pengenalan pola acak; menghiasi buku catatan dengan aneka gambar ilustrasi kartun tanpa mencantumkan rangkuman materi biologi.
 
-**E.** Otomatisasi fotokopi; memfotokopi seluruh buku tanpa membaca dan mempelajarinya secara mendalam.
+**E.** Penggandaan berkas; mencetak salinan seluruh isi buku pelajaran di tempat fotokopi tanpa mempelajari konsep yang tertulis.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Membuat ringkasan peta konsep dengan hanya mengambil ide pokok dan mengabaikan narasi tambahan yang berbelit-belit adalah contoh penerapan Abstraksi dalam kegiatan akademik belajar siswa.
@@ -488,15 +488,15 @@ Sebagai ketua panitia kemah bakti OSIS, Andi membagi kepanitiaan menjadi divisi 
 
 Kombinasi pilar berpikir komputasional apakah yang berhasil diintegrasikan oleh Andi dalam mempersiapkan acara sekolah tersebut?
 
-**A.** Dekomposisi (pembagian divisi kepanitiaan) dan Algoritma (penyusunan urutan waktu pelaksanaan kegiatan per menit).
+**A.** Dekomposisi (pembagian kelompok divisi kepanitiaan) dan Algoritma (perancangan susunan jadwal acara menit demi menit).
 
-**B.** Abstraksi semata tanpa mempertimbangkan siapa yang akan menjalankan tugas di lapangan.
+**B.** Abstraksi parsial semata tanpa merumuskan siapa petugas yang bertanggung jawab menjalankan perlengkapan di lapangan perkemahan.
 
-**C.** Pengenalan pola cuaca tanpa menyusun rencana tindakan konkret untuk para peserta kemah.
+**C.** Pengenalan pola ramalan cuaca tanpa diimbangi oleh penyusunan langkah tindakan darurat yang nyata bagi seluruh anggota perkemahan.
 
-**D.** Percabangan acak yang membiarkan setiap peserta kemah menentukan sendiri jadwal kegiatannya tanpa koordinasi.
+**D.** Penjadwalan acak yang membiarkan seluruh peserta kemah menentukan waktu kegiatan upacara pembukaan sesuai keinginan masing-masing.
 
-**E.** Pengulangan tanpa henti yang mengharuskan upacara pembukaan dilakukan berulang-ulang sepanjang hari.
+**E.** Pengulangan tanpa henti yang mewajibkan seluruh rangkaian acara pembukaan perkemahan diulang berkali-kali sepanjang hari pelaksanaan.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Membagi kepanitiaan besar menjadi beberapa divisi kerja adalah Dekomposisi, sedangkan menyusun jadwal kegiatan dari jam ke jam dengan instruksi dan penanggung jawab yang terukur adalah Algoritma.
@@ -509,15 +509,15 @@ Bendahara kelas X mencatat arus kas mingguan kelas. Di dalam buku kas, bendahara
 
 Mengapa tindakan bendahara kelas mengabaikan detail uang tersebut merupakan wujud abstraksi yang benar?
 
-**A.** Karena nomor seri uang dan warna kertas sama sekali tidak mempengaruhi nilai saldo kas kelas maupun keabsahan laporan keuangan.
+**A.** Nomor seri dan warna uang kertas tidak mempengaruhi kebenaran nilai saldo kas maupun keterbukaan laporan keuangan.
 
-**B.** Karena bendahara kelas malas menuliskan rincian lengkap dari seluruh uang yang disetorkan oleh teman sekelasnya.
+**B.** Pengurus bendahara kelas merasa jenuh untuk mencatat data perincian uang yang disetorkan oleh setiap teman sekelas di sekolah.
 
-**C.** Karena uang kas kelas tidak boleh diperiksa oleh wali kelas maupun ketua murid selama masa jabatan berlangsung.
+**C.** Uang kas simpanan murid dilarang untuk diperiksa oleh wali kelas maupun ketua kelas selama masa kepengurusan organisasi berjalan.
 
-**D.** Karena nomor seri uang kertas akan hilang dengan sendirinya ketika disimpan di dalam kotak kas kelas.
+**D.** Catatan angka pada nomor seri uang kertas dipercaya akan terhapus dengan sendirinya sewaktu tersimpan lama di dalam kotak brankas.
 
-**E.** Karena pencatatan nomor seri uang hanya diwajibkan untuk uang koin logam kuno keluaran abad pertengahan.
+**E.** Pendataan nomor seri uang hanya diwajibkan oleh pihak bank untuk transaksi keping koin logam zaman kuno bernilai sejarah tinggi.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Dalam akuntansi kas sederhana, informasi yang esensial hanyalah nominal uang, tanggal, tujuan transaksi, dan saldo akhir. Detail fisik uang (nomor seri, kelipatan lembar, warna kertas) adalah noise yang harus diabstraksi/dihilangkan agar laporan tetap ringkas dan transparan.
@@ -530,15 +530,15 @@ Dalam materi buku ajar Informatika, dijelaskan bahwa peta jaringan transportasi 
 
 Mengapa penumpang angkutan kota justru jauh lebih terbantu oleh peta yang telah diabstraksi tersebut dibandingkan jika diberikan foto satelit permukaan bumi yang sangat mendetail?
 
-**A.** Karena penumpang hanya membutuhkan informasi rute dan titik transit utama; terlalu banyak detail pemandangan fisik justru akan membuat bingung dan memperlambat pengambilan keputusan.
+**A.** Penumpang hanya membutuhkan info jalur dan stasiun transit; terlalu banyak gambar pemandangan fisik justru membingungkan pembaca rute.
 
-**B.** Karena foto satelit beresolusi tinggi dilarang oleh undang-undang transportasi untuk dilihat oleh masyarakat umum.
+**B.** Foto citra satelit beresolusi tajam dilarang keras oleh dinas perhubungan untuk diperlihatkan kepada seluruh warga masyarakat umum.
 
-**C.** Karena garis jalur warna-warni secara otomatis memandu langkah kaki penumpang tanpa perlu membaca peta kembali.
+**C.** Garis jalur rel warna-warni pada lembar kertas sanggup memandu langkah kaki penumpang secara ajaib tanpa perlu menatap papan halte.
 
-**D.** Karena peta yang sederhana lebih murah biaya pencetakannya sehingga pengelola kereta bisa menghemat anggaran stasiun.
+**D.** Peta sederhana membutuhkan biaya pencetakan yang jauh lebih hemat sehingga pengelola stasiun dapat menyimpan kelebihan anggaran dana.
 
-**E.** Karena kereta komuter tidak bergerak di atas rel nyata melainkan hanya meluncur di dalam ruang simulasi maya.
+**E.** Gerbong kereta komuter hanya meluncur di dalam ruang simulasi maya sehingga jalur rel tidak memiliki wujud nyata di permukaan bumi.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Abstraksi pada peta transportasi menyaring informasi sehingga hanya menyisakan data yang dibutuhkan oleh pengguna (stasiun, jalur, titik transfer). Gambar pohon, bangunan, atau belokan riil adalah detail pengganggu (noise visual) yang justru membingungkan penumpang saat membaca rute.
@@ -551,15 +551,15 @@ Pak Joko, seorang petani apel di kawasan Bumiaji Kota Batu, mencatat bahwa setia
 
 Pilar berpikir komputasional apakah yang berhasil dimanfaatkan Pak Joko untuk menyelamatkan hasil panen apelnya?
 
-**A.** Pengenalan pola; mengaitkan hubungan berulang antara faktor kelembapan cuaca dengan siklus kemunculan hama untuk melakukan pencegahan dini.
+**A.** Pengenalan pola; mengaitkan hubungan berulang antara kelembapan udara dan kemunculan hama untuk langkah pencegahan dini.
 
-**B.** Dekomposisi acak; memotong seluruh batang pohon apel yang sehat agar hama tidak memiliki tempat untuk hinggap.
+**B.** Dekomposisi perusakan; memangkas seluruh dahan pohon apel yang sehat agar hama pemakan daun tidak memiliki tempat untuk hinggap.
 
-**C.** Abstraksi ekstrem; mengabaikan kondisi cuaca dan membiarkan kebun apel terendam air hujan tanpa pengawasan.
+**C.** Abstraksi pasrah; mengesampingkan pengamatan cuaca dan membiarkan areal perkebunan apel diguyur hujan tanpa pemantauan berkala.
 
-**D.** Algoritma tertutup; menyemprotkan pestisida kimia setiap jam sepanjang tahun tanpa memperhatikan musim.
+**D.** Algoritma serampangan; menyemprotkan cairan pestisida kimia setiap beberapa jam sepanjang tahun tanpa memeriksa kondisi tanaman.
 
-**E.** Penyusunan kode sandi; memberi nomor kode rahasia pada setiap buah apel yang bergelantungan di pohon.
+**E.** Pembuatan kode rahasia; membubuhkan tanda angka sandi pada setiap permukaan kulit buah apel yang masih bergelantungan di dahan.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Petani memanfaatkan Pengenalan Pola. Mengamati korelasi berulang antara tingkat kelembapan mikro dan waktu penetasan hama memungkinkan tindakan preventif yang presisi dan menghemat biaya operasional kebun.
@@ -572,15 +572,15 @@ Setiap akhir pekan panjang, jalan utama di pusat oleh-oleh Kota Batu kerap menga
 
 Karakteristik penting apa dari sebuah algoritma rekayasa transportasi yang tercermin dari kebijakan tersebut?
 
-**A.** Memiliki aturan percabangan kondisi (kondisional) yang terukur dan memiliki tindakan aksi yang pasti ketika ambang batas kemacetan terlampaui.
+**A.** Memiliki percabangan kondisi terukur dan panduan tindakan yang pasti saat ambang batas panjang antrean kendaraan terlampaui.
 
-**B.** Mewajibkan seluruh kendaraan bermotor mematikan mesin dan menunggu di jalan raya sampai polisi mengizinkan jalan.
+**B.** Mewajibkan seluruh pengemudi mematikan mesin kendaraan di tengah jalan raya sampai petugas kepolisian meniup peluit tanda aman.
 
-**C.** Mengharuskan pengendara mobil pribadi membayar denda uang tunai di tempat kepada petugas pengatur lalu lintas.
+**C.** Memberi wewenang kepada petugas pengatur jalur untuk memungut uang denda tunai langsung kepada setiap pengemudi mobil di lapangan.
 
-**D.** Menutup seluruh akses jalan menuju Kota Batu secara permanen agar jalanan kota selalu lengang dari wisatawan.
+**D.** Memblokir seluruh akses jalan penghubung menuju Kota Batu secara permanen agar jalanan dalam kota selalu terbebas dari kepadatan.
 
-**E.** Mengundi rute jalan yang boleh dilewati pengemudi menggunakan roda keberuntungan di setiap persimpangan jalan.
+**E.** Menentukan arah rute perjalanan pengemudi menggunakan undian kartu keberuntungan di setiap persimpangan lampu lalu lintas jalan.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Kebijakan rekayasa jalan tersebut menerapkan algoritma percabangan (IF-THEN): JIKA antrean kendaraan > 500 meter, MAKA alihkan mobil ke jalur alternatif dan batasi bus ke kantong parkir. Instruksinya jelas, deterministik, dan dapat dieksekusi petugas di lapangan.
@@ -593,15 +593,15 @@ Pengelola sebuah museum wahana edukasi di Kota Batu mencatat riwayat kunjungan s
 
 Manfaat berpikir komputasional apa yang diperoleh pengelola tempat wisata tersebut?
 
-**A.** Mampu melakukan perencanaan alokasi sumber daya dan layanan secara matang jauh-jauh hari berlandaskan pola tren historis.
+**A.** Mampu menyiapkan alokasi sarana dan tenaga petugas secara matang jauh hari berlandaskan pola kecenderungan masa lalu.
 
-**B.** Dapat menaikkan harga tiket masuk secara mendadak hingga sepuluh kali lipat untuk meraup keuntungan pribadi.
+**B.** Memiliki alasan untuk menaikkan tarif tiket masuk secara sepihak hingga berkali-kali lipat demi melipatgandakan perolehan laba.
 
-**C.** Menolak kedatangan rombongan pelajar sekolah karena dianggap membuat museum menjadi terlalu berisik.
+**C.** Menolak kedatangan rombongan bus karya wisata pelajar sebab suara keramaian anak sekolah dianggap merusak ketenangan museum.
 
-**D.** Menghapus catatan buku tamu agar kantor pajak tidak mengetahui jumlah wisatawan yang datang berkunjung.
+**D.** Menghapus arsip buku kunjungan agar instansi dinas pajak pariwisata tidak mengetahui jumlah pemasukan pengunjung yang sebenarnya.
 
-**E.** Mengganti seluruh staf loket manusia dengan robot mekanik tanpa memperhatikan kepuasan pengunjung wisata.
+**E.** Menggantikan seluruh peran pemandu wisata manusia dengan robot pajangan mekanis tanpa memedulikan kepuasan pelayanan pengunjung.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Pengenalan Pola dari data kunjungan masa lalu memberikan kemampuan prediktif (perencanaan proaktif). Pengelola dapat mempersiapkan tiket online, loket tambahan, dan staf pendukung sebelum lonjakan pengunjung terjadi.
@@ -614,15 +614,15 @@ Di dalam materi pengantar berpikir komputasional, dicontohkan rancangan pembuata
 
 Apa keuntungan yang dirasakan oleh pengembang sistem atau petugas perpustakaan dari penerapan dekomposisi tersebut saat terjadi kesalahan (bug) pada penghitungan denda siswa?
 
-**A.** Petugas atau pemrogram cukup memeriksa dan memperbaiki subsistem denda tanpa perlu membongkar atau mengganggu subsistem pendataan buku dan keanggotaan siswa.
+**A.** Pemrogram cukup memeriksa dan membenahi modul denda tanpa perlu mengganggu modul pendataan buku atau data keanggotaan siswa.
 
-**B.** Petugas harus menghapus seluruh data siswa dan menginput ulang ribuan buku dari awal di perpustakaan.
+**B.** Petugas perpustakaan harus mengosongkan seluruh basis data sekolah dan mengetik ulang judul ribuan buku dari lembar awal kembali.
 
-**C.** Perpustakaan sekolah terpaksa ditutup selama satu tahun ajaran karena sistem komputer rusak total.
+**C.** Pelayanan perpustakaan sekolah terpaksa dinonaktifkan sepanjang tahun ajaran karena kerusakan pada satu komponen modul aplikasi.
 
-**D.** Siswa yang meminjam buku tidak perlu mengembalikan buku yang dipinjam karena sistem denda sedang mengalami perbaikan.
+**D.** Siswa peminjam dibebaskan dari kewajiban mengembalikan buku bacaan karena sistem penghitungan sanksi sedang dalam masa perbaikan.
 
-**E.** Dekomposisi mengharuskan pemrogram merakit ulang perangkat keras komputer dari komponen motherboard dasar.
+**E.** Pemrogram diwajibkan membongkar susunan kabel perangkat keras komputer server dari papan induk rangkaian elektronik utama.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Keunggulan utama Dekomposisi adalah pemisahan modular (modularitas). Jika terjadi kesalahan pada satu modul (misal penghitungan denda), pemecahan masalah hanya terisolasi pada modul tersebut tanpa merusak modul lainnya yang sudah berjalan normal.
@@ -635,15 +635,15 @@ Pada materi buku ajar, prosedur keselamatan saat terjadi kebakaran di gedung ber
 
 Mengapa aturan nomor (4) yang melarang penggunaan lift sangat krusial dimasukkan ke dalam algoritma penyelamatan diri tersebut?
 
-**A.** Karena saat terjadi kebakaran listrik gedung dapat terputus seketika dan cerobong lift dapat terisi asap beracun yang menjebak penumpang di dalamnya.
+**A.** Aliran listrik dapat terputus seketika dan lubang poros lift dapat terisi asap beracun yang menjebak penumpang di dalamnya.
 
-**B.** Karena pintu lift hanya boleh dibuka oleh kepala sekolah dan pejabat dinas kebakaran yang berwenang.
+**B.** Pintu akses elevator bertingkat hanya boleh dioperasikan oleh pejabat dinas pemadam kebakaran yang memiliki kunci master khusus.
 
-**C.** Karena tangga darurat sengaja dibuat agar siswa dapat berolahraga membakar kalori saat terjadi situasi bencana.
+**C.** Tangga darurat sengaja disediakan agar setiap warga sekolah dapat melatih ketahanan fisik saat menghadapi situasi gawat darurat.
 
-**D.** Karena lift gedung sekolah membutuhkan koin khusus untuk dapat beroperasi turun ke lantai dasar.
+**D.** Pengoperasian kabin elevator gedung bertingkat membutuhkan koin khusus yang tersimpan di dalam laci ruang kepala sekolah dasar.
 
-**E.** Karena kecepatan lift dianggap terlalu lambat dibandingkan jika siswa melompat langsung dari jendela lantai atas.
+**E.** Laju penurunan kabin lift dinilai terlalu lambat dibandingkan jika para penghuni melompat langsung melalui jendela lantai atas.
 
 *Kunci Jawaban:* **A**  
 *Pembahasan:* Dalam penyusunan algoritma evakuasi, setiap batasan (aturan keselamatan) dirancang berdasarkan analisis risiko sistemik. Menggunakan lift saat kebakaran sangat berbahaya karena pasokan listrik bisa terputus mendadak dan poros lift berfungsi layaknya cerobong asap beracun yang mematikan.

@@ -61,12 +61,13 @@ export const STUDENTS_KELAS_X: RegisteredStudent[] = [
  * Paket Ujian 30 Soal HOTS Berpikir Komputasional Kelas X SMA
  * Mengacu pada Dokumen Resmi "Materi_CT_Informatika_SMAN_1_Batu.pdf"
  * Penyusun: Abdul Aziz., S.Kom., Gr
- * Karakteristik:
- * 1. Bahasa Indonesia baku dan lugas tanpa istilah asing yang rumit
- * 2. Literasi kontekstual panjang & mendalam (studi kasus Delta, Garuda Rescue, serta kehidupan sehari-hari siswa di rumah, sekolah, dan Kota Batu)
- * 3. Tidak sekadar definisi teori, tetapi penalaran analitis aplikatif (HOTS)
- * 4. Master Admin: Seluruh Kunci Jawaban berada di Opsi A (Nilai 10)
- * 5. Tampilan Siswa: Opsi dan nomor soal diacak otomatis secara dinamis (shuffleQuestions: true, shuffleOptions: true)
+ * Karakteristik Standar Ujian Sekolah:
+ * 1. Seluruh opsi jawaban (A, B, C, D, E) RATA dan SEIMBANG panjang kalimatnya (tidak ada clue jawaban paling panjang)
+ * 2. Bahasa Indonesia baku dan lugas tanpa istilah asing yang rumit
+ * 3. Literasi kontekstual panjang & mendalam (studi kasus Delta, Garuda Rescue, serta kehidupan sehari-hari siswa di rumah, sekolah, dan Kota Batu)
+ * 4. Tidak sekadar definisi teori, tetapi penalaran analitis aplikatif (HOTS)
+ * 5. Master Admin: Seluruh Kunci Jawaban berada di Opsi A (Nilai 10, Pengecoh B-E Nilai 0)
+ * 6. Tampilan Siswa: Opsi dan nomor soal diacak otomatis secara dinamis (shuffleQuestions: true, shuffleOptions: true)
  */
 export const CT_INFORMATIKA_30_EXAM: Exam = {
   id: 'exam-ct-inf-x-30',
@@ -88,7 +89,7 @@ export const CT_INFORMATIKA_30_EXAM: Exam = {
   maxCheatViolations: 3,
   isActive: true,
   blockEarlyExit: false,
-  createdAt: '2026-10-05T13:15:00.000Z',
+  createdAt: '2026-10-05T13:20:00.000Z',
   questions: [
     {
       id: 'q-ct-01',
@@ -99,23 +100,23 @@ Berdasarkan prinsip kerja berpikir komputasional, apakah tujuan utama Dr. Aris m
       options: [
         {
           key: 'A',
-          text: 'Membuat masalah besar yang rumit menjadi bagian-bagian kecil yang terkelola sehingga setiap tim ahli dapat fokus bekerja secara mendalam dan terarah.',
+          text: 'Mengurai persoalan rumit menjadi bagian terkelola agar setiap tim ahli dapat fokus bekerja secara mendalam dan terarah.',
         },
         {
           key: 'B',
-          text: 'Memperpanjang durasi penyelidikan agar pemerintah daerah memiliki alasan untuk menambah alokasi anggaran proyek penanganan bencana.',
+          text: 'Menunda pengambilan tindakan penyelamatan agar pemerintah daerah memiliki waktu cukup untuk menambah anggaran penanggulangan.',
         },
         {
           key: 'C',
-          text: 'Menghindari tanggung jawab langsung atas kegagalan penanganan banjir dengan menyerahkan keputusan sepenuhnya kepada kelompok kerja.',
+          text: 'Menghindari beban tanggung jawab langsung dengan menyerahkan keputusan penanganan sepenuhnya kepada masing-masing tim kerja.',
         },
         {
           key: 'D',
-          text: 'Mengalihkan perhatian warga dari bahaya limbah beracun dengan menyibukkan relawan pada pencatatan ketinggian air sungai.',
+          text: 'Mengalihkan perhatian warga dari bahaya limbah beracun dengan menyibukkan relawan pada pencatatan ketinggian muka air sungai.',
         },
         {
           key: 'E',
-          text: 'Memastikan seluruh warga di sepanjang bantaran sungai terlibat langsung sebagai peneliti lapangan tanpa memandang keahlian mereka.',
+          text: 'Melibatkan seluruh masyarakat di sepanjang bantaran sungai sebagai tenaga peneliti lapangan tanpa memandang keahlian khusus.',
         },
       ],
       correctOption: 'A',
@@ -131,23 +132,23 @@ Penerapan pilar berpikir komputasional apakah yang ditunjukkan oleh tim dalam me
       options: [
         {
           key: 'A',
-          text: 'Pengenalan pola; membantu tim menemukan keteraturan hubungan sebab-akibat masa lalu untuk memprediksi saat bahaya akan datang di masa depan.',
+          text: 'Pengenalan pola; memanfaatkan keteraturan masa lalu guna memprediksi dan mengantisipasi datangnya bahaya di masa depan.',
         },
         {
           key: 'B',
-          text: 'Dekomposisi; memilah data cuaca menjadi dokumen digital yang tersimpan rapi di dalam arsip kantor dinas kebersihan.',
+          text: 'Dekomposisi; memilah tumpukan berkas data cuaca menjadi dokumen digital yang tersimpan rapi pada lemari arsip dinas kota.',
         },
         {
           key: 'C',
-          text: 'Abstraksi; menghapus seluruh catatan curah hujan masa lalu agar komputer tidak mengalami kelambatan memori saat bekerja.',
+          text: 'Abstraksi; menghapus seluruh rekaman curah hujan masa lampau agar perangkat komputer tidak mengalami kelebihan beban memori.',
         },
         {
           key: 'D',
-          text: 'Pemrograman mekanis; memaksa sensor cuaca untuk otomatis menurunkan curah hujan ketika angka 150 milimeter tercapai.',
+          text: 'Otomatisasi; memasang pintu bendungan otomatis yang sanggup menurunkan intensitas awan hujan secara langsung di angkasa.',
         },
         {
           key: 'E',
-          text: 'Penyusunan aturan hukum; melarang awan mendung berkumpul di atas kawasan hulu selama musim hujan berlangsung.',
+          text: 'Berpikir algoritma; membuat aturan hukum tertulis yang melarang berkumpulnya gumpalan awan mendung di atas kawasan hulu.',
         },
       ],
       correctOption: 'A',
@@ -163,23 +164,23 @@ Mengapa keputusan Dr. Aris mengabaikan sebagian besar bangunan dan informasi ter
       options: [
         {
           key: 'A',
-          text: 'Karena menyaring dan membuang informasi yang tidak berkaitan dengan sumber zat beracun, sehingga tenaga dan waktu penyelidikan terpusat pada sasaran yang tepat.',
+          text: 'Menyaring dan menyingkirkan data yang tidak relevan agar fokus penyelidikan terpusat pada industri pembuang racun utama.',
         },
         {
           key: 'B',
-          text: 'Karena pabrik makanan dan toko kelontong telah membayar pajak perlindungan kepada pemerintah kota sehingga tidak boleh diperiksa.',
+          text: 'Melindungi tempat usaha makanan dan toko kecil warga karena pemiliknya telah membayar uang retribusi resmi kepada dinas kota.',
         },
         {
           key: 'C',
-          text: 'Karena tim tidak memiliki peralatan yang memadai untuk menguji sampel dari pabrik kayu dan bangunan ruko warga.',
+          text: 'Menutupi keterbatasan sarana laboratorium penyelidik yang tidak memiliki peralatan memadai untuk memeriksa bangunan industri.',
         },
         {
           key: 'D',
-          text: 'Karena Dr. Aris ingin mempercepat penutupan kasus tanpa perlu membuktikan keterkaitan kimiawi dari limbah yang dibuang.',
+          text: 'Mempercepat penutupan proses penyelidikan tanpa perlu membuktikan hubungan sebab-akibat pencemaran limbah secara ilmiah.',
         },
         {
           key: 'E',
-          text: 'Karena pilar abstraksi menuntut agar hanya pabrik berukuran paling besar yang berhak mendapatkan pemeriksaan lingkungan.',
+          text: 'Membatasi jangkauan pengawasan hanya pada pabrik berukuran paling luas sesuai ketentuan peraturan birokrasi pemerintahan.',
         },
       ],
       correctOption: 'A',
@@ -195,23 +196,23 @@ Kriteria apa yang membuat rangkaian petunjuk kerja di atas memenuhi syarat sebag
       options: [
         {
           key: 'A',
-          text: 'Langkah-langkahnya tersusun runtut, memiliki batasan syarat yang pasti dan tegas, serta dapat dijalankan secara konsisten oleh seluruh petugas.',
+          text: 'Langkah tersusun runtut, syarat kondisi bernilai pasti, dan dapat dieksekusi seragam oleh setiap petugas di lapangan.',
         },
         {
           key: 'B',
-          text: 'Petunjuk tersebut ditulis menggunakan bahasa pemrograman komputer tingkat tinggi yang hanya dimengerti oleh mesin pemindai.',
+          text: 'Perintah dirumuskan menggunakan bahasa kode mesin komputer tingkat tinggi yang hanya dimengerti oleh perangkat lunak server.',
         },
         {
           key: 'C',
-          text: 'Instruksi di dalamnya bersifat lentur dan bebas ditafsirkan berbeda-beda oleh masing-masing penjaga pintu air di lapangan.',
+          text: 'Instruksi bersifat lentur dan diserahkan pada tafsiran pribadi masing-masing penjaga pintu air tanpa acuan baku tertulis.',
         },
         {
           key: 'D',
-          text: 'Rangkaian tindakan tersebut disusun tanpa mempertimbangkan kondisi keselamatan warga dan ketersediaan petugas tanggap darurat.',
+          text: 'Rangkaian tindakan disusun tanpa memperhitungkan ketersediaan personel pengawas serta keselamatan warga di permukiman hilir.',
         },
         {
           key: 'E',
-          text: 'Aturan tersebut hanya berlaku satu kali saja dan tidak dapat digunakan kembali jika bencana banjir datang pada tahun berikutnya.',
+          text: 'Aturan penyelamatan dirancang hanya untuk sekali pakai dan tidak boleh diterapkan lagi pada musim penghujan tahun berikutnya.',
         },
       ],
       correctOption: 'A',
@@ -227,23 +228,23 @@ Risiko sistemik apakah yang paling mungkin terjadi terhadap operasi penanggulang
       options: [
         {
           key: 'A',
-          text: 'Tim penyelidik akan kehabisan waktu dan tenaga karena tenggelam dalam lautan data yang tidak penting, sehingga sumber racun utama gagal dihentikan tepat waktu.',
+          text: 'Waktu dan energi penyelidik terkuras oleh data yang tidak penting, sehingga sumber pencemaran utama terlambat dihentikan.',
         },
         {
           key: 'B',
-          text: 'Sungai Kota Delta akan secara otomatis kembali jernih karena seluruh warga merasa diawasi oleh petugas pemeriksa.',
+          text: 'Kawasan aliran sungai akan kembali bersih dengan sendirinya karena seluruh pengelola pabrik merasa diawasi secara mendalam.',
         },
         {
           key: 'C',
-          text: 'Pabrik tekstil dan aki pembuang limbah berbahaya akan secara sukarela menyerahkan diri tanpa perlu diuji sampel limbahnya.',
+          text: 'Seluruh pengelola pabrik pencemar bahan berbahaya akan menyerahkan diri secara sukarela tanpa perlu proses pembuktian kimia.',
         },
         {
           key: 'D',
-          text: 'Waktu eksekusi penanganan menjadi jauh lebih singkat karena semakin banyak informasi yang dikumpulkan maka komputer semakin cepat mengolahnya.',
+          text: 'Waktu penyelesaian masalah menjadi semakin cepat karena semakin lengkap data yang dihimpun maka kesimpulan kian mudah diambil.',
         },
         {
           key: 'E',
-          text: 'Curah hujan ekstrem akan berhenti secara mendadak karena proses pendataan administratif berlangsung sangat terperinci.',
+          text: 'Intensitas curah hujan tinggi di wilayah hulu sungai akan mereda secara mendadak akibat keteraturan pencatatan administrasi.',
         },
       ],
       correctOption: 'A',
@@ -259,23 +260,23 @@ Prinsip berpikir komputasional apa yang ditunjukkan oleh tim perancang di daerah
       options: [
         {
           key: 'A',
-          text: 'Pemanfaatan kembali solusi umum dengan menyesuaikan parameter yang sesuai dengan kondisi lingkungan setempat.',
+          text: 'Menggunakan kembali model penyelesaian masalah dengan menyesuaikan variabel sesuai kondisi lingkungan wilayah setempat.',
         },
         {
           key: 'B',
-          text: 'Penyalinan tanpa modifikasi yang membuktikan bahwa seluruh bencana alam di dunia memiliki karakter yang persis sama.',
+          text: 'Menyalin seluruh rancangan penanganan secara mentah karena seluruh bentuk bencana alam memiliki sifat bahaya yang persis sama.',
         },
         {
           key: 'C',
-          text: 'Penolakan terhadap pilar algoritma karena pedoman dari daerah lain tidak boleh diterapkan di wilayah berbeda.',
+          text: 'Mengabaikan kaidah logika algoritma karena pedoman mitigasi bencana dari satu daerah pantang digunakan di wilayah perbukitan.',
         },
         {
           key: 'D',
-          text: 'Penerapan coba-coba tanpa dasar perhitungan nalar yang jelas untuk melihat apakah bencana tanah longsor bisa dicegah.',
+          text: 'Menjalankan strategi coba-coba tanpa perencanaan terukur untuk menguji apakah ancaman bahaya tanah longsor dapat dicegah tepat.',
         },
         {
           key: 'E',
-          text: 'Penghapusan seluruh data lingkungan karena penanganan tanah longsor sama sekali tidak memerlukan data masa lalu.',
+          text: 'Meniadakan pengumpulan data geologis sebab upaya penanganan lereng longsor sama sekali tidak membutuhkan catatan histori masa lalu.',
         },
       ],
       correctOption: 'A',
@@ -291,23 +292,23 @@ Tindakan Kapten Rina dalam mengelompokkan desa-desa terdampak tersebut merupakan
       options: [
         {
           key: 'A',
-          text: 'Dekomposisi; mengurai wilayah operasi yang luas dan rumit menjadi satuan-satuan area yang lebih teratur berdasarkan skala prioritas.',
+          text: 'Dekomposisi; membagi wilayah tugas yang luas menjadi bagian teratur agar alokasi bantuan dapat disalurkan tepat prioritas.',
         },
         {
           key: 'B',
-          text: 'Abstraksi semu; meniadakan desa-desa di Wilayah Selatan agar tim tidak perlu mengirimkan bantuan ke sana.',
+          text: 'Abstraksi keliru; menghapus keberadaan desa pada Wilayah Selatan agar tim penyelamat tidak terbebani kewajiban mengirim paket bantuan.',
         },
         {
           key: 'C',
-          text: 'Algoritma acak; memilih rute penerbangan secara mendadak tergantung pada arah hembusan angin di pagi hari.',
+          text: 'Pemilihan acak; menentukan jalur terbang helikopter secara mendadak mengikuti arah hembusan angin perbukitan pada pagi hari.',
         },
         {
           key: 'D',
-          text: 'Otomatisasi mesin; memprogram komputer helikopter agar terbang sendiri tanpa memerlukan pilot manusia.',
+          text: 'Otomatisasi mesin; mengaktifkan kendali jarak jauh pada komputer armada agar helikopter dapat terbang tanpa pengawasan manusia.',
         },
         {
           key: 'E',
-          text: 'Pengenalan pola cuaca; membuktikan bahwa gempa bumi selalu terjadi bersamaan dengan kabut tebal di pegunungan.',
+          text: 'Pengenalan pola cuaca; membuktikan bahwa bencana gempa bumi selalu diikuti oleh kabut tebal pada kawasan lembah perbukitan terjal.',
         },
       ],
       correctOption: 'A',
@@ -323,23 +324,23 @@ Bagaimana Kapten Rina memanfaatkan pengenalan pola tersebut dalam menyusun strat
       options: [
         {
           key: 'A',
-          text: 'Mengerahkan seluruh kekuatan armada helikopter ke Wilayah Utara sejak pagi hari sebelum jendela waktu penerbangan tertutup oleh kabut tebal.',
+          text: 'Mengerahkan seluruh armada ke Wilayah Utara sejak pagi hari sebelum jalur penerbangan tertutup rapat oleh kabut berbahaya.',
         },
         {
           key: 'B',
-          text: 'Membatalkan seluruh misi penerbangan ke Wilayah Utara dan membiarkan warga di sana menunggu hingga musim kemarau tiba.',
+          text: 'Menghentikan seluruh pengiriman bantuan ke Wilayah Utara dan membiarkan para korban menunggu hingga datangnya musim kemarau panjang.',
         },
         {
           key: 'C',
-          text: 'Memerintahkan para pilot untuk tetap nekat menerobos kabut tebal pada sore hari demi menunjukkan keberanian tim penyelamat.',
+          text: 'Menginstruksikan para penerbang menerobos kabut tebal pada sore hari demi menunjukkan ketangguhan mental pasukan penyelamat udara.',
         },
         {
           key: 'D',
-          text: 'Mengalihkan seluruh helikopter ke Wilayah Selatan di pagi hari karena wilayah tersebut tidak pernah berkabut.',
+          text: 'Mengalihkan seluruh helikopter menuju Wilayah Selatan pada pagi hari karena kawasan tersebut memiliki jarak tempuh yang lebih dekat.',
         },
         {
           key: 'E',
-          text: 'Menghapus catatan kabut masa lalu dari papan rencana operasi karena dianggap hanya perkiraan cuaca yang belum tentu terulang.',
+          text: 'Menghapus catatan cuaca masa lalu dari papan posko pemantau karena dianggap hanya perkiraan yang belum tentu terjadi berulang kembali.',
         },
       ],
       correctOption: 'A',
@@ -355,23 +356,23 @@ Argumentasi rasional apa yang mendasari penerapan abstraksi oleh Kapten Rina dal
       options: [
         {
           key: 'A',
-          text: 'Mengabaikan barang-barang yang bukan kebutuhan penyelamat jiwa demi memaksimalkan muatan kebutuhan pokok yang menentukan kelangsungan hidup korban.',
+          text: 'Menyisihkan muatan non-darurat demi memaksimalkan kapasitas angkut terbatas pada barang penopang keselamatan nyawa korban.',
         },
         {
           key: 'B',
-          text: 'Menolak barang sumbangan warga karena helikopter hanya diperbolehkan membawa barang yang dibeli oleh dinas pemerintah.',
+          text: 'Menolak barang kiriman warga karena helikopter kargo militer hanya diizinkan memuat perbekalan yang dibeli lewat anggaran dinas.',
         },
         {
           key: 'C',
-          text: 'Mengurangi beban kerja petugas gudang agar mereka memiliki waktu istirahat yang lebih lama di pangkalan posko.',
+          text: 'Mengurangi beban kerja relawan gudang pangkalan udara agar mereka memiliki waktu istirahat lebih banyak di dalam tenda penampungan.',
         },
         {
           key: 'D',
-          text: 'Menyenangkan hati para penyumbang makanan dengan mendahulukan produk makanan pabrik tertentu.',
+          text: 'Memprioritaskan produk makanan pabrikan tertentu guna menjaga kerja sama kemitraan logistik antara pihak posko dan badan penyumbang.',
         },
         {
           key: 'E',
-          text: 'Menunjukkan wewenang mutlak seorang pimpinan operasi logistik tanpa perlu menjelaskan alasannya kepada sukarelawan.',
+          text: 'Memperlihatkan wewenang mutlak seorang pemimpin misi penyelamatan tanpa berkewajiban memberi penjelasan rasional kepada sukarelawan.',
         },
       ],
       correctOption: 'A',
@@ -387,23 +388,23 @@ Mengapa jadwal kerja terstruktur tersebut dipandang sebagai implementasi pilar a
       options: [
         {
           key: 'A',
-          text: 'Menyediakan panduan langkah kerja yang runtut waktu, terukur alokasi sumber dayanya, dan mencegah kebingungan para pilot di lapangan.',
+          text: 'Menyajikan panduan kerja berurutan waktu dan terukur pemanfaatan sumber dayanya sehingga mencegah kebingungan para penerbang.',
         },
         {
           key: 'B',
-          text: 'Membuat helikopter dapat terbang lebih cepat melampaui batas kecepatan maksimal yang ditentukan pabrik pembuatnya.',
+          text: 'Memungkinkan helikopter melesat lebih cepat melampaui batas kecepatan tertinggi yang sudah ditetapkan oleh pabrik pembuat mesin.',
         },
         {
           key: 'C',
-          text: 'Menjamin bahwa seluruh warga di 15 desa akan mendapatkan jumlah pasokan beras yang sama persis tanpa selisih satu butir pun.',
+          text: 'Menjamin seluruh warga di lima belas desa menerima jatah logistik dalam takaran yang sama rata tanpa selisih berat sedikit pun.',
         },
         {
           key: 'D',
-          text: 'Menghilangkan kebutuhan pilot manusia karena helikopter dapat terbang secara mandiri mengikuti tulisan di papan tulis posko.',
+          text: 'Menggantikan peran penerbang manusia karena armada kargo dapat mengudara sendiri secara otomatis berbekal jadwal di papan posko.',
         },
         {
           key: 'E',
-          text: 'Memastikan seluruh anggaran operasional bahan bakar avtur habis digunakan dalam satu hari pelaksanaan misi.',
+          text: 'Memastikan seluruh jatah cadangan bahan bakar avtur pangkalan habis terpakai dalam satu hari pelaksanaan rangkaian misi darurat.',
         },
       ],
       correctOption: 'A',
@@ -417,23 +418,23 @@ Mengapa jadwal kerja terstruktur tersebut dipandang sebagai implementasi pilar a
       options: [
         {
           key: 'A',
-          text: 'Helikopter berisiko kehabisan bahan bakar atau mengalami gangguan mesin di tengah penerbangan yang dapat menyebabkan kecelakaan mematikan.',
+          text: 'Helikopter berisiko kehabisan bahan bakar atau mengalami gangguan mesin di udara yang memicu kecelakaan penerbangan fatal.',
         },
         {
           key: 'B',
-          text: 'Warga desa penerima bantuan akan merasa bosan karena paket bantuan datang terlalu cepat dari perkiraan semula.',
+          text: 'Warga desa terdampak akan merasa jenuh karena paket bantuan kemanusiaan tiba di lokasi penampungan lebih cepat dari jadwal semula.',
         },
         {
           key: 'C',
-          text: 'Harga bahan bakar helikopter di pasaran akan melonjak tinggi karena dibeli pada waktu siang hari.',
+          text: 'Biaya pembelian bahan bakar avtur akan melonjak tinggi karena stasiun pengisian pangkalan menaikkan harga pada siang hari terik.',
         },
         {
           key: 'D',
-          text: 'Pangkalan posko akan kelebihan persediaan logistik makanan karena gudang tidak sempat menampung kiriman baru.',
+          text: 'Gudang penampungan posko akan kelebihan muatan barang sebab petugas logistik tidak sanggup memilah kiriman donasi yang baru masuk.',
         },
         {
           key: 'E',
-          text: 'Pilot helikopter akan kehilangan sinyal panduan arah karena satelit cuaca hanya bekerja pada pagi dan sore hari.',
+          text: 'Perangkat navigasi satelit akan kehilangan arah sebab pemancar sinyal di angkasa hanya dapat berfungsi pada pagi dan sore hari.',
         },
       ],
       correctOption: 'A',
@@ -447,23 +448,23 @@ Mengapa jadwal kerja terstruktur tersebut dipandang sebagai implementasi pilar a
       options: [
         {
           key: 'A',
-          text: 'Mengerahkan seluruh 4 helikopter yang siap ke Wilayah Utara pada pagi hari, lalu membagi masing-masing 2 helikopter untuk Wilayah Tengah dan Selatan pada sesi siang.',
+          text: 'Mengerahkan seluruh 4 helikopter ke Wilayah Utara pada pagi hari, lalu membagi masing-masing 2 helikopter ke wilayah lain saat siang.',
         },
         {
           key: 'B',
-          text: 'Memaksakan helikopter yang bocor oli untuk tetap terbang melintasi jurang terjal demi menjaga kuota lima armada.',
+          text: 'Memaksakan helikopter yang rusak oli tetap terbang melintasi jurang terjal demi menjaga target jumlah lima armada di udara perbukitan.',
         },
         {
           key: 'C',
-          text: 'Membatalkan seluruh penerbangan hari itu ke semua wilayah sampai helikopter pengganti datang dari ibu kota pekan depan.',
+          text: 'Membatalkan seluruh operasi bantuan hari itu ke semua kawasan hingga unit helikopter pengganti tiba dari ibu kota pada minggu depan.',
         },
         {
           key: 'D',
-          text: 'Mengalihkan seluruh penerbangan hanya ke Wilayah Selatan karena jaraknya paling dekat dari pangkalan pendaratan.',
+          text: 'Memindahkan seluruh fokus penerbangan ke Wilayah Selatan karena memiliki medan paling landai dan jarak terdekat dari pangkalan utama.',
         },
         {
           key: 'E',
-          text: 'Meminta para pilot helikopter mengangkut kargo dengan berjalan kaki mendaki gunung menuju Wilayah Utara.',
+          text: 'Memerintahkan kru penerbang memikul barang kargo dengan berjalan kaki menyusuri lereng terjal menuju desa terpencil di Wilayah Utara.',
         },
       ],
       correctOption: 'A',
@@ -479,23 +480,23 @@ Penerapan pilar berpikir komputasional apakah yang dilakukan oleh keluarga terse
       options: [
         {
           key: 'A',
-          text: 'Dekomposisi; memecah beban pekerjaan rumah yang besar menjadi beberapa bagian tugas wilayah yang lebih kecil dan terkelola sesuai kemampuan masing-masing.',
+          text: 'Dekomposisi; memecah pekerjaan rumah tangga yang berat ke dalam bidang tugas yang lebih teratur sesuai kemampuan masing-masing.',
         },
         {
           key: 'B',
-          text: 'Abstraksi keliru; membiarkan ruang tamu dalam keadaan kotor karena dianggap tidak terlihat oleh tamu yang datang.',
+          text: 'Abstraksi keliru; membiarkan tumpukan sampah di ruang tamu karena menganggap area tersebut tidak akan diperhatikan oleh para tamu.',
         },
         {
           key: 'C',
-          text: 'Pengenalan pola acak; menyapu lantai rumah secara berulang-ulang tanpa memedulikan apakah lantai sudah bersih atau belum.',
+          text: 'Pengenalan pola acak; membersihkan lantai berulang kali tanpa memeriksa apakah permukaan keramik sudah bersih dari kotoran debu.',
         },
         {
           key: 'D',
-          text: 'Penyusunan aturan paksa; mewajibkan setiap anggota keluarga menggunakan pakaian dengan warna yang seragam saat menyapu.',
+          text: 'Aturan baku sepihak; mewajibkan setiap anggota keluarga mengenakan pakaian dengan warna serasi saat membersihkan perabot di rumah.',
         },
         {
           key: 'E',
-          text: 'Otomatisasi murni; menyerahkan seluruh pembersihan rumah kepada mesin penyedot debu tanpa bantuan tenaga manusia sama sekali.',
+          text: 'Otomatisasi total; membebankan seluruh tugas pembersihan lantai kepada robot penyedot debu tanpa bantuan tenaga manusia sama sekali.',
         },
       ],
       correctOption: 'A',
@@ -511,23 +512,23 @@ Pilar berpikir komputasional apa yang diterapkan oleh Budi saat memilah cucian t
       options: [
         {
           key: 'A',
-          text: 'Pengenalan pola; mengenali kesamaan sifat bahan dan warna pakaian dari pengalaman masa lalu untuk mencegah kerusakan pakaian putih.',
+          text: 'Pengenalan pola; mengelompokkan cucian berdasarkan sifat warna dan risiko luntur dari pengalaman mencuci sebelumnya.',
         },
         {
           key: 'B',
-          text: 'Algoritma acak; memasukkan pakaian ke mesin cuci secara sembarangan tanpa memeriksa label petunjuk perawatan pakaian.',
+          text: 'Algoritma acak; mencampur seluruh pakaian kotor ke tabung mesin cuci tanpa membaca instruksi perawatan pada label pakaian.',
         },
         {
           key: 'C',
-          text: 'Abstraksi berlebihan; membuang seluruh pakaian berwarna ke tempat sampah agar mesin cuci hanya mencuci pakaian putih.',
+          text: 'Abstraksi berlebihan; membuang seluruh celana berwarna ke tempat sampah agar mesin cuci hanya membersihkan seragam putih sekolah.',
         },
         {
           key: 'D',
-          text: 'Dekomposisi biner; menghitung jumlah kancing pada setiap kemeja sebelum merendamnya ke dalam ember air sabun.',
+          text: 'Dekomposisi mekanis; menghitung jumlah kancing pada setiap baju sebelum merendamnya ke dalam larutan air detergen di ember cuci.',
         },
         {
           key: 'E',
-          text: 'Perancangan perangkat keras; membongkar mesin cuci keluarga untuk mengganti tabung pemutar dengan ember kayu tradisional.',
+          text: 'Rekayasa perangkat; membongkar tabung mesin cuci untuk mengganti motor penggerak listrik dengan tuas pemutar kayu tradisional.',
         },
       ],
       correctOption: 'A',
@@ -543,23 +544,23 @@ Mengapa perencanaan langkah yang disusun Rian merupakan contoh penerapan algorit
       options: [
         {
           key: 'A',
-          text: 'Menyusun urutan tindakan secara terperinci dan memperhitungkan pemanfaatan sumber daya kompor secara bersamaan sehingga seluruh makanan matang tepat waktu.',
+          text: 'Merancang urutan kerja dan memanfaatkan dua tungku secara terkoordinasi agar semua hidangan matang bersamaan sebelum berangkat.',
         },
         {
           key: 'B',
-          text: 'Memasak seluruh bahan makanan dalam satu panci besar tanpa memedulikan rasa dan perbedaan tingkat kematangan.',
+          text: 'Memasukkan semua bahan makanan ke dalam satu wadah wajan yang sama tanpa memedulikan cita rasa dan tingkat kematangan masakan.',
         },
         {
           key: 'C',
-          text: 'Memastikan sarapan disiapkan hanya jika ada tamu penting yang berkunjung ke rumah di pagi hari.',
+          text: 'Menyiapkan menu hidangan sarapan hanya apabila ada sanak keluarga penting yang datang berkunjung ke rumah pada waktu pagi hari.',
         },
         {
           key: 'D',
-          text: 'Mengabaikan kebersihan dapur dengan membiarkan kompor menyala tanpa ditunggui sama sekali.',
+          text: 'Mengabaikan keselamatan dapur dengan menyalakan api kompor berkekuatan besar tanpa ditunggui selama proses penggorengan makanan.',
         },
         {
           key: 'E',
-          text: 'Menghabiskan seluruh persediaan bumbu dapur keluarga hanya untuk membuat satu porsi sarapan pagi.',
+          text: 'Menghabiskan seluruh persediaan minyak goreng keluarga di lemari dapur hanya demi memasak sebutir telur mata sapi di wajan panas.',
         },
       ],
       correctOption: 'A',
@@ -575,23 +576,23 @@ Langkah Doni menemukan sumber pemborosan listrik tersebut merupakan penerapan be
       options: [
         {
           key: 'A',
-          text: 'Pengenalan pola; mengamati keteraturan waktu pemakaian alat listrik dan mengaitkannya dengan lonjakan biaya pada data tagihan.',
+          text: 'Pengenalan pola; meneliti keteraturan waktu pemakaian alat listrik dan mengaitkannya dengan lonjakan biaya tagihan bulanan.',
         },
         {
           key: 'B',
-          text: 'Abstraksi parsial; mematikan meteran listrik utama rumah secara permanen sehingga keluarga tidak menggunakan listrik sama sekali.',
+          text: 'Abstraksi parsial; mematikan sakelar listrik utama rumah tangga sehingga seluruh penghuni tidak lagi memanfaatkan energi listrik.',
         },
         {
           key: 'C',
-          text: 'Dekomposisi manual; membongkar mesin pendingin ruangan menjadi ratusan komponen kabel kecil di ruang tamu.',
+          text: 'Dekomposisi mekanik; melepas seluruh baut pendingin ruangan menjadi ratusan kabel kecil yang berserakan di atas lantai kamar tidur.',
         },
         {
           key: 'D',
-          text: 'Algoritma semu; membayar tagihan listrik dua kali lipat setiap bulan agar petugas listrik tidak datang memeriksa ke rumah.',
+          text: 'Kebiasaan boros; membayar tagihan listrik berlipat ganda setiap bulan agar petugas pencatat meteran tidak perlu datang memeriksa.',
         },
         {
           key: 'E',
-          text: 'Pemodelan grafis; menggambar sketsa bentuk fisik pendingin ruangan pada selembar kertas karton berwarna.',
+          text: 'Pemodelan visual; menggambar ulang bentuk fisik pendingin ruangan pada selembar kertas karton untuk dipajang di dinding ruang tamu.',
         },
       ],
       correctOption: 'A',
@@ -607,23 +608,23 @@ Pilar berpikir komputasional apa yang ditunjukkan Siti ketika mengabaikan merek 
       options: [
         {
           key: 'A',
-          text: 'Abstraksi; membuang detail yang tidak relevan (aroma dan merek) serta hanya berfokus pada informasi penting yaitu jenis bahan botol (plastik daur ulang).',
+          text: 'Abstraksi; mengabaikan detail aroma dan merek kemasan serta hanya berfokus pada informasi penting yaitu jenis bahan plastik.',
         },
         {
           key: 'B',
-          text: 'Algoritma; mengharuskan Siti membersihkan botol sampo dengan sabun mandi sebanyak sepuluh kali sebelum dibuang.',
+          text: 'Algoritma kaku; mewajibkan pencucian botol plastik menggunakan sabun pembersih sebanyak sepuluh kali sebelum dimasukkan ke tong sampah.',
         },
         {
           key: 'C',
-          text: 'Dekomposisi; memotong botol plastik menjadi serpihan berukuran satu milimeter menggunakan gunting kuku.',
+          text: 'Dekomposisi ekstrem; memotong kemasan botol plastik menjadi serpihan berukuran sangat kecil menggunakan gunting pemotong kuku tangan.',
         },
         {
           key: 'D',
-          text: 'Pengenalan pola keliru; menganggap seluruh benda cair di kamar mandi adalah racun berbahaya yang tidak boleh disentuh.',
+          text: 'Penilaian keliru; menganggap seluruh sisa cairan pembersih di kamar mandi sebagai racun berbahaya yang dilarang untuk disentuh tangan.',
         },
         {
           key: 'E',
-          text: 'Otomatisasi; membiarkan sampah menumpuk di lantai kamar mandi sampai larut sendiri ditelan air pembuangan.',
+          text: 'Sikap pasif; membiarkan kemasan bekas menumpuk di sudut lantai kamar mandi hingga larut dengan sendirinya terbawa arus air pembuangan.',
         },
       ],
       correctOption: 'A',
@@ -639,23 +640,23 @@ Kombinasi dua pilar berpikir komputasional apakah yang paling menonjol pada cara
       options: [
         {
           key: 'A',
-          text: 'Pengenalan pola kebutuhan hidup tanaman dan penyusunan algoritma jadwal penyiraman yang teratur.',
+          text: 'Pengenalan pola kebutuhan hayati setiap tanaman dan perancangan algoritma jadwal perawatan berkala yang teratur.',
         },
         {
           key: 'B',
-          text: 'Penghapusan data tanaman dan pembagian pot bunga secara acak tanpa memperhatikan jenis tanamannya.',
+          text: 'Penyeragaman takaran air siraman tanpa membedakan daya tahan akar kaktus gurun dengan tanaman anggrek gantung.',
         },
         {
           key: 'C',
-          text: 'Pengabaian seluruh kebutuhan air dan penyerahan pertumbuhan tanaman sepenuhnya pada air hujan alami.',
+          text: 'Pengabaian seluruh kebutuhan pupuk dan membiarkan pertumbuhan pot tanaman pekarangan bergantung pada air hujan.',
         },
         {
           key: 'D',
-          text: 'Pembongkaran seluruh akar tanaman setiap pagi hari untuk memastikan ada cacing tanah di dalam pot.',
+          text: 'Pemeriksaan fisik berlebihan dengan membongkar tanah pot tanaman setiap pagi untuk menghitung jumlah cacing tanah.',
         },
         {
           key: 'E',
-          text: 'Pemberian pupuk kimia berdosis tinggi setiap jam agar tanaman tumbuh sepuluh kali lebih cepat dari biasanya.',
+          text: 'Pemberian cairan pupuk berkonsentrasi tinggi setiap beberapa jam agar bunga tanaman mekar sepuluh kali lebih cepat.',
         },
       ],
       correctOption: 'A',
@@ -671,23 +672,23 @@ Strategi ketua kelompok dalam mengelola tugas besar tersebut menerapkan pilar:`,
       options: [
         {
           key: 'A',
-          text: 'Dekomposisi; memecah proyek besar berdurasi satu bulan ke dalam tahapan-tahapan waktu dan target kerja yang terfokus.',
+          text: 'Dekomposisi; mengurai proyek berdurasi satu bulan ke dalam tahapan waktu dan target kerja berkala yang lebih terfokus.',
         },
         {
           key: 'B',
-          text: 'Abstraksi sepihak; menolak mencantumkan nama anggota kelompok pada berkas laporan akhir tugas sekolah.',
+          text: 'Abstraksi sepihak; menghapus nama rekan satu kelompok pada laporan lembar penyerahan tugas agar nilai terkumpul mandiri.',
         },
         {
           key: 'C',
-          text: 'Algoritma jalan pintas; mengunduh video dokumenter milik orang lain di internet dan mengubah judulnya menjadi tugas sendiri.',
+          text: 'Langkah curang; menyalin rekaman video milik orang lain di internet kemudian mengubah judulnya menjadi karya kelompok tugas.',
         },
         {
           key: 'D',
-          text: 'Pengenalan pola acak; merekam gambar tanpa naskah dan berharap video akan tersusun sendiri saat diedit.',
+          text: 'Pemilihan acak; merekam pemandangan jalan tanpa acuan naskah cerita dan berharap rekaman tersusun padu saat tahap pengeditan.',
         },
         {
           key: 'E',
-          text: 'Otomatisasi tanpa batas; membiarkan kamera merekam ruang kelas kosong selama 24 jam tanpa ada kegiatan terarah.',
+          text: 'Pengawasan hampa; membiarkan kamera merekam ruangan kelas kosong selama seharian penuh tanpa ada arahan kegiatan yang jelas.',
         },
       ],
       correctOption: 'A',
@@ -703,23 +704,23 @@ Usulan pengurus OSIS tersebut merupakan perbaikan sistem sekolah menggunakan pri
       options: [
         {
           key: 'A',
-          text: 'Algoritma; merancang alur urutan proses layanan yang teratur dan searah untuk mengurai penumpukan antrean siswa.',
+          text: 'Algoritma; merancang urutan langkah alur transaksi yang searah untuk mencegah penumpukan antrean siswa di kantin.',
         },
         {
           key: 'B',
-          text: 'Dekomposisi parsial; menutup kantin sekolah secara sepihak agar siswa membawa bekal dari rumah masing-masing.',
+          text: 'Penutupan sepihak; melarang seluruh kantin beroperasi agar siswa membawa kotak bekal makanan sendiri dari rumah mereka.',
         },
         {
           key: 'C',
-          text: 'Abstraksi berlebih; menghapus daftar harga makanan sehingga siswa tidak tahu berapa uang yang harus dibayarkan.',
+          text: 'Peniadaan informasi; mencopot daftar harga makanan sehingga para pembeli tidak mengetahui nominal uang yang disiapkan.',
         },
         {
           key: 'D',
-          text: 'Pengenalan pola negatif; menyimpulkan bahwa antrean panjang merupakan tradisi sekolah yang tidak perlu diubah.',
+          text: 'Pembiaran kebiasaan; menganggap kerumunan antrean padat sebagai tradisi sekolah yang wajar dan tidak perlu diperbaiki.',
         },
         {
           key: 'E',
-          text: 'Pemrograman manual; mewajibkan siswa menghafal kode batang setiap bungkus makanan sebelum membelinya.',
+          text: 'Pengujian berbelit; mengharuskan setiap siswa menghafal kode batang bungkus makanan sebelum diizinkan membeli di loket.',
         },
       ],
       correctOption: 'A',
@@ -735,23 +736,23 @@ Bagaimana Nina sebaiknya menerapkan pemikiran komputasional berdasarkan pola yan
       options: [
         {
           key: 'A',
-          text: 'Mengubah jadwal belajarnya menjadi rutinitas pagi hari setelah subuh dan menjauhkan gangguan ponsel pintar untuk menjaga konsentrasi optimal.',
+          text: 'Mengubah jadwal belajar pribadi ke waktu subuh hari dan menjauhkan gangguan ponsel pintar demi konsentrasi yang optimal.',
         },
         {
           key: 'B',
-          text: 'Tetap begadang hingga tengah malam karena menganggap nilai ulangan semata-mata bergantung pada keberuntungan lembar soal.',
+          text: 'Mempertahankan kebiasaan belajar larut malam karena menganggap hasil perolehan nilai semata-mata ditentukan oleh faktor nasib.',
         },
         {
           key: 'C',
-          text: 'Berhenti belajar sama sekali dan hanya mengandalkan ingatan sekilas saat guru menjelaskan materi di depan kelas.',
+          text: 'Menghentikan kegiatan belajar mandiri dan hanya mengandalkan penjelasan sekilas yang disampaikan oleh bapak ibu guru di kelas.',
         },
         {
           key: 'D',
-          text: 'Menghapus catatan nilai ulangannya agar tidak merasa terbebani oleh riwayat prestasi akademiknya.',
+          text: 'Membuang buku rapor berkala agar pikiran tidak terbebani oleh catatan capaian nilai ulangan yang pernah diperoleh sebelumnya.',
         },
         {
           key: 'E',
-          text: 'Meminta guru mengubah seluruh materi ujian menjadi lagu musik pop agar sesuai dengan kebiasaan belajarnya di malam hari.',
+          text: 'Mengajukan permohonan agar seluruh naskah ulangan sekolah diubah menjadi lantunan lagu pop sesuai kebiasaan mendengarkan musik.',
         },
       ],
       correctOption: 'A',
@@ -767,23 +768,23 @@ Proses yang dilakukan Farhan dalam meringkas materi pelajaran tersebut menunjukk
       options: [
         {
           key: 'A',
-          text: 'Abstraksi; menyaring konsep-konsep inti yang paling esensial dan mengesampingkan kalimat penjelas yang terlalu panjang lebar.',
+          text: 'Abstraksi; menyaring konsep-konsep inti yang penting dan mengesampingkan uraian kalimat penjelas yang berbelit-belit.',
         },
         {
           key: 'B',
-          text: 'Algoritma sekuensial; menghafal nomor halaman buku teks tanpa memahami makna dari materi yang dibaca.',
+          text: 'Algoritma sekuensial; menghafalkan urutan nomor halaman buku cetak tanpa mendalami hubungan konsep materi yang sedang dibaca.',
         },
         {
           key: 'C',
-          text: 'Dekomposisi destruktif; merobek halaman buku teks yang dianggap tidak akan keluar dalam lembar soal ujian.',
+          text: 'Dekomposisi ekstrem; menyobek lembaran buku pelajaran yang diperkirakan tidak akan diujikan pada naskah soal penilaian akhir.',
         },
         {
           key: 'D',
-          text: 'Pengenalan pola acak; mencoret-coret lembar buku catatan dengan gambar animasi tanpa ada teks penjelasan.',
+          text: 'Pengenalan pola acak; menghiasi buku catatan dengan aneka gambar ilustrasi kartun tanpa mencantumkan rangkuman materi biologi.',
         },
         {
           key: 'E',
-          text: 'Otomatisasi fotokopi; memfotokopi seluruh buku tanpa membaca dan mempelajarinya secara mendalam.',
+          text: 'Penggandaan berkas; mencetak salinan seluruh isi buku pelajaran di tempat fotokopi tanpa mempelajari konsep yang tertulis.',
         },
       ],
       correctOption: 'A',
@@ -799,23 +800,23 @@ Kombinasi pilar berpikir komputasional apakah yang berhasil diintegrasikan oleh 
       options: [
         {
           key: 'A',
-          text: 'Dekomposisi (pembagian divisi kepanitiaan) dan Algoritma (penyusunan urutan waktu pelaksanaan kegiatan per menit).',
+          text: 'Dekomposisi (pembagian kelompok divisi kepanitiaan) dan Algoritma (perancangan susunan jadwal acara menit demi menit).',
         },
         {
           key: 'B',
-          text: 'Abstraksi semata tanpa mempertimbangkan siapa yang akan menjalankan tugas di lapangan.',
+          text: 'Abstraksi parsial semata tanpa merumuskan siapa petugas yang bertanggung jawab menjalankan perlengkapan di lapangan perkemahan.',
         },
         {
           key: 'C',
-          text: 'Pengenalan pola cuaca tanpa menyusun rencana tindakan konkret untuk para peserta kemah.',
+          text: 'Pengenalan pola ramalan cuaca tanpa diimbangi oleh penyusunan langkah tindakan darurat yang nyata bagi seluruh anggota perkemahan.',
         },
         {
           key: 'D',
-          text: 'Percabangan acak yang membiarkan setiap peserta kemah menentukan sendiri jadwal kegiatannya tanpa koordinasi.',
+          text: 'Penjadwalan acak yang membiarkan seluruh peserta kemah menentukan waktu kegiatan upacara pembukaan sesuai keinginan masing-masing.',
         },
         {
           key: 'E',
-          text: 'Pengulangan tanpa henti yang mengharuskan upacara pembukaan dilakukan berulang-ulang sepanjang hari.',
+          text: 'Pengulangan tanpa henti yang mewajibkan seluruh rangkaian acara pembukaan perkemahan diulang berkali-kali sepanjang hari pelaksanaan.',
         },
       ],
       correctOption: 'A',
@@ -831,23 +832,23 @@ Mengapa tindakan bendahara kelas mengabaikan detail uang tersebut merupakan wuju
       options: [
         {
           key: 'A',
-          text: 'Karena nomor seri uang dan warna kertas sama sekali tidak mempengaruhi nilai saldo kas kelas maupun keabsahan laporan keuangan.',
+          text: 'Nomor seri dan warna uang kertas tidak mempengaruhi kebenaran nilai saldo kas maupun keterbukaan laporan keuangan.',
         },
         {
           key: 'B',
-          text: 'Karena bendahara kelas malas menuliskan rincian lengkap dari seluruh uang yang disetorkan oleh teman sekelasnya.',
+          text: 'Pengurus bendahara kelas merasa jenuh untuk mencatat data perincian uang yang disetorkan oleh setiap teman sekelas di sekolah.',
         },
         {
           key: 'C',
-          text: 'Karena uang kas kelas tidak boleh diperiksa oleh wali kelas maupun ketua murid selama masa jabatan berlangsung.',
+          text: 'Uang kas simpanan murid dilarang untuk diperiksa oleh wali kelas maupun ketua kelas selama masa kepengurusan organisasi berjalan.',
         },
         {
           key: 'D',
-          text: 'Karena nomor seri uang kertas akan hilang dengan sendirinya ketika disimpan di dalam kotak kas kelas.',
+          text: 'Catatan angka pada nomor seri uang kertas dipercaya akan terhapus dengan sendirinya sewaktu tersimpan lama di dalam kotak brankas.',
         },
         {
           key: 'E',
-          text: 'Karena pencatatan nomor seri uang hanya diwajibkan untuk uang koin logam kuno keluaran abad pertengahan.',
+          text: 'Pendataan nomor seri uang hanya diwajibkan oleh pihak bank untuk transaksi keping koin logam zaman kuno bernilai sejarah tinggi.',
         },
       ],
       correctOption: 'A',
@@ -863,23 +864,23 @@ Mengapa penumpang angkutan kota justru jauh lebih terbantu oleh peta yang telah 
       options: [
         {
           key: 'A',
-          text: 'Karena penumpang hanya membutuhkan informasi rute dan titik transit utama; terlalu banyak detail pemandangan fisik justru akan membuat bingung dan memperlambat pengambilan keputusan.',
+          text: 'Penumpang hanya membutuhkan info jalur dan stasiun transit; terlalu banyak gambar pemandangan fisik justru membingungkan pembaca rute.',
         },
         {
           key: 'B',
-          text: 'Karena foto satelit beresolusi tinggi dilarang oleh undang-undang transportasi untuk dilihat oleh masyarakat umum.',
+          text: 'Foto citra satelit beresolusi tajam dilarang keras oleh dinas perhubungan untuk diperlihatkan kepada seluruh warga masyarakat umum.',
         },
         {
           key: 'C',
-          text: 'Karena garis jalur warna-warni secara otomatis memandu langkah kaki penumpang tanpa perlu membaca peta kembali.',
+          text: 'Garis jalur rel warna-warni pada lembar kertas sanggup memandu langkah kaki penumpang secara ajaib tanpa perlu menatap papan halte.',
         },
         {
           key: 'D',
-          text: 'Karena peta yang sederhana lebih murah biaya pencetakannya sehingga pengelola kereta bisa menghemat anggaran stasiun.',
+          text: 'Peta sederhana membutuhkan biaya pencetakan yang jauh lebih hemat sehingga pengelola stasiun dapat menyimpan kelebihan anggaran dana.',
         },
         {
           key: 'E',
-          text: 'Karena kereta komuter tidak bergerak di atas rel nyata melainkan hanya meluncur di dalam ruang simulasi maya.',
+          text: 'Gerbong kereta komuter hanya meluncur di dalam ruang simulasi maya sehingga jalur rel tidak memiliki wujud nyata di permukaan bumi.',
         },
       ],
       correctOption: 'A',
@@ -895,23 +896,23 @@ Pilar berpikir komputasional apakah yang berhasil dimanfaatkan Pak Joko untuk me
       options: [
         {
           key: 'A',
-          text: 'Pengenalan pola; mengaitkan hubungan berulang antara faktor kelembapan cuaca dengan siklus kemunculan hama untuk melakukan pencegahan dini.',
+          text: 'Pengenalan pola; mengaitkan hubungan berulang antara kelembapan udara dan kemunculan hama untuk langkah pencegahan dini.',
         },
         {
           key: 'B',
-          text: 'Dekomposisi acak; memotong seluruh batang pohon apel yang sehat agar hama tidak memiliki tempat untuk hinggap.',
+          text: 'Dekomposisi perusakan; memangkas seluruh dahan pohon apel yang sehat agar hama pemakan daun tidak memiliki tempat untuk hinggap.',
         },
         {
           key: 'C',
-          text: 'Abstraksi ekstrem; mengabaikan kondisi cuaca dan membiarkan kebun apel terendam air hujan tanpa pengawasan.',
+          text: 'Abstraksi pasrah; mengesampingkan pengamatan cuaca dan membiarkan areal perkebunan apel diguyur hujan tanpa pemantauan berkala.',
         },
         {
           key: 'D',
-          text: 'Algoritma tertutup; menyemprotkan pestisida kimia setiap jam sepanjang tahun tanpa memperhatikan musim.',
+          text: 'Algoritma serampangan; menyemprotkan cairan pestisida kimia setiap beberapa jam sepanjang tahun tanpa memeriksa kondisi tanaman.',
         },
         {
           key: 'E',
-          text: 'Penyusunan kode sandi; memberi nomor kode rahasia pada setiap buah apel yang bergelantungan di pohon.',
+          text: 'Pembuatan kode rahasia; membubuhkan tanda angka sandi pada setiap permukaan kulit buah apel yang masih bergelantungan di dahan.',
         },
       ],
       correctOption: 'A',
@@ -927,23 +928,23 @@ Karakteristik penting apa dari sebuah algoritma rekayasa transportasi yang terce
       options: [
         {
           key: 'A',
-          text: 'Memiliki aturan percabangan kondisi (kondisional) yang terukur dan memiliki tindakan aksi yang pasti ketika ambang batas kemacetan terlampaui.',
+          text: 'Memiliki percabangan kondisi terukur dan panduan tindakan yang pasti saat ambang batas panjang antrean kendaraan terlampaui.',
         },
         {
           key: 'B',
-          text: 'Mewajibkan seluruh kendaraan bermotor mematikan mesin dan menunggu di jalan raya sampai polisi mengizinkan jalan.',
+          text: 'Mewajibkan seluruh pengemudi mematikan mesin kendaraan di tengah jalan raya sampai petugas kepolisian meniup peluit tanda aman.',
         },
         {
           key: 'C',
-          text: 'Mengharuskan pengendara mobil pribadi membayar denda uang tunai di tempat kepada petugas pengatur lalu lintas.',
+          text: 'Memberi wewenang kepada petugas pengatur jalur untuk memungut uang denda tunai langsung kepada setiap pengemudi mobil di lapangan.',
         },
         {
           key: 'D',
-          text: 'Menutup seluruh akses jalan menuju Kota Batu secara permanen agar jalanan kota selalu lengang dari wisatawan.',
+          text: 'Memblokir seluruh akses jalan penghubung menuju Kota Batu secara permanen agar jalanan dalam kota selalu terbebas dari kepadatan.',
         },
         {
           key: 'E',
-          text: 'Mengundi rute jalan yang boleh dilewati pengemudi menggunakan roda keberuntungan di setiap persimpangan jalan.',
+          text: 'Menentukan arah rute perjalanan pengemudi menggunakan undian kartu keberuntungan di setiap persimpangan lampu lalu lintas jalan.',
         },
       ],
       correctOption: 'A',
@@ -959,23 +960,23 @@ Manfaat berpikir komputasional apa yang diperoleh pengelola tempat wisata terseb
       options: [
         {
           key: 'A',
-          text: 'Mampu melakukan perencanaan alokasi sumber daya dan layanan secara matang jauh-jauh hari berlandaskan pola tren historis.',
+          text: 'Mampu menyiapkan alokasi sarana dan tenaga petugas secara matang jauh hari berlandaskan pola kecenderungan masa lalu.',
         },
         {
           key: 'B',
-          text: 'Dapat menaikkan harga tiket masuk secara mendadak hingga sepuluh kali lipat untuk meraup keuntungan pribadi.',
+          text: 'Memiliki alasan untuk menaikkan tarif tiket masuk secara sepihak hingga berkali-kali lipat demi melipatgandakan perolehan laba.',
         },
         {
           key: 'C',
-          text: 'Menolak kedatangan rombongan pelajar sekolah karena dianggap membuat museum menjadi terlalu berisik.',
+          text: 'Menolak kedatangan rombongan bus karya wisata pelajar sebab suara keramaian anak sekolah dianggap merusak ketenangan museum.',
         },
         {
           key: 'D',
-          text: 'Menghapus catatan buku tamu agar kantor pajak tidak mengetahui jumlah wisatawan yang datang berkunjung.',
+          text: 'Menghapus arsip buku kunjungan agar instansi dinas pajak pariwisata tidak mengetahui jumlah pemasukan pengunjung yang sebenarnya.',
         },
         {
           key: 'E',
-          text: 'Mengganti seluruh staf loket manusia dengan robot mekanik tanpa memperhatikan kepuasan pengunjung wisata.',
+          text: 'Menggantikan seluruh peran pemandu wisata manusia dengan robot pajangan mekanis tanpa memedulikan kepuasan pelayanan pengunjung.',
         },
       ],
       correctOption: 'A',
@@ -991,23 +992,23 @@ Apa keuntungan yang dirasakan oleh pengembang sistem atau petugas perpustakaan d
       options: [
         {
           key: 'A',
-          text: 'Petugas atau pemrogram cukup memeriksa dan memperbaiki subsistem denda tanpa perlu membongkar atau mengganggu subsistem pendataan buku dan keanggotaan siswa.',
+          text: 'Pemrogram cukup memeriksa dan membenahi modul denda tanpa perlu mengganggu modul pendataan buku atau data keanggotaan siswa.',
         },
         {
           key: 'B',
-          text: 'Petugas harus menghapus seluruh data siswa dan menginput ulang ribuan buku dari awal di perpustakaan.',
+          text: 'Petugas perpustakaan harus mengosongkan seluruh basis data sekolah dan mengetik ulang judul ribuan buku dari lembar awal kembali.',
         },
         {
           key: 'C',
-          text: 'Perpustakaan sekolah terpaksa ditutup selama satu tahun ajaran karena sistem komputer rusak total.',
+          text: 'Pelayanan perpustakaan sekolah terpaksa dinonaktifkan sepanjang tahun ajaran karena kerusakan pada satu komponen modul aplikasi.',
         },
         {
           key: 'D',
-          text: 'Siswa yang meminjam buku tidak perlu mengembalikan buku yang dipinjam karena sistem denda sedang mengalami perbaikan.',
+          text: 'Siswa peminjam dibebaskan dari kewajiban mengembalikan buku bacaan karena sistem penghitungan sanksi sedang dalam masa perbaikan.',
         },
         {
           key: 'E',
-          text: 'Dekomposisi mengharuskan pemrogram merakit ulang perangkat keras komputer dari komponen motherboard dasar.',
+          text: 'Pemrogram diwajibkan membongkar susunan kabel perangkat keras komputer server dari papan induk rangkaian elektronik utama.',
         },
       ],
       correctOption: 'A',
@@ -1023,23 +1024,23 @@ Mengapa aturan nomor (4) yang melarang penggunaan lift sangat krusial dimasukkan
       options: [
         {
           key: 'A',
-          text: 'Karena saat terjadi kebakaran listrik gedung dapat terputus seketika dan cerobong lift dapat terisi asap beracun yang menjebak penumpang di dalamnya.',
+          text: 'Aliran listrik dapat terputus seketika dan lubang poros lift dapat terisi asap beracun yang menjebak penumpang di dalamnya.',
         },
         {
           key: 'B',
-          text: 'Karena pintu lift hanya boleh dibuka oleh kepala sekolah dan pejabat dinas kebakaran yang berwenang.',
+          text: 'Pintu akses elevator bertingkat hanya boleh dioperasikan oleh pejabat dinas pemadam kebakaran yang memiliki kunci master khusus.',
         },
         {
           key: 'C',
-          text: 'Karena tangga darurat sengaja dibuat agar siswa dapat berolahraga membakar kalori saat terjadi situasi bencana.',
+          text: 'Tangga darurat sengaja disediakan agar setiap warga sekolah dapat melatih ketahanan fisik saat menghadapi situasi gawat darurat.',
         },
         {
           key: 'D',
-          text: 'Karena lift gedung sekolah membutuhkan koin khusus untuk dapat beroperasi turun ke lantai dasar.',
+          text: 'Pengoperasian kabin elevator gedung bertingkat membutuhkan koin khusus yang tersimpan di dalam laci ruang kepala sekolah dasar.',
         },
         {
           key: 'E',
-          text: 'Karena kecepatan lift dianggap terlalu lambat dibandingkan jika siswa melompat langsung dari jendela lantai atas.',
+          text: 'Laju penurunan kabin lift dinilai terlalu lambat dibandingkan jika para penghuni melompat langsung melalui jendela lantai atas.',
         },
       ],
       correctOption: 'A',
