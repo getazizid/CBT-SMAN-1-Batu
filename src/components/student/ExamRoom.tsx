@@ -33,6 +33,7 @@ import {
   exitAppFullscreen,
   getDeviceCategory,
   getDeviceInfoString,
+  isAndroidDevice,
   isCurrentlyFullscreen,
   isFullscreenSupported,
   isIOSDevice,
@@ -168,17 +169,43 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
   const fsSupported = isFullscreenSupported();
   const isIOS = isIOSDevice();
+  const isAndroid = isAndroidDevice();
   const [isFullscreen, setIsFullscreen] = useState<boolean>(() => 
     fsSupported ? isCurrentlyFullscreen() : true
   );
-  // Initial entry gate: require student to tap fullscreen button on Android & PC
-  const [needsInitialFullscreen, setNeedsInitialFullscreen] = useState<boolean>(() => 
-    !isIOS && fsSupported && !isCurrentlyFullscreen()
-  );
+  // Initial entry gate: require student to tap Safe Mode confirmation on iPhone, Android & PC
+  const [needsInitialFullscreen, setNeedsInitialFullscreen] = useState<boolean>(() => {
+    if (initialSaved) {
+      if (!isIOS && fsSupported && !isCurrentlyFullscreen()) return true;
+      return false;
+    }
+    return true;
+  });
 
   const startTimeRef = useRef<string>(initialSaved?.startTime ?? new Date().toISOString());
-  const lastViolationTimeRef = useRef<number>(0);
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Anti-cheat refs to prevent stale closure and double-counting
+  const tabSwitchCountRef = useRef<number>(initialSaved?.tabSwitchCount ?? 0);
+  const showCheatWarningRef = useRef<boolean>(false);
+  const lastViolationReasonRef = useRef<string>('');
+  const isBlurredRef = useRef<boolean>(false);
+  const wasHiddenRef = useRef<boolean>(false);
+  const lastViolationTimeRef = useRef<number>(0);
+  const lastHeartbeatTimeRef = useRef<number>(Date.now());
+  const handleAutoSubmitRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    tabSwitchCountRef.current = tabSwitchCount;
+  }, [tabSwitchCount]);
+
+  useEffect(() => {
+    showCheatWarningRef.current = showCheatWarning;
+  }, [showCheatWarning]);
+
+  useEffect(() => {
+    lastViolationReasonRef.current = lastViolationReason;
+  }, [lastViolationReason]);
 
   const currentQuestion = displayQuestions[currentIndex] || displayQuestions[0] || {
     displayNumber: 1,
@@ -344,29 +371,35 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
-  // Timer countdown
+  // Exam countdown timer based on wall clock time (cannot cheat by pausing app or freezing background)
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeftSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          handleAutoSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const totalDurationSeconds = (exam?.durationMinutes || 60) * 60;
+    const startMs = new Date(startTimeRef.current).getTime();
 
+    const updateTimer = () => {
+      const elapsedSeconds = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
+      const remaining = Math.max(0, totalDurationSeconds - elapsedSeconds);
+      setTimeLeftSeconds(remaining);
+
+      if (remaining <= 0) {
+        handleAutoSubmitRef.current();
+      }
+    };
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [exam?.durationMinutes]);
 
-  // Setup iOS Fullscreen CSS & Viewport lock
+  // Setup iOS Fullscreen CSS & Viewport lock and anti-callout protection
   useEffect(() => {
+    document.body.classList.add('cbt-exam-active');
     if (isIOS) {
       document.documentElement.classList.add('cbt-ios-fullscreen');
       window.scrollTo(0, 0);
     }
     return () => {
+      document.body.classList.remove('cbt-exam-active');
       if (isIOS) {
         document.documentElement.classList.remove('cbt-ios-fullscreen');
       }
@@ -392,113 +425,272 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     requestAppFullscreen();
   };
 
-  // Anti-cheat detector & Fullscreen enforcer (Quizizz Pro Style)
+  // 1-second Watchdog Heartbeat Delta: Catches frozen backgrounding, app switches, notification replies
   useEffect(() => {
-    const playAlertSound = () => {
-      try {
-        if (typeof window === 'undefined') return;
-        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-        if (AudioCtx) {
-          const ctx = new AudioCtx();
-          if (ctx.state === 'suspended') {
-            ctx.resume().catch(() => {});
-          }
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
-          gain.gain.setValueAtTime(0.25, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.35);
-        }
-      } catch {}
-    };
+    if (needsInitialFullscreen) return;
+    lastHeartbeatTimeRef.current = Date.now();
 
-    const recordViolation = (reason: string = 'Keluar Layar Penuh / Pindah Aplikasi') => {
+    const watchdogInterval = setInterval(() => {
       const now = Date.now();
-      if (now - lastViolationTimeRef.current < 1500) return;
-      lastViolationTimeRef.current = now;
-      const nextCount = tabSwitchCount + 1;
-      setTabSwitchCount(nextCount);
-      setLastViolationReason(reason);
-      setShowCheatWarning(true);
-      playAlertSound();
+      const delta = now - lastHeartbeatTimeRef.current;
+      lastHeartbeatTimeRef.current = now;
 
-      // Send IMMEDIATE live notification to Proktor Admin
-      syncLiveToFirebase('warning_exit', nextCount, reason);
+      // In normal active browsing, delta is ~1000ms.
+      // If delta > 2800ms, the JS thread was frozen in background, phone was locked,
+      // or student was in another app / chatting / in notification center!
+      if (delta > 2800) {
+        const secondsAway = Math.round(delta / 1000);
+        const reason = isIOS
+          ? `Membuka Chat / Notifikasi di iPhone (${secondsAway} detik di latar belakang)`
+          : isAndroid
+          ? `Membuka Chat / Notifikasi di Android (${secondsAway} detik di latar belakang)`
+          : `Meninggalkan Ujian di Latar Belakang (${secondsAway} detik)`;
+        recordViolation(reason);
+      }
+    }, 1000);
+
+    return () => clearInterval(watchdogInterval);
+  }, [needsInitialFullscreen, isIOS, isAndroid]);
+
+  // Back navigation trap to prevent swiping back or back button
+  useEffect(() => {
+    window.history.pushState({ cbtLocked: true }, '', window.location.href);
+
+    const handlePopState = () => {
+      window.history.pushState({ cbtLocked: true }, '', window.location.href);
+      if (!needsInitialFullscreen) {
+        recordViolation('Mencoba Menekan Tombol Kembali (Back Navigation)');
+      }
     };
 
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [needsInitialFullscreen]);
+
+  // Anti-cheat detector & Fullscreen enforcer (Multi-layer Mobile & Desktop Protection)
+  const playAlertSound = () => {
+    try {
+      if (typeof window === 'undefined') return;
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) {
+        const ctx = new AudioCtx();
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(650, now);
+        osc.frequency.setValueAtTime(950, now + 0.12);
+        osc.frequency.setValueAtTime(650, now + 0.24);
+        osc.frequency.setValueAtTime(950, now + 0.36);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.55);
+      }
+    } catch {}
+  };
+
+  const recordViolation = (reason: string = 'Keluar Layar Penuh / Pindah Aplikasi') => {
+    const now = Date.now();
+
+    // If exam is already locked with the warning modal, don't increment duplicate count for same departure
+    if (showCheatWarningRef.current) {
+      return;
+    }
+
+    // Debounce rapid cascading events (e.g. blur + visibilitychange firing within 1500ms)
+    if (now - lastViolationTimeRef.current < 1500) {
+      return;
+    }
+    lastViolationTimeRef.current = now;
+
+    const nextCount = tabSwitchCountRef.current + 1;
+    tabSwitchCountRef.current = nextCount;
+    setTabSwitchCount(nextCount);
+    setLastViolationReason(reason);
+    lastViolationReasonRef.current = reason;
+    setShowCheatWarning(true);
+    showCheatWarningRef.current = true;
+    playAlertSound();
+
+    // Send IMMEDIATE live notification to Proktor Admin
+    syncLiveToFirebase('warning_exit', nextCount, reason);
+
+    // Immediate save to localStorage to persist count across any potential reload
+    saveStoredExamProgress(exam.id, studentData.nisn, {
+      examId: exam.id,
+      studentNisn: studentData.nisn,
+      studentData,
+      displayQuestions,
+      answersByQuestionId,
+      displayAnswers,
+      flaggedDisplayNumbers,
+      timeLeftSeconds,
+      tabSwitchCount: nextCount,
+      currentIndex,
+      startTime: startTimeRef.current,
+      lastSavedAt: new Date().toISOString(),
+    });
+  };
+
+  useEffect(() => {
+    if (needsInitialFullscreen) return;
+
+    // 1. Window Blur: Fired when notification center, control center, floating app, or chat is opened
+    const handleWindowBlur = () => {
+      isBlurredRef.current = true;
+      const reason = isIOS
+        ? 'Membuka Notifikasi / Pusat Kontrol / Balas Chat di iPhone'
+        : isAndroid
+        ? 'Membuka Notifikasi / Split-Screen / Balas Chat di Android'
+        : 'Jendela Ujian Kehilangan Fokus (Window Blur)';
+      recordViolation(reason);
+    };
+
+    // 2. Window Focus: Fired when student returns from notification / chat / other app
+    const handleWindowFocus = () => {
+      const wasBlurred = isBlurredRef.current;
+      isBlurredRef.current = false;
+      if (wasBlurred && !showCheatWarningRef.current) {
+        const reason = isIOS
+          ? 'Kembali ke Ujian Setelah Membuka Notifikasi / Chat di iPhone'
+          : isAndroid
+          ? 'Kembali ke Ujian Setelah Membuka Notifikasi / Chat di Android'
+          : 'Kembali ke Halaman Ujian Setelah Kehilangan Fokus';
+        recordViolation(reason);
+      }
+    };
+
+    // 3. Document Visibility Change: Fired when switching tabs or backgrounding
+    const handleVisibilityChange = () => {
+      if (document.hidden || document.visibilityState === 'hidden') {
+        wasHiddenRef.current = true;
+        const reason = isIOS
+          ? 'Meninggalkan Halaman Ujian / Pindah Aplikasi di iPhone'
+          : isAndroid
+          ? 'Meninggalkan Halaman Ujian / Membuka Aplikasi Lain di Android'
+          : 'Berpindah Tab / Membuka Aplikasi Lain';
+        recordViolation(reason);
+      } else if (document.visibilityState === 'visible') {
+        const wasHidden = wasHiddenRef.current;
+        wasHiddenRef.current = false;
+        if (wasHidden && !showCheatWarningRef.current) {
+          const reason = isIOS
+            ? 'Kembali ke Ujian Setelah Membuka Aplikasi Lain / Chat di iPhone'
+            : 'Kembali ke Halaman Ujian Setelah Berpindah Tab / Aplikasi';
+          recordViolation(reason);
+        }
+      }
+    };
+
+    // 4. Page Hide / Page Show: Mobile Safari / Chrome lifecycle events (bfcache)
+    const handlePageHide = () => {
+      wasHiddenRef.current = true;
+      recordViolation('Meninggalkan Halaman Ujian (Page Hide)');
+    };
+
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted || wasHiddenRef.current || isBlurredRef.current) {
+        wasHiddenRef.current = false;
+        isBlurredRef.current = false;
+        if (!showCheatWarningRef.current) {
+          recordViolation('Kembali ke Halaman Ujian (Page Show / Unfreeze)');
+        }
+      }
+    };
+
+    // 5. Fullscreen Change (Android & PC)
     const handleFullscreenChange = () => {
       if (!fsSupported) return;
       const isFs = isCurrentlyFullscreen();
       setIsFullscreen(isFs);
       if (!isFs && !needsInitialFullscreen) {
-        recordViolation('Keluar dari Mode Layar Penuh (Fullscreen)');
+        recordViolation(
+          isAndroid
+            ? 'Keluar dari Mode Layar Penuh di Android (Status Bar / Navigasi / Split-Screen)'
+            : 'Keluar dari Mode Layar Penuh (Fullscreen)'
+        );
       }
     };
 
-    const handleVisibilityChange = () => {
-      if (document.hidden || document.visibilityState === 'hidden') {
-        recordViolation('Berpindah Tab / Membuka Aplikasi Lain');
-      }
-    };
-
-    const handlePageHide = () => {
-      recordViolation('Meninggalkan Halaman Ujian (Page Hide)');
-    };
-
-    const handleWindowBlur = () => {
-      if (isIOS) {
-        // On iOS Safari, check if document is actually hidden
-        if (document.hidden || document.visibilityState === 'hidden') {
-          recordViolation('Berpindah Aplikasi / Notifikasi di iPhone');
+    // 6. Split-Screen / Resize detection for Android
+    const handleResize = () => {
+      if (isAndroid) {
+        const isPortrait = window.innerHeight > window.innerWidth;
+        const heightRatio = window.innerHeight / screen.height;
+        if (isPortrait && heightRatio < 0.65) {
+          recordViolation('Terdeteksi Menggunakan Mode Split-Screen / Layar Belah di Android');
         }
-      } else {
-        recordViolation('Jendela Ujian Kehilangan Fokus (Window Blur)');
       }
     };
 
+    // 7. Developer tools & System Keyboard Shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
         e.preventDefault();
-        recordViolation('Membuka Developer Tools Browser');
+        recordViolation('Mencoba Membuka Developer Tools Browser');
+        return;
+      }
+      if (e.key === 'PrintScreen' || (e.ctrlKey && e.key.toLowerCase() === 'p')) {
+        e.preventDefault();
+        recordViolation('Mencoba Mengambil Tangkapan Layar (Screenshot) / Cetak');
+        return;
+      }
+      if (e.altKey || e.metaKey) {
+        recordViolation('Mencoba Menekan Tombol Sistem (Alt / Cmd / Windows)');
+        return;
+      }
+      if (e.ctrlKey && ['t', 'n', 'w', 'r'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        recordViolation('Mencoba Pintasan Browser (Tab / Refresh)');
+        return;
       }
     };
 
+    // 8. Prevent context menu, copy, cut, paste, text drag
     const preventDefault = (e: Event) => e.preventDefault();
 
     if (fsSupported) {
       document.addEventListener('fullscreenchange', handleFullscreenChange);
       document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     }
+    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focus', handleWindowFocus);
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pagehide', handlePageHide);
-    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('resize', handleResize);
     window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('contextmenu', preventDefault);
     document.addEventListener('copy', preventDefault);
     document.addEventListener('cut', preventDefault);
     document.addEventListener('paste', preventDefault);
+    document.addEventListener('selectstart', preventDefault);
 
     return () => {
       if (fsSupported) {
         document.removeEventListener('fullscreenchange', handleFullscreenChange);
         document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
       }
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focus', handleWindowFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pagehide', handlePageHide);
-      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('resize', handleResize);
       window.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('contextmenu', preventDefault);
       document.removeEventListener('copy', preventDefault);
       document.removeEventListener('cut', preventDefault);
       document.removeEventListener('paste', preventDefault);
+      document.removeEventListener('selectstart', preventDefault);
     };
-  }, [fsSupported, isIOS, tabSwitchCount, needsInitialFullscreen]);
+  }, [fsSupported, isIOS, isAndroid, needsInitialFullscreen]);
 
 
   const handleSelectOption = (opt: DisplayOption) => {
@@ -639,6 +831,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     const submission = calculateResults();
     onSubmitExam(submission);
   };
+  handleAutoSubmitRef.current = handleAutoSubmit;
 
   const getFontSizeClass = () => {
     if (fontSize === 'sm') return 'text-base sm:text-lg leading-relaxed';
@@ -648,7 +841,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
-      {/* Quizizz Pro Safe Exam Fullscreen Entry Gate for Android & PC */}
+      {/* Quizizz Pro Safe Exam Fullscreen Entry Gate for Android, iPhone & PC */}
       {needsInitialFullscreen && (
         <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-blue-500/30 text-center animate-in zoom-in-95 duration-200">
@@ -656,25 +849,55 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
               <Lock className="w-8 h-8" />
             </div>
             <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300">
-              Quizizz Pro Safe Mode
+              {isIOS ? 'iPhone / iOS Safe Mode' : isAndroid ? 'Android Safe Exam Mode' : 'Quizizz Pro Safe Mode'}
             </span>
             <h3 className="text-xl font-black text-slate-900 dark:text-white mt-3 mb-2">
-              Kunci Layar Penuh (Fullscreen)
+              {isIOS ? 'Kunci Mode Ujian Aman iPhone' : 'Kunci Layar Penuh (Fullscreen)'}
             </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
-              Sistem CBT mewajibkan mode <strong>Layar Penuh Terkunci</strong>. Berpindah tab, membuka aplikasi lain, atau keluar dari layar penuh akan otomatis tercatat sebagai pelanggaran dan dilaporkan langsung secara <strong>realtime</strong> ke pengawas.
+            <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+              {isIOS
+                ? 'Sistem CBT mewajibkan mode Ujian Aman Terkunci pada iPhone / iPad. Segala bentuk perpindahan aplikasi, membuka notifikasi, atau membalas chat otomatis tercatat sebagai pelanggaran dan dilaporkan langsung secara realtime ke pengawas.'
+                : 'Sistem CBT mewajibkan mode Layar Penuh Terkunci. Berpindah tab, membuka notifikasi/chat, split-screen, atau keluar dari layar penuh akan otomatis tercatat sebagai pelanggaran dan dilaporkan langsung secara realtime ke pengawas.'}
             </p>
+            <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl p-3 text-left text-[11px] text-rose-800 dark:text-rose-300 mb-6 space-y-1">
+              <div className="font-bold flex items-center gap-1.5 text-rose-900 dark:text-rose-200">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                <span>Peringatan Ketat Anti-Kecurangan:</span>
+              </div>
+              <ul className="list-disc list-inside space-y-0.5 text-slate-700 dark:text-slate-300 text-[10.5px]">
+                <li>Dilarang menarik Notifikasi / Control Center.</li>
+                <li>Dilarang membalas chat (WA, Telegram, dll).</li>
+                <li>Dilarang beralih aplikasi atau menggunakan split-screen.</li>
+              </ul>
+            </div>
             <button
               onClick={async () => {
-                await requestAppFullscreen();
+                if (isIOS) {
+                  document.documentElement.classList.add('cbt-ios-fullscreen');
+                  window.scrollTo(0, 0);
+                } else {
+                  await requestAppFullscreen();
+                  setIsFullscreen(true);
+                }
+                // Pre-warm AudioContext on user interaction
+                try {
+                  const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+                  if (AudioCtx) {
+                    const ctx = new AudioCtx();
+                    if (ctx.state === 'suspended') {
+                      ctx.resume().catch(() => {});
+                    }
+                  }
+                } catch {}
                 setNeedsInitialFullscreen(false);
-                setIsFullscreen(true);
+                lastHeartbeatTimeRef.current = Date.now();
+                lastViolationTimeRef.current = Date.now();
                 syncLiveToFirebase('active', tabSwitchCount);
               }}
               className="w-full py-3.5 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
             >
               <Maximize2 className="w-5 h-5" />
-              <span>Aktifkan Layar Penuh & Mulai</span>
+              <span>{isIOS ? 'Aktifkan Mode Ujian & Mulai' : 'Aktifkan Layar Penuh & Mulai'}</span>
             </button>
           </div>
         </div>
@@ -1158,42 +1381,55 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
       {/* Anti-Cheat Alert Modal */}
       {showCheatWarning && (
-        <div className="fixed inset-0 bg-slate-900/70 dark:bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-rose-200 dark:border-rose-900 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-4 border border-rose-100 dark:border-rose-900">
-              <ShieldAlert className="w-6 h-6" />
+        <div className="fixed inset-0 bg-slate-900/80 dark:bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-rose-500/40 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto mb-4 border border-rose-200 dark:border-rose-900/80 shadow-inner">
+              <ShieldAlert className="w-8 h-8" />
             </div>
 
-            <h3 className="text-lg font-black text-center text-slate-900 dark:text-white mb-1">
+            <h3 className="text-xl font-black text-center text-slate-900 dark:text-white mb-2">
               UJIAN TERKUNCI - PELANGGARAN TERDETEKSI
             </h3>
-            <p className="text-xs text-center text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
-              {lastViolationReason || 'Sistem mendeteksi Anda meninggalkan jendela ujian (berpindah tab, membuka aplikasi lain, atau keluar dari Mode Layar Penuh).'}
-            </p>
 
-            <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-2xl p-3.5 text-xs text-rose-900 dark:text-rose-200 mb-5 space-y-1.5">
-              <p className="font-semibold text-rose-800 dark:text-rose-300 flex items-center justify-between">
-                <span>Jumlah Pelanggaran:</span>
-                <span className="bg-rose-600 text-white px-2 py-0.5 rounded-md font-bold text-xs">
+            <div className="bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/80 rounded-2xl p-4 text-xs text-rose-900 dark:text-rose-200 mb-5 space-y-2.5">
+              <div className="flex items-center justify-between pb-2 border-b border-rose-200 dark:border-rose-900">
+                <span className="font-semibold text-rose-800 dark:text-rose-300">Total Pelanggaran:</span>
+                <span className="bg-rose-600 text-white px-2.5 py-0.5 rounded-lg font-black text-xs shadow-xs">
                   {tabSwitchCount} Kali
                 </span>
-              </p>
-              <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
-                🔴 <strong>Terkirim Realtime:</strong> Status keluar Anda telah langsung dilaporkan ke Proktor/Guru Pengawas. Seluruh soal dikunci sampai Anda mengaktifkan kembali Layar Penuh.
+              </div>
+              <div>
+                <span className="font-semibold text-rose-800 dark:text-rose-300 block mb-1">Penyebab Pelanggaran:</span>
+                <p className="font-bold text-rose-700 dark:text-rose-300 text-xs bg-white dark:bg-slate-800/80 p-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 leading-relaxed">
+                  {lastViolationReason || 'Meninggalkan jendela ujian atau berpindah aplikasi'}
+                </p>
+              </div>
+              <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed pt-1">
+                🔴 <strong>Terkirim Realtime:</strong> Laporan pelanggaran ini telah langsung dilaporkan ke Proktor/Guru Pengawas. Seluruh soal dikunci sampai Anda membuka kunci di bawah.
               </p>
             </div>
 
             <button
               onClick={async () => {
                 setShowCheatWarning(false);
-                await requestAppFullscreen();
-                setIsFullscreen(true);
-                syncLiveToFirebase('active', tabSwitchCount);
+                showCheatWarningRef.current = false;
+                isBlurredRef.current = false;
+                wasHiddenRef.current = false;
+                lastHeartbeatTimeRef.current = Date.now();
+                lastViolationTimeRef.current = Date.now();
+                if (isIOS) {
+                  document.documentElement.classList.add('cbt-ios-fullscreen');
+                  window.scrollTo(0, 0);
+                } else {
+                  await requestAppFullscreen();
+                  setIsFullscreen(true);
+                }
+                syncLiveToFirebase('active', tabSwitchCountRef.current);
               }}
               className="w-full py-3.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-lg shadow-rose-600/30 cursor-pointer transition-colors flex items-center justify-center gap-2 active:scale-98"
             >
               <Maximize2 className="w-4 h-4" />
-              <span>Kembalikan Layar Penuh & Buka Kunci</span>
+              <span>Buka Kunci Ujian & Lanjutkan Mengerjakan</span>
             </button>
           </div>
         </div>
