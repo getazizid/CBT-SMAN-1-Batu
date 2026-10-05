@@ -973,10 +973,10 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                           Teks Pertanyaan
                         </label>
                         <textarea
-                          rows={3}
+                          rows={5}
                           value={q.text}
                           onChange={(e) => handleUpdateQuestion(qIdx, 'text', e.target.value)}
-                          className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl p-3 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl p-3 text-xs sm:text-sm leading-relaxed focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
                       </div>
 
@@ -1004,13 +1004,13 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                           return (
                             <div
                               key={optKey}
-                              className={`flex items-center gap-2 p-1.5 rounded-2xl border transition-all ${
+                              className={`flex items-start gap-2 p-2 rounded-2xl border transition-all ${
                                 !useWeightedScoring && isCorrect
                                   ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/40 dark:bg-emerald-950/30'
                                   : 'border-transparent'
                               }`}
                             >
-                              <span className={`w-7 h-7 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 ${
+                              <span className={`w-7 h-7 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 mt-1 ${
                                 !useWeightedScoring && isCorrect
                                   ? 'bg-emerald-600 text-white shadow-xs'
                                   : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
@@ -1018,12 +1018,12 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                                 {optKey}
                               </span>
 
-                              <input
-                                type="text"
+                              <textarea
+                                rows={2}
                                 value={currentOpt?.text || ''}
                                 onChange={(e) => handleUpdateOptionText(qIdx, optKey, e.target.value)}
                                 placeholder={`Teks pilihan opsi ${optKey}...`}
-                                className="flex-1 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="flex-1 bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none resize-y leading-relaxed"
                               />
 
                               {useWeightedScoring ? (

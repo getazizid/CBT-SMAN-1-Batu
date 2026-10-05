@@ -3,6 +3,7 @@ import {
   BookOpen,
   CheckCircle2,
   CheckSquare,
+  Columns2,
   Download,
   Edit,
   Eye,
@@ -12,6 +13,7 @@ import {
   GraduationCap,
   Key,
   KeyRound,
+  LayoutList,
   ListOrdered,
   Lock,
   LogOut,
@@ -20,6 +22,8 @@ import {
   PanelLeftOpen,
   Plus,
   Radio,
+  RotateCcw,
+  Save,
   Search,
   Shield,
   ShieldAlert,
@@ -33,7 +37,6 @@ import {
   UserPlus,
   Users,
   X,
-  RotateCcw
 } from 'lucide-react';
 import {
   AdminAccount,
@@ -126,6 +129,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Pagination states
   const [questionsPage, setQuestionsPage] = useState(1);
   const [questionsPerPage, setQuestionsPerPage] = useState(10);
+  const [optionsViewMode, setOptionsViewMode] = useState<'list' | 'grid2' | 'grid5'>('list');
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [editQuestionDraft, setEditQuestionDraft] = useState<Question | null>(null);
 
   const [studentsPage, setStudentsPage] = useState(1);
   const [studentsPerPage, setStudentsPerPage] = useState(10);
@@ -373,6 +379,75 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       questions: updatedQuestions,
     };
     handleSaveExam(updatedExam);
+  };
+
+  const handleStartEditQuestion = (question: Question) => {
+    setEditingQuestionId(question.id);
+    setEditQuestionDraft(JSON.parse(JSON.stringify(question)));
+  };
+
+  const handleCancelEditQuestion = () => {
+    setEditingQuestionId(null);
+    setEditQuestionDraft(null);
+  };
+
+  const handleSaveQuestionDraft = () => {
+    if (!currentExam || !editQuestionDraft) return;
+    const updatedQuestions = currentExam.questions.map((q) =>
+      q.id === editQuestionDraft.id ? editQuestionDraft : q
+    );
+    handleSaveExam({
+      ...currentExam,
+      questions: updatedQuestions,
+    });
+    setEditingQuestionId(null);
+    setEditQuestionDraft(null);
+  };
+
+  const handleDeleteQuestion = (questionId: string) => {
+    if (!currentExam) return;
+    if (confirm('Apakah Anda yakin ingin menghapus butir soal ini?')) {
+      const updatedQuestions = currentExam.questions
+        .filter((q) => q.id !== questionId)
+        .map((q, idx) => ({ ...q, number: idx + 1 }));
+      handleSaveExam({
+        ...currentExam,
+        questions: updatedQuestions,
+      });
+      if (editingQuestionId === questionId) {
+        setEditingQuestionId(null);
+        setEditQuestionDraft(null);
+      }
+    }
+  };
+
+  const handleAddNewQuestionToCurrentExam = () => {
+    if (!currentExam) return;
+    const newNum = currentExam.questions.length + 1;
+    const newQ: Question = {
+      id: `q-custom-${Date.now()}`,
+      number: newNum,
+      text: 'Tuliskan teks pertanyaan / stimulus baru di sini...',
+      options: [
+        { key: 'A', text: 'Pilihan jawaban A' },
+        { key: 'B', text: 'Pilihan jawaban B' },
+        { key: 'C', text: 'Pilihan jawaban C' },
+        { key: 'D', text: 'Pilihan jawaban D' },
+        { key: 'E', text: 'Pilihan jawaban E' },
+      ],
+      correctOption: 'A',
+      optionScores: { A: 10, B: 0, C: 0, D: 0, E: 0 },
+      explanation: '',
+    };
+    const updatedQuestions = [...currentExam.questions, newQ];
+    handleSaveExam({
+      ...currentExam,
+      questions: updatedQuestions,
+    });
+    setEditingQuestionId(newQ.id);
+    setEditQuestionDraft(newQ);
+    const lastPage = Math.ceil(updatedQuestions.length / questionsPerPage);
+    setQuestionsPage(lastPage);
   };
 
   const handleExportExcel = () => {
@@ -1391,6 +1466,86 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 />
               )}
 
+              {/* Questions List Header & Layout Controls */}
+              <div className="bg-white dark:bg-slate-900 px-5 py-3.5 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-slate-900 dark:text-white text-sm">
+                    Daftar Butir Soal ({currentExam.questions.length} Butir)
+                  </span>
+                  <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                    &bull; Ditampilkan lengkap tanpa terpotong
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* View Mode Switcher */}
+                  <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setOptionsViewMode('list')}
+                      className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+                        optionsViewMode === 'list'
+                          ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                      title="Tampilan Daftar Penuh (1 Kolom) - Sangat nyaman untuk membaca opsi panjang"
+                    >
+                      <LayoutList className="w-3.5 h-3.5" />
+                      <span>Daftar Penuh</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setOptionsViewMode('grid2')}
+                      className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+                        optionsViewMode === 'grid2'
+                          ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                      title="Tampilan Grid 2 Kolom"
+                    >
+                      <Columns2 className="w-3.5 h-3.5" />
+                      <span>Grid 2 Kolom</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setOptionsViewMode('grid5')}
+                      className={`px-2.5 py-1 rounded-lg font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer ${
+                        optionsViewMode === 'grid5'
+                          ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                      title="Tampilan Grid Kompak 5 Kolom"
+                    >
+                      <span>Grid 5 Kolom</span>
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleAddNewQuestionToCurrentExam}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-xs inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Tambah Soal</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingExam(currentExam);
+                      setIsEditorOpen(true);
+                    }}
+                    className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+                    title="Buka modal editor paket ujian dan bobot serentak"
+                  >
+                    <Edit className="w-3.5 h-3.5" />
+                    <span>Modal Editor</span>
+                  </button>
+                </div>
+              </div>
+
               {/* Questions List */}
               <div className="space-y-4">
                 {currentExam.questions.length === 0 ? (
@@ -1411,6 +1566,189 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     const globalIdx = currentExam.questions.findIndex((q) => q.id === question.id);
                     const qIdx = globalIdx >= 0 ? globalIdx : (safeQuestionsPage - 1) * questionsPerPage + pIdx;
                     const questionNumber = question.number || qIdx + 1;
+                    const isInlineEditing = editingQuestionId === question.id && editQuestionDraft;
+
+                    if (isInlineEditing && editQuestionDraft) {
+                      return (
+                        <div
+                          key={question.id || `q-${qIdx}`}
+                          id={`question-card-${questionNumber}`}
+                          className="bg-white dark:bg-slate-900 rounded-3xl p-6 border-2 border-blue-500/80 shadow-lg space-y-4 ring-2 ring-blue-500/20"
+                        >
+                          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-2">
+                              <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-xs">
+                                Edit Soal No. {questionNumber}
+                              </span>
+                              <span className="text-xs text-amber-600 dark:text-amber-400 font-semibold bg-amber-50 dark:bg-amber-950/50 px-2.5 py-0.5 rounded-lg border border-amber-200 dark:border-amber-800">
+                                Mode Edit Aktif
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={handleCancelEditQuestion}
+                                className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+                              >
+                                Batal
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleSaveQuestionDraft}
+                                className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
+                              >
+                                <Save className="w-3.5 h-3.5" />
+                                <span>Simpan Soal</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Question Textarea */}
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                              Teks Soal / Pertanyaan Lengkap:
+                            </label>
+                            <textarea
+                              rows={5}
+                              value={editQuestionDraft.text}
+                              onChange={(e) => setEditQuestionDraft({ ...editQuestionDraft, text: e.target.value })}
+                              placeholder="Ketikkan teks pertanyaan / stimulus lengkap..."
+                              className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl p-4 text-xs sm:text-sm font-medium leading-relaxed focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                          </div>
+
+                          {/* Options List Editor */}
+                          <div className="space-y-3">
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">
+                              Pilihan Jawaban (A - E) & Kunci Benar:
+                            </label>
+                            {editQuestionDraft.options.map((opt) => {
+                              const isWeighted = currentExam.useWeightedScoring !== false;
+                              const isCorrect = (editQuestionDraft.correctOption || 'A') === opt.key;
+                              const score = editQuestionDraft.optionScores[opt.key] ?? 0;
+                              return (
+                                <div
+                                  key={opt.key}
+                                  className={`p-3.5 rounded-2xl border transition-all space-y-2.5 ${
+                                    isCorrect
+                                      ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/30'
+                                      : 'border-slate-200 dark:border-slate-700/80 bg-slate-50/40 dark:bg-slate-800/40'
+                                  }`}
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <span
+                                      className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 mt-1 ${
+                                        isCorrect
+                                          ? 'bg-emerald-600 text-white shadow-xs'
+                                          : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                      }`}
+                                    >
+                                      {opt.key}
+                                    </span>
+                                    <textarea
+                                      rows={2}
+                                      value={opt.text}
+                                      onChange={(e) => {
+                                        const updatedOptions = editQuestionDraft.options.map((o) =>
+                                          o.key === opt.key ? { ...o, text: e.target.value } : o
+                                        );
+                                        setEditQuestionDraft({ ...editQuestionDraft, options: updatedOptions });
+                                      }}
+                                      placeholder={`Teks pilihan jawaban opsi ${opt.key}...`}
+                                      className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl p-2.5 text-xs sm:text-sm font-normal focus:ring-2 focus:ring-blue-500 focus:outline-none resize-y"
+                                    />
+                                  </div>
+
+                                  <div className="flex items-center justify-between pt-1 pl-10 text-xs">
+                                    {isWeighted ? (
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-slate-500 text-[11px] font-medium">Poin Bobot Opsi {opt.key}:</span>
+                                        <input
+                                          type="number"
+                                          min="0"
+                                          max="100"
+                                          value={score}
+                                          onChange={(e) => {
+                                            const newScore = parseInt(e.target.value, 10) || 0;
+                                            setEditQuestionDraft({
+                                              ...editQuestionDraft,
+                                              optionScores: { ...editQuestionDraft.optionScores, [opt.key]: newScore },
+                                            });
+                                          }}
+                                          className="w-16 text-center font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-0.5"
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div>
+                                        {isCorrect ? (
+                                          <span className="text-emerald-700 dark:text-emerald-400 font-bold inline-flex items-center gap-1 text-xs">
+                                            <CheckCircle2 className="w-4 h-4" /> Kunci Jawaban Benar (100% Poin)
+                                          </span>
+                                        ) : (
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              setEditQuestionDraft({
+                                                ...editQuestionDraft,
+                                                correctOption: opt.key,
+                                                optionScores: {
+                                                  A: opt.key === 'A' ? 10 : 0,
+                                                  B: opt.key === 'B' ? 10 : 0,
+                                                  C: opt.key === 'C' ? 10 : 0,
+                                                  D: opt.key === 'D' ? 10 : 0,
+                                                  E: opt.key === 'E' ? 10 : 0,
+                                                },
+                                              });
+                                            }}
+                                            className="px-2.5 py-1 rounded-lg text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800 cursor-pointer"
+                                          >
+                                            Jadikan Opsi {opt.key} Sebagai Kunci Benar
+                                          </button>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Explanation editor */}
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                              Pembahasan / Keterangan Jawaban:
+                            </label>
+                            <textarea
+                              rows={3}
+                              value={editQuestionDraft.explanation || ''}
+                              onChange={(e) => setEditQuestionDraft({ ...editQuestionDraft, explanation: e.target.value })}
+                              placeholder="Ketikkan penjelasan atau pembahasan guru untuk soal ini..."
+                              className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl p-3 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                            <button
+                              type="button"
+                              onClick={handleCancelEditQuestion}
+                              className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                            >
+                              Batal
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleSaveQuestionDraft}
+                              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
+                            >
+                              <Save className="w-4 h-4" />
+                              <span>Simpan Perubahan Soal</span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    }
+
                     return (
                       <div
                         key={question.id || `q-${qIdx}`}
@@ -1428,15 +1766,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               </span>
                             )}
                           </div>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleStartEditQuestion(question)}
+                              className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                              title="Edit teks pertanyaan, pilihan jawaban, kunci, atau pembahasan"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                              <span>Edit Soal</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteQuestion(question.id)}
+                              className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                              title="Hapus soal ini"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
 
-                        {/* Question Text */}
-                        <p className="text-slate-900 dark:text-white text-sm font-semibold whitespace-pre-line leading-relaxed">
-                          {question.text}
-                        </p>
+                        {/* Question Text - Full Display without Truncation */}
+                        <div className="p-4 bg-slate-50/70 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800">
+                          <p className="text-slate-900 dark:text-white text-sm sm:text-base font-medium whitespace-pre-line leading-relaxed select-text">
+                            {question.text}
+                          </p>
+                        </div>
 
-                        {/* Options & Weights Table */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-2">
+                        {/* Options List - FULL DISPLAY WITHOUT ANY TRUNCATION */}
+                        <div
+                          className={
+                            optionsViewMode === 'list'
+                              ? 'space-y-2.5 pt-2'
+                              : optionsViewMode === 'grid2'
+                              ? 'grid grid-cols-1 md:grid-cols-2 gap-3 pt-2'
+                              : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-2'
+                          }
+                        >
                           {question.options.map((opt) => {
                             const isWeighted = currentExam.useWeightedScoring !== false;
                             const isCorrect = (question.correctOption || 'A') === opt.key;
@@ -1446,49 +1814,49 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               return (
                                 <div
                                   key={opt.key}
-                                  className={`p-3.5 rounded-2xl border text-xs flex flex-col justify-between space-y-2.5 transition-all ${
+                                  className={`p-4 rounded-2xl border text-xs sm:text-sm flex flex-col justify-between space-y-3 transition-all ${
                                     isCorrect
-                                      ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/70 dark:bg-emerald-950/40 ring-1 ring-emerald-400/50'
-                                      : 'border-slate-200 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40 hover:border-slate-300'
+                                      ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/80 dark:bg-emerald-950/40 ring-1 ring-emerald-400/50'
+                                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-700'
                                   }`}
                                 >
-                                  <div className="flex items-start gap-2">
+                                  <div className="flex items-start gap-3">
                                     <span
-                                      className={`w-5 h-5 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${
+                                      className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 ${
                                         isCorrect
                                           ? 'bg-emerald-600 text-white shadow-xs'
-                                          : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                                       }`}
                                     >
                                       {opt.key}
                                     </span>
-                                    <span
-                                      className={`line-clamp-2 text-[11px] font-medium ${
+                                    <p
+                                      className={`text-xs sm:text-sm font-medium leading-relaxed flex-1 select-text ${
                                         isCorrect
                                           ? 'text-emerald-950 dark:text-emerald-200 font-semibold'
-                                          : 'text-slate-700 dark:text-slate-300'
+                                          : 'text-slate-800 dark:text-slate-200'
                                       }`}
                                     >
                                       {opt.text}
-                                    </span>
+                                    </p>
                                   </div>
 
-                                  <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/60 text-[11px]">
+                                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[11px]">
                                     {isCorrect ? (
-                                      <span className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/90 dark:bg-emerald-900/60 px-2 py-0.5 rounded-md text-[10px]">
+                                      <span className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/90 dark:bg-emerald-900/60 px-2.5 py-0.5 rounded-md text-[11px]">
                                         <CheckCircle2 className="w-3.5 h-3.5" />
-                                        Kunci Benar (100%)
+                                        Kunci Benar (100% Nilai)
                                       </span>
                                     ) : (
                                       <div className="flex items-center justify-between w-full">
-                                        <span className="text-slate-400 dark:text-slate-500 text-[10px]">Salah (0 poin)</span>
+                                        <span className="text-slate-400 dark:text-slate-500 font-medium">Salah (0 poin)</span>
                                         <button
                                           type="button"
                                           onClick={() => handleSetCorrectOption(question.id, opt.key)}
-                                          className="px-2 py-0.5 rounded-md font-bold text-[10px] text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
+                                          className="px-2.5 py-1 rounded-lg font-bold text-[11px] text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
                                           title={`Jadikan Opsi ${opt.key} sebagai kunci jawaban benar`}
                                         >
-                                          Pilih Kunci
+                                          Pilih Jadi Kunci
                                         </button>
                                       </div>
                                     )}
@@ -1500,32 +1868,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             return (
                               <div
                                 key={opt.key}
-                                className={`p-3.5 rounded-2xl border text-xs flex flex-col justify-between space-y-2.5 transition-all ${
+                                className={`p-4 rounded-2xl border text-xs sm:text-sm flex flex-col justify-between space-y-3 transition-all ${
                                   score === 10
                                     ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/40'
                                     : score > 0
                                     ? 'border-blue-100 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/30'
-                                    : 'border-slate-200 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/40'
+                                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60'
                                 }`}
                               >
-                                <div className="flex items-start gap-2">
+                                <div className="flex items-start gap-3">
                                   <span
-                                    className={`w-5 h-5 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${
+                                    className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 ${
                                       score === 10
                                         ? 'bg-emerald-600 text-white'
                                         : score > 0
                                         ? 'bg-blue-600 text-white'
-                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                                     }`}
                                   >
                                     {opt.key}
                                   </span>
-                                  <span className="text-slate-700 dark:text-slate-300 line-clamp-2 text-[11px] font-medium">
+                                  <p className="text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-medium leading-relaxed flex-1 select-text">
                                     {opt.text}
-                                  </span>
+                                  </p>
                                 </div>
 
-                                <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-700/60 text-[11px]">
+                                <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px]">
                                   <span className="text-slate-400 dark:text-slate-500 font-medium">Poin Bobot:</span>
                                   <input
                                     type="number"
@@ -1551,7 +1919,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                         questions: updatedQuestions,
                                       });
                                     }}
-                                    className="w-14 text-center font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-1 py-0.5 focus:ring-1 focus:ring-blue-500 focus:outline-none text-slate-900 dark:text-white"
+                                    className="w-16 text-center font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-1.5 py-1 focus:ring-1 focus:ring-blue-500 focus:outline-none text-slate-900 dark:text-white"
                                   />
                                 </div>
                               </div>
@@ -1561,9 +1929,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                         {/* Explanation */}
                         {question.explanation && (
-                          <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl text-xs text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700/60">
+                          <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl text-xs sm:text-sm text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-800">
                             <span className="font-bold text-slate-800 dark:text-white">Pembahasan Guru: </span>
-                            <span>{question.explanation}</span>
+                            <span className="leading-relaxed select-text">{question.explanation}</span>
                           </div>
                         )}
                       </div>
