@@ -42,11 +42,14 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
   try {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
     const settingsSnap = await getDoc(settingsRef);
-    const isV5Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'ct_v5_30_soal';
+    const isV6Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'ct_v6_fresh_30_soal';
 
-    if (!isV5Updated) {
+    if (!isV6Updated) {
       console.log('🔄 Memperbarui dataset Ujian CT Informatika (30 Soal HOTS) & MPK-OSIS SMAN 1 Batu ke Cloud Firestore...');
       const batch = writeBatch(db);
+
+      // Hapus dokumen duplikat paket lama jika ada
+      batch.delete(doc(db, COLLECTIONS.EXAMS, 'exam-ct-informatika-30'));
 
       // 1. Seed CT Informatika 30 Exam and MPK OSIS 50 Exam
       batch.set(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), cleanForFirestore(CT_INFORMATIKA_30_EXAM));
@@ -88,7 +91,7 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
       batch.set(settingsRef, {
         enforceWhitelist: true,
         isInitialized: true,
-        version: 'ct_v5_30_soal',
+        version: 'ct_v6_fresh_30_soal',
         updatedAt: new Date().toISOString(),
       }, { merge: true });
 
@@ -124,26 +127,33 @@ export const subscribeToExams = (
           }
         });
 
+        // Hapus dan bersihkan dokumen duplikat lama (CTBATU / exam-ct-informatika-30) jika ada di Firestore
+        const legacyDoc = list.find((e) => e.id === 'exam-ct-informatika-30' || e.token === 'CTBATU');
+        if (legacyDoc) {
+          deleteDoc(doc(db, COLLECTIONS.EXAMS, legacyDoc.id)).catch(console.warn);
+        }
+        let cleanList = list.filter((e) => e.id !== 'exam-ct-informatika-30' && e.token !== 'CTBATU');
+
         // Ensure CT exam is in the list and matches latest version
-        const ctExam = list.find((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
+        const ctExam = cleanList.find((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
         if (!ctExam || (ctExam.questions?.length ?? 0) !== 30 || ctExam.createdAt !== CT_INFORMATIKA_30_EXAM.createdAt) {
           setDoc(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), cleanForFirestore(CT_INFORMATIKA_30_EXAM)).catch(console.warn);
           if (!ctExam) {
-            list.unshift(CT_INFORMATIKA_30_EXAM);
+            cleanList.unshift(CT_INFORMATIKA_30_EXAM);
           } else {
-            const idx = list.findIndex((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
-            list[idx] = CT_INFORMATIKA_30_EXAM;
+            const idx = cleanList.findIndex((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
+            cleanList[idx] = CT_INFORMATIKA_30_EXAM;
           }
         }
 
         // Prioritize CT Informatika exam first
-        list.sort((a, b) => {
+        cleanList.sort((a, b) => {
           if (a.id === CT_INFORMATIKA_30_EXAM.id) return -1;
           if (b.id === CT_INFORMATIKA_30_EXAM.id) return 1;
           return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
         });
 
-        onUpdate(list);
+        onUpdate(cleanList);
       },
       (err) => {
         console.warn('Firestore Exams subscription error:', err);

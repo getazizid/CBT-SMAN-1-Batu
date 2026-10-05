@@ -53,13 +53,18 @@ export const getStoredExams = (): Exam[] => {
       localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(INITIAL_EXAMS));
       return INITIAL_EXAMS;
     }
-    const parsed: Exam[] = JSON.parse(raw);
+    let parsed: Exam[] = JSON.parse(raw);
+    // Hapus duplikat paket lama (CTBATU / exam-ct-informatika-30) jika ada
+    parsed = parsed.filter((e) => e.id !== 'exam-ct-informatika-30' && e.token !== 'CTBATU');
+
     const ctIdx = parsed.findIndex((e) => e.id === CT_INFORMATIKA_30_EXAM.id);
     if (ctIdx === -1) {
       parsed.unshift(CT_INFORMATIKA_30_EXAM);
       localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(parsed));
     } else if (parsed[ctIdx].createdAt !== CT_INFORMATIKA_30_EXAM.createdAt || (parsed[ctIdx].questions?.length ?? 0) !== 30) {
       parsed[ctIdx] = CT_INFORMATIKA_30_EXAM;
+      localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(parsed));
+    } else {
       localStorage.setItem(STORAGE_KEYS.EXAMS, JSON.stringify(parsed));
     }
     // Prioritize CT Informatika exam first
