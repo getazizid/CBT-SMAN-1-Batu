@@ -42,10 +42,10 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
   try {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
     const settingsSnap = await getDoc(settingsRef);
-    const isV6Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'ct_v6_fresh_30_soal';
+    const isV7Updated = settingsSnap.exists() && settingsSnap.data()?.version === 'ct_v7_36_students';
 
-    if (!isV6Updated) {
-      console.log('🔄 Memperbarui dataset Ujian CT Informatika (30 Soal HOTS) & MPK-OSIS SMAN 1 Batu ke Cloud Firestore...');
+    if (!isV7Updated) {
+      console.log('🔄 Memperbarui dataset Ujian CT Informatika (30 Soal HOTS) & 36 Siswa Kelas X SMAN 1 Batu ke Cloud Firestore...');
       const batch = writeBatch(db);
 
       // Hapus dokumen duplikat paket lama jika ada
@@ -55,7 +55,12 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
       batch.set(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), cleanForFirestore(CT_INFORMATIKA_30_EXAM));
       batch.set(doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id), cleanForFirestore(MPK_OSIS_50_EXAM));
 
-      // 2. Seed students: Kelas X-1 s/d X-5 + Real MPK OSIS
+      // Hapus data siswa dummy lama dari Firestore jika ada
+      ['std-ct-x1-01', 'std-ct-x2-01', 'std-ct-x3-01', 'std-ct-x4-01', 'std-ct-x5-01'].forEach((oldId) => {
+        batch.delete(doc(db, COLLECTIONS.STUDENTS, oldId));
+      });
+
+      // 2. Seed 36 Siswa Kelas X + Siswa MPK OSIS
       const allStudents = [...STUDENTS_KELAS_X, ...REAL_STUDENTS_MPK_OSIS];
       allStudents.forEach((student) => {
         batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
@@ -91,12 +96,12 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
       batch.set(settingsRef, {
         enforceWhitelist: true,
         isInitialized: true,
-        version: 'ct_v6_fresh_30_soal',
+        version: 'ct_v7_36_students',
         updatedAt: new Date().toISOString(),
       }, { merge: true });
 
       await batch.commit();
-      console.log('✅ Dataset Ujian CT Informatika (30 Soal HOTS) & SMAN 1 Batu berhasil disinkronkan ke Cloud Firestore!');
+      console.log('✅ Dataset Ujian CT Informatika & 36 Siswa Kelas X SMAN 1 Batu berhasil disinkronkan ke Cloud Firestore!');
     }
     return true;
   } catch (error) {

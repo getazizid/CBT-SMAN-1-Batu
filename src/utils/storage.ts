@@ -118,14 +118,26 @@ export const getStoredStudents = (): RegisteredStudent[] => {
       return INITIAL_STUDENTS;
     }
     const parsed: RegisteredStudent[] = JSON.parse(raw);
-    const existingIds = new Set(parsed.map((s) => s.id));
-    const missing = STUDENTS_KELAS_X.filter((s) => !existingIds.has(s.id));
-    if (missing.length > 0) {
-      const merged = [...parsed, ...missing];
+    
+    // Bersihkan dummy lama std-ct-x1-*, std-ct-x2-*, dst jika ada
+    const cleaned = parsed.filter(
+      (s) => !s.id.startsWith('std-ct-x1-') && 
+             !s.id.startsWith('std-ct-x2-') && 
+             !s.id.startsWith('std-ct-x3-') && 
+             !s.id.startsWith('std-ct-x4-') && 
+             !s.id.startsWith('std-ct-x5-')
+    );
+
+    // Sinkronkan 36 siswa kelas X terbaru
+    const ctStudentMap = new Map(STUDENTS_KELAS_X.map((s) => [s.nisn, s]));
+    const nonCtStudents = cleaned.filter((s) => !ctStudentMap.has(s.nisn) && !s.id.startsWith('std-ct-x-'));
+    const merged = [...STUDENTS_KELAS_X, ...nonCtStudents];
+
+    // Simpan jika ada perubahan data siswa
+    if (merged.length !== parsed.length || !parsed.some((s) => s.id === 'std-ct-x-36')) {
       localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(merged));
-      return merged;
     }
-    return parsed;
+    return merged;
   } catch {
     return INITIAL_STUDENTS;
   }
