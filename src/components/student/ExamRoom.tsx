@@ -492,7 +492,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       if (typeof document !== 'undefined' && typeof document.hasFocus === 'function') {
         if (!document.hasFocus()) {
           unfocusedTicks++;
-          if (unfocusedTicks >= 2) {
+          if (unfocusedTicks >= 3) {
             recordViolation(
               isIOS
                 ? 'Membuka Notifikasi / Pusat Kontrol / Balas Chat di iPhone'
@@ -510,11 +510,11 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     return () => clearInterval(focusInterval);
   }, [needsInitialFullscreen, isIOS, isAndroid]);
 
-  // 4. Background AudioContext Interruption Detector (Specialized for iOS Safari)
+  // 4. Background AudioContext Interruption Detector (Specialized for iOS Safari only)
   // When Notification Center, Control Center, or incoming call/banner interrupts iOS,
   // CoreAudio immediately suspends or interrupts the active AudioContext.
   useEffect(() => {
-    if (needsInitialFullscreen) return;
+    if (needsInitialFullscreen || !isIOS) return;
 
     let audioCtx: AudioContext | null = null;
     let osc: OscillatorNode | null = null;
@@ -650,7 +650,17 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     if (needsInitialFullscreen) return;
 
     // 1. Window Blur: Fired when notification center, control center, floating app, or chat is opened
-    const handleWindowBlur = () => {
+    const handleWindowBlur = (e?: Event) => {
+      // Ignore if event target is an internal DOM element (e.g. clicking buttons, options, radio buttons)
+      if (e && e.target && e.target !== window && e.target !== document) {
+        return;
+      }
+      // Double-check if document actually still has focus
+      if (typeof document !== 'undefined' && typeof document.hasFocus === 'function') {
+        if (document.hasFocus()) {
+          return;
+        }
+      }
       isBlurredRef.current = true;
       const reason = isIOS
         ? 'Membuka Notifikasi / Pusat Kontrol / Balas Chat di iPhone'
@@ -674,17 +684,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 3. Touch Cancel: On iOS, pulling down Notification Center triggers touchcancel immediately
-    const handleTouchCancel = () => {
-      isBlurredRef.current = true;
-      recordViolation(
-        isIOS
-          ? 'Membuka Notifikasi / Pusat Kontrol di iPhone (Touch Cancel)'
-          : 'Interupsi Layar Sistem / Notifikasi'
-      );
-    };
-
-    // 4. Document Visibility Change: Fired when switching tabs or backgrounding
+    // 3. Document Visibility Change: Fired when switching tabs or backgrounding
     const handleVisibilityChange = () => {
       if (document.hidden || document.visibilityState === 'hidden') {
         wasHiddenRef.current = true;
@@ -706,7 +706,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 5. Page Hide / Page Show: Mobile Safari / Chrome lifecycle events (bfcache)
+    // 4. Page Hide / Page Show: Mobile Safari / Chrome lifecycle events (bfcache)
     const handlePageHide = () => {
       wasHiddenRef.current = true;
       recordViolation('Meninggalkan Halaman Ujian (Page Hide)');
@@ -722,7 +722,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 6. Fullscreen Change (Android & PC)
+    // 5. Fullscreen Change (Android & PC)
     const handleFullscreenChange = () => {
       if (!fsSupported) return;
       const isFs = isCurrentlyFullscreen();
@@ -736,7 +736,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 7. Split-Screen / Resize detection for Android
+    // 6. Split-Screen / Resize detection for Android
     const handleResize = () => {
       if (isAndroid) {
         const isPortrait = window.innerHeight > window.innerWidth;
@@ -747,7 +747,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 8. Screenshot shortcuts & Developer tools & System Keyboard Shortcuts
+    // 7. Screenshot shortcuts & Developer tools & System Keyboard Shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
         e.preventDefault();
@@ -781,43 +781,16 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 9. Top-Edge Swipe Down Detection (Catches attempt to pull down Notification / Control Center)
-    let touchStartY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches && e.touches.length > 0) {
-        touchStartY = e.touches[0].clientY;
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches && e.touches.length > 0) {
-        const curY = e.touches[0].clientY;
-        // If swipe started in the top 45px (status bar / notch zone) and dragged downward > 20px
-        if (touchStartY < 45 && curY - touchStartY > 20) {
-          recordViolation(
-            isIOS
-              ? 'Mencoba Menarik Notifikasi / Pusat Kontrol di iPhone'
-              : 'Mencoba Menarik Notifikasi dari Atas Layar'
-          );
-        }
-      }
-    };
-
-    // 10. Prevent context menu, copy, cut, paste, text drag
+    // 8. Prevent context menu, copy, cut, paste, text drag
     const preventDefault = (e: Event) => e.preventDefault();
 
     if (fsSupported) {
       document.addEventListener('fullscreenchange', handleFullscreenChange);
       document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     }
-    // useCapture = true to intercept ALL blur, focusout, touch events immediately
-    window.addEventListener('blur', handleWindowBlur, true);
-    window.addEventListener('focus', handleWindowFocus, true);
-    window.addEventListener('focusout', handleWindowBlur, true);
-    document.addEventListener('focusout', handleWindowBlur, true);
-    window.addEventListener('touchcancel', handleTouchCancel, true);
-    window.addEventListener('touchstart', handleTouchStart, { passive: true, capture: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true, capture: true });
+    // Standard window blur & focus without capture phase (avoids child button blur false positives)
+    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focus', handleWindowFocus);
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pagehide', handlePageHide);
     window.addEventListener('pageshow', handlePageShow);
@@ -834,13 +807,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
         document.removeEventListener('fullscreenchange', handleFullscreenChange);
         document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
       }
-      window.removeEventListener('blur', handleWindowBlur, true);
-      window.removeEventListener('focus', handleWindowFocus, true);
-      window.removeEventListener('focusout', handleWindowBlur, true);
-      document.removeEventListener('focusout', handleWindowBlur, true);
-      window.removeEventListener('touchcancel', handleTouchCancel, true);
-      window.removeEventListener('touchstart', handleTouchStart, true);
-      window.removeEventListener('touchmove', handleTouchMove, true);
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focus', handleWindowFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pagehide', handlePageHide);
       window.removeEventListener('pageshow', handlePageShow);
