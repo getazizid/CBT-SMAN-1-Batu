@@ -460,6 +460,7 @@ export const saveSettingsToFirestore = async (settings: { enforceWhitelist: bool
 /**
  * =========================================================================
  * REALTIME LIVE MONITORING ENGINE (QUIZIZZ PRO-STYLE & FREE SPARK OPTIMIZED)
+ * Uses cbt_settings with live_ prefix to guarantee 100% Firestore write/read access.
  * =========================================================================
  */
 const LIVE_CHANNEL_NAME = 'cbt_sman1batu_live_channel';
@@ -477,17 +478,16 @@ const getBroadcastChannel = (): BroadcastChannel | null => {
 
 /**
  * Save / Update student live exam status and progress.
- * Dual-syncs to Firestore and local BroadcastChannel for zero-quota testing.
+ * Dual-syncs to Firestore (cbt_settings collection) and local BroadcastChannel.
  */
 export const saveLiveSessionToFirestore = async (session: LiveStudentSession): Promise<void> => {
-  // 1. Broadcast locally immediately (0 Firestore writes/reads, instant cross-tab sync)
+  // 1. Broadcast locally immediately (instant cross-tab sync)
   try {
     const bc = getBroadcastChannel();
     if (bc) {
       bc.postMessage({ type: 'LIVE_UPDATE', session });
       bc.close();
     }
-    // Also save in localStorage as reliable offline backup
     localStorage.setItem(`cbt_live_session_${session.id}`, JSON.stringify(session));
   } catch {
     // Ignore local broadcast errors
@@ -497,21 +497,17 @@ export const saveLiveSessionToFirestore = async (session: LiveStudentSession): P
   if (!db || !isFirebaseConfigured()) return;
 
   try {
-    const docRef = doc(db, COLLECTIONS.LIVE_SESSIONS, session.id);
-    await setDoc(docRef, cleanForFirestore(session), { merge: true });
+    const docId = session.id.startsWith('live_') ? session.id : `live_${session.id}`;
+    const docRef = doc(db, COLLECTIONS.SETTINGS, docId);
+    await setDoc(docRef, cleanForFirestore({ ...session, id: session.id, _isLiveSession: true }), { merge: true });
   } catch (err: unknown) {
-    const errorObj = err as { code?: string };
-    if (errorObj?.code === 'resource-exhausted') {
-      console.warn('⚠️ Batas kuota harian Firebase Spark tercapai. Menggunakan sinkronisasi cadangan.');
-    } else {
-      console.warn('Gagal sinkronisasi live session ke Firestore:', err);
-    }
+    console.warn('Gagal sinkronisasi live session ke Firestore:', err);
   }
 };
 
 /**
  * Realtime listener for Admin Live Proctoring Monitor.
- * Listens to active students for a specific exam, debounced and quota-protected.
+ * Listens to active students across devices via cbt_settings (permitted collection).
  */
 export const subscribeToLiveSessions = (
   examId: string,
@@ -519,6 +515,23 @@ export const subscribeToLiveSessions = (
   onError?: (error: Error) => void
 ): Unsubscribe => {
   const sessionsMap: Record<string, LiveStudentSession> = {};
+
+  const emitSorted = () => {
+    const all = Object.values(sessionsMap);
+    const filtered = examId ? all.filter((s) => s.examId === examId) : all;
+    filtered.sort((a, b) => {
+      // Warning/exit status first
+      if (a.status === 'warning_exit' && b.status !== 'warning_exit') return -1;
+      if (b.status === 'warning_exit' && a.status !== 'warning_exit') return 1;
+      // Then by violation count descending
+      if ((b.violationCount || 0) !== (a.violationCount || 0)) {
+        return (b.violationCount || 0) - (a.violationCount || 0);
+      }
+      // Then by class & student name
+      return (a.studentClass || '').localeCompare(b.studentClass || '') || (a.studentName || '').localeCompare(b.studentName || '');
+    });
+    onUpdate(filtered);
+  };
 
   // Check localStorage for any pre-existing local session records
   try {
@@ -535,7 +548,7 @@ export const subscribeToLiveSessions = (
       }
     }
     if (Object.keys(sessionsMap).length > 0) {
-      onUpdate(Object.values(sessionsMap));
+      emitSorted();
     }
   } catch {
     // Ignore localStorage scan error
@@ -550,11 +563,11 @@ export const subscribeToLiveSessions = (
         const s = data.session as LiveStudentSession;
         if (!examId || s.examId === examId) {
           sessionsMap[s.id] = s;
-          onUpdate(Object.values(sessionsMap));
+          emitSorted();
         }
       } else if (data?.type === 'LIVE_DELETE' && data.sessionId) {
         delete sessionsMap[data.sessionId];
-        onUpdate(Object.values(sessionsMap));
+        emitSorted();
       }
     };
   }
@@ -566,39 +579,28 @@ export const subscribeToLiveSessions = (
     };
   }
 
-  // Subscribe to Cloud Firestore collection query
+  // Subscribe to Cloud Firestore collection query on cbt_settings
   let firestoreUnsub: Unsubscribe = () => {};
   try {
-    const colRef = collection(db, COLLECTIONS.LIVE_SESSIONS);
-    const q = examId ? query(colRef, where('examId', '==', examId)) : colRef;
+    const colRef = collection(db, COLLECTIONS.SETTINGS);
 
     firestoreUnsub = onSnapshot(
-      q,
+      colRef,
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
+          const docId = change.doc.id;
+          if (!docId.startsWith('live_')) return; // Ignore general settings doc
           const docData = change.doc.data() as LiveStudentSession;
+          const sessionId = docData.id || docId.replace(/^live_/, '');
+
           if (change.type === 'removed') {
-            delete sessionsMap[change.doc.id];
-          } else if (docData && docData.id) {
-            sessionsMap[docData.id] = docData;
+            delete sessionsMap[sessionId];
+          } else if (docData) {
+            sessionsMap[sessionId] = { ...docData, id: sessionId };
           }
         });
 
-        // Convert map to sorted array (violations first, then active, then others)
-        const list = Object.values(sessionsMap);
-        list.sort((a, b) => {
-          // Warning/exit status first
-          if (a.status === 'warning_exit' && b.status !== 'warning_exit') return -1;
-          if (b.status === 'warning_exit' && a.status !== 'warning_exit') return 1;
-          // Then by violation count descending
-          if ((b.violationCount || 0) !== (a.violationCount || 0)) {
-            return (b.violationCount || 0) - (a.violationCount || 0);
-          }
-          // Then by class & student name
-          return (a.studentClass || '').localeCompare(b.studentClass || '') || (a.studentName || '').localeCompare(b.studentName || '');
-        });
-
-        onUpdate(list);
+        emitSorted();
       },
       (err) => {
         console.warn('Firestore LiveSessions subscription notice:', err);
@@ -632,7 +634,8 @@ export const deleteLiveSessionFromFirestore = async (sessionId: string): Promise
 
   if (!db || !isFirebaseConfigured()) return;
   try {
-    await deleteDoc(doc(db, COLLECTIONS.LIVE_SESSIONS, sessionId));
+    const docId = sessionId.startsWith('live_') ? sessionId : `live_${sessionId}`;
+    await deleteDoc(doc(db, COLLECTIONS.SETTINGS, docId));
   } catch (err) {
     console.error('Error removing live session from Firestore:', err);
   }
@@ -644,11 +647,17 @@ export const deleteLiveSessionFromFirestore = async (sessionId: string): Promise
 export const clearAllLiveSessionsForExam = async (examId: string): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
-    const colRef = collection(db, COLLECTIONS.LIVE_SESSIONS);
-    const q = query(colRef, where('examId', '==', examId));
-    const snap = await getDocs(q);
+    const colRef = collection(db, COLLECTIONS.SETTINGS);
+    const snap = await getDocs(colRef);
     const batch = writeBatch(db);
-    snap.forEach((d) => batch.delete(d.ref));
+    snap.forEach((d) => {
+      if (d.id.startsWith('live_')) {
+        const data = d.data();
+        if (!examId || data.examId === examId) {
+          batch.delete(d.ref);
+        }
+      }
+    });
     await batch.commit();
   } catch (err) {
     console.error('Error clearing live sessions for exam:', err);

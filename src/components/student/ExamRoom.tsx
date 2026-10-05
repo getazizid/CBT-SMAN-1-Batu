@@ -166,6 +166,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   const [lastViolationReason, setLastViolationReason] = useState<string>('');
   const [showQuestionGridMobile, setShowQuestionGridMobile] = useState<boolean>(false);
   const [showRestoredNotice, setShowRestoredNotice] = useState<boolean>(() => !!initialSaved);
+  const [isScreenshotShieldActive, setIsScreenshotShieldActive] = useState<boolean>(false);
 
   const fsSupported = isFullscreenSupported();
   const isIOS = isIOSDevice();
@@ -425,7 +426,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     requestAppFullscreen();
   };
 
-  // 1-second Watchdog Heartbeat Delta: Catches frozen backgrounding, app switches, notification replies
+  // 1. Fast 200ms Watchdog Heartbeat Delta: Catches background freeze and throttled JavaScript
   useEffect(() => {
     if (needsInitialFullscreen) return;
     lastHeartbeatTimeRef.current = Date.now();
@@ -435,11 +436,10 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       const delta = now - lastHeartbeatTimeRef.current;
       lastHeartbeatTimeRef.current = now;
 
-      // In normal active browsing, delta is ~1000ms.
-      // If delta > 2800ms, the JS thread was frozen in background, phone was locked,
-      // or student was in another app / chatting / in notification center!
-      if (delta > 2800) {
-        const secondsAway = Math.round(delta / 1000);
+      // In active browsing, delta is ~200ms. If delta > 650ms, the JS thread was frozen in background,
+      // phone was locked, or student opened notification shade / chat!
+      if (delta > 650) {
+        const secondsAway = Math.round(delta / 100) / 10;
         const reason = isIOS
           ? `Membuka Chat / Notifikasi di iPhone (${secondsAway} detik di latar belakang)`
           : isAndroid
@@ -447,9 +447,67 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
           : `Meninggalkan Ujian di Latar Belakang (${secondsAway} detik)`;
         recordViolation(reason);
       }
-    }, 1000);
+    }, 200);
 
     return () => clearInterval(watchdogInterval);
+  }, [needsInitialFullscreen, isIOS, isAndroid]);
+
+  // 2. Compositor requestAnimationFrame gap loop: Catches iOS Notification Center, Quick-Reply banner, Control Center
+  useEffect(() => {
+    if (needsInitialFullscreen) return;
+    let lastRafTime = performance.now();
+    let rafId: number;
+    let isRunning = true;
+
+    const checkRaf = (now: DOMHighResTimeStamp) => {
+      if (!isRunning) return;
+      const gap = now - lastRafTime;
+      lastRafTime = now;
+
+      // Normal 60fps frame is ~16.6ms. If gap > 450ms, iOS compositor was suspended by system overlay
+      if (gap > 450) {
+        const sec = Math.round(gap / 100) / 10;
+        recordViolation(
+          isIOS
+            ? `Membuka Notifikasi / Pusat Kontrol / Balas Chat di iPhone (Terjeda ${sec}s)`
+            : `Membuka Notifikasi / Balas Chat (Terjeda ${sec}s)`
+        );
+      }
+      rafId = requestAnimationFrame(checkRaf);
+    };
+
+    rafId = requestAnimationFrame(checkRaf);
+    return () => {
+      isRunning = false;
+      cancelAnimationFrame(rafId);
+    };
+  }, [needsInitialFullscreen, isIOS]);
+
+  // 3. Fast 150ms document.hasFocus() checker: Catches active notification typing & sheet focus
+  useEffect(() => {
+    if (needsInitialFullscreen) return;
+    let unfocusedTicks = 0;
+
+    const focusInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && typeof document.hasFocus === 'function') {
+        if (!document.hasFocus()) {
+          unfocusedTicks++;
+          if (unfocusedTicks >= 2) {
+            recordViolation(
+              isIOS
+                ? 'Membuka Notifikasi / Pusat Kontrol / Balas Chat di iPhone'
+                : isAndroid
+                ? 'Membuka Notifikasi / Split-Screen / Balas Chat di Android'
+                : 'Jendela Ujian Kehilangan Fokus (Window Blur)'
+            );
+          }
+        } else {
+          unfocusedTicks = 0;
+        }
+      }
+    }, 150);
+
+    return () => clearInterval(focusInterval);
   }, [needsInitialFullscreen, isIOS, isAndroid]);
 
   // Back navigation trap to prevent swiping back or back button
@@ -566,7 +624,17 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 3. Document Visibility Change: Fired when switching tabs or backgrounding
+    // 3. Touch Cancel: On iOS, pulling down Notification Center triggers touchcancel immediately
+    const handleTouchCancel = () => {
+      isBlurredRef.current = true;
+      recordViolation(
+        isIOS
+          ? 'Membuka Notifikasi / Pusat Kontrol di iPhone (Touch Cancel)'
+          : 'Interupsi Layar Sistem / Notifikasi'
+      );
+    };
+
+    // 4. Document Visibility Change: Fired when switching tabs or backgrounding
     const handleVisibilityChange = () => {
       if (document.hidden || document.visibilityState === 'hidden') {
         wasHiddenRef.current = true;
@@ -588,7 +656,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 4. Page Hide / Page Show: Mobile Safari / Chrome lifecycle events (bfcache)
+    // 5. Page Hide / Page Show: Mobile Safari / Chrome lifecycle events (bfcache)
     const handlePageHide = () => {
       wasHiddenRef.current = true;
       recordViolation('Meninggalkan Halaman Ujian (Page Hide)');
@@ -604,7 +672,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 5. Fullscreen Change (Android & PC)
+    // 6. Fullscreen Change (Android & PC)
     const handleFullscreenChange = () => {
       if (!fsSupported) return;
       const isFs = isCurrentlyFullscreen();
@@ -618,7 +686,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 6. Split-Screen / Resize detection for Android
+    // 7. Split-Screen / Resize detection for Android
     const handleResize = () => {
       if (isAndroid) {
         const isPortrait = window.innerHeight > window.innerWidth;
@@ -629,18 +697,29 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 7. Developer tools & System Keyboard Shortcuts
+    // 8. Screenshot shortcuts & Developer tools & System Keyboard Shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
         e.preventDefault();
         recordViolation('Mencoba Membuka Developer Tools Browser');
         return;
       }
-      if (e.key === 'PrintScreen' || (e.ctrlKey && e.key.toLowerCase() === 'p')) {
+
+      // Screenshot shortcuts: PrintScreen, Ctrl+P, Win+Shift+S, Cmd+Shift+3/4/5
+      const isPrintScreen = e.key === 'PrintScreen';
+      const isPrintKey = e.ctrlKey && e.key.toLowerCase() === 'p';
+      const isMacScreenshot = e.metaKey && e.shiftKey && ['3', '4', '5'].includes(e.key);
+      const isWindowsSnip = (e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 's';
+
+      if (isPrintScreen || isPrintKey || isMacScreenshot || isWindowsSnip) {
         e.preventDefault();
+        e.stopPropagation();
+        setIsScreenshotShieldActive(true);
+        setTimeout(() => setIsScreenshotShieldActive(false), 2500);
         recordViolation('Mencoba Mengambil Tangkapan Layar (Screenshot) / Cetak');
         return;
       }
+
       if (e.altKey || e.metaKey) {
         recordViolation('Mencoba Menekan Tombol Sistem (Alt / Cmd / Windows)');
         return;
@@ -652,20 +731,24 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 8. Prevent context menu, copy, cut, paste, text drag
+    // 9. Prevent context menu, copy, cut, paste, text drag
     const preventDefault = (e: Event) => e.preventDefault();
 
     if (fsSupported) {
       document.addEventListener('fullscreenchange', handleFullscreenChange);
       document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     }
-    window.addEventListener('blur', handleWindowBlur);
-    window.addEventListener('focus', handleWindowFocus);
+    // useCapture = true to intercept ALL blur, focusout, touch events immediately
+    window.addEventListener('blur', handleWindowBlur, true);
+    window.addEventListener('focus', handleWindowFocus, true);
+    window.addEventListener('focusout', handleWindowBlur, true);
+    document.addEventListener('focusout', handleWindowBlur, true);
+    window.addEventListener('touchcancel', handleTouchCancel, true);
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pagehide', handlePageHide);
     window.addEventListener('pageshow', handlePageShow);
     window.addEventListener('resize', handleResize);
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown, true);
     document.addEventListener('contextmenu', preventDefault);
     document.addEventListener('copy', preventDefault);
     document.addEventListener('cut', preventDefault);
@@ -677,13 +760,16 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
         document.removeEventListener('fullscreenchange', handleFullscreenChange);
         document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
       }
-      window.removeEventListener('blur', handleWindowBlur);
-      window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener('blur', handleWindowBlur, true);
+      window.removeEventListener('focus', handleWindowFocus, true);
+      window.removeEventListener('focusout', handleWindowBlur, true);
+      document.removeEventListener('focusout', handleWindowBlur, true);
+      window.removeEventListener('touchcancel', handleTouchCancel, true);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pagehide', handlePageHide);
       window.removeEventListener('pageshow', handlePageShow);
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown, true);
       document.removeEventListener('contextmenu', preventDefault);
       document.removeEventListener('copy', preventDefault);
       document.removeEventListener('cut', preventDefault);
@@ -840,7 +926,31 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200 relative select-none">
+      {/* Blackout Screenshot Shield (Instant Pitch-Black Blanking upon Screenshot Attempt) */}
+      {isScreenshotShieldActive && (
+        <div className="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center text-white p-6 text-center select-none pointer-events-none animate-in fade-in duration-75">
+          <ShieldAlert className="w-16 h-16 text-rose-500 mb-4 animate-bounce" />
+          <h2 className="text-xl font-black text-rose-400 mb-2 uppercase tracking-wider">
+            Tangkapan Layar Diblokir Sistem CBT
+          </h2>
+          <p className="text-xs text-slate-300 max-w-sm leading-relaxed">
+            Dilarang mengambil tangkapan layar (screenshot) selama ujian berlangsung. Aktivitas ini tercatat otomatis dan dilaporkan secara realtime ke Proktor.
+          </p>
+        </div>
+      )}
+
+      {/* Prominent High-Security Anti-Leak Watermark Grid (Prevents Photo/Screen Leaks) */}
+      <div className="fixed inset-0 pointer-events-none select-none overflow-hidden z-20 opacity-[0.06] dark:opacity-[0.09] flex flex-wrap items-center justify-around gap-16 p-8 rotate-[-15deg]">
+        {Array.from({ length: 24 }).map((_, i) => (
+          <div key={i} className="text-center font-mono font-black text-xs sm:text-sm text-slate-900 dark:text-white uppercase tracking-wider">
+            <span>SMAN 1 BATU &bull; {studentData.name}</span>
+            <br />
+            <span>NISN: {studentData.nisn} &bull; {studentData.studentClass}</span>
+          </div>
+        ))}
+      </div>
+
       {/* Quizizz Pro Safe Exam Fullscreen Entry Gate for Android, iPhone & PC */}
       {needsInitialFullscreen && (
         <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
