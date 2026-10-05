@@ -356,7 +356,7 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
     const interval = setInterval(() => {
       syncLiveToFirebase();
-    }, 30000);
+    }, 45000);
 
     return () => clearInterval(interval);
   }, []);
@@ -509,6 +509,56 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
 
     return () => clearInterval(focusInterval);
   }, [needsInitialFullscreen, isIOS, isAndroid]);
+
+  // 4. Background AudioContext Interruption Detector (Specialized for iOS Safari)
+  // When Notification Center, Control Center, or incoming call/banner interrupts iOS,
+  // CoreAudio immediately suspends or interrupts the active AudioContext.
+  useEffect(() => {
+    if (needsInitialFullscreen) return;
+
+    let audioCtx: AudioContext | null = null;
+    let osc: OscillatorNode | null = null;
+
+    try {
+      const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtxClass) {
+        audioCtx = new AudioCtxClass();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
+
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.0001; // Inaudible
+        osc = audioCtx.createOscillator();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.start();
+
+        audioCtx.onstatechange = () => {
+          if (audioCtx && (audioCtx.state === 'suspended' || (audioCtx.state as string) === 'interrupted')) {
+            if (!showCheatWarningRef.current && !needsInitialFullscreen) {
+              recordViolation(
+                isIOS
+                  ? 'Membuka Notifikasi / Pusat Kontrol di iPhone (Audio Interrupted)'
+                  : 'Interupsi Sistem / Beralih Aplikasi'
+              );
+            }
+          }
+        };
+      }
+    } catch {
+      // Ignore audio context errors on unsupported browsers
+    }
+
+    return () => {
+      try {
+        if (osc) osc.stop();
+        if (audioCtx && audioCtx.state !== 'closed') {
+          audioCtx.close().catch(() => {});
+        }
+      } catch {}
+    };
+  }, [needsInitialFullscreen, isIOS]);
 
   // Back navigation trap to prevent swiping back or back button
   useEffect(() => {
@@ -731,7 +781,29 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       }
     };
 
-    // 9. Prevent context menu, copy, cut, paste, text drag
+    // 9. Top-Edge Swipe Down Detection (Catches attempt to pull down Notification / Control Center)
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches && e.touches.length > 0) {
+        touchStartY = e.touches[0].clientY;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches && e.touches.length > 0) {
+        const curY = e.touches[0].clientY;
+        // If swipe started in the top 45px (status bar / notch zone) and dragged downward > 20px
+        if (touchStartY < 45 && curY - touchStartY > 20) {
+          recordViolation(
+            isIOS
+              ? 'Mencoba Menarik Notifikasi / Pusat Kontrol di iPhone'
+              : 'Mencoba Menarik Notifikasi dari Atas Layar'
+          );
+        }
+      }
+    };
+
+    // 10. Prevent context menu, copy, cut, paste, text drag
     const preventDefault = (e: Event) => e.preventDefault();
 
     if (fsSupported) {
@@ -744,6 +816,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
     window.addEventListener('focusout', handleWindowBlur, true);
     document.addEventListener('focusout', handleWindowBlur, true);
     window.addEventListener('touchcancel', handleTouchCancel, true);
+    window.addEventListener('touchstart', handleTouchStart, { passive: true, capture: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true, capture: true });
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pagehide', handlePageHide);
     window.addEventListener('pageshow', handlePageShow);
@@ -765,6 +839,8 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
       window.removeEventListener('focusout', handleWindowBlur, true);
       document.removeEventListener('focusout', handleWindowBlur, true);
       window.removeEventListener('touchcancel', handleTouchCancel, true);
+      window.removeEventListener('touchstart', handleTouchStart, true);
+      window.removeEventListener('touchmove', handleTouchMove, true);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pagehide', handlePageHide);
       window.removeEventListener('pageshow', handlePageShow);
@@ -939,17 +1015,6 @@ export const ExamRoom: React.FC<ExamRoomProps> = ({
           </p>
         </div>
       )}
-
-      {/* Prominent High-Security Anti-Leak Watermark Grid (Prevents Photo/Screen Leaks) */}
-      <div className="fixed inset-0 pointer-events-none select-none overflow-hidden z-20 opacity-[0.06] dark:opacity-[0.09] flex flex-wrap items-center justify-around gap-16 p-8 rotate-[-15deg]">
-        {Array.from({ length: 24 }).map((_, i) => (
-          <div key={i} className="text-center font-mono font-black text-xs sm:text-sm text-slate-900 dark:text-white uppercase tracking-wider">
-            <span>SMAN 1 BATU &bull; {studentData.name}</span>
-            <br />
-            <span>NISN: {studentData.nisn} &bull; {studentData.studentClass}</span>
-          </div>
-        ))}
-      </div>
 
       {/* Quizizz Pro Safe Exam Fullscreen Entry Gate for Android, iPhone & PC */}
       {needsInitialFullscreen && (
