@@ -139,12 +139,26 @@ export const getStoredStudents = (): RegisteredStudent[] => {
       (s) => !s.id.startsWith('std-ct-x1-') && 
              !s.id.startsWith('std-ct-x2-') && 
              !s.id.startsWith('std-ct-x3-') && 
-             !s.id.startsWith('std-ct-x4-') && 
-             !s.id.startsWith('std-ct-x5-')
+             !s.id.startsWith('std-ct-x4-')
     );
+
+    // Sinkronkan data siswa dari INITIAL_STUDENTS (termasuk X-5) yang belum ada di localStorage
+    const existingNisns = new Set(cleaned.map((s) => s.nisn));
+    let hasNewStudents = false;
+    for (const initStd of INITIAL_STUDENTS) {
+      if (!existingNisns.has(initStd.nisn)) {
+        cleaned.push(initStd);
+        existingNisns.add(initStd.nisn);
+        hasNewStudents = true;
+      }
+    }
+
+    if (hasNewStudents || cleaned.length !== parsed.length) {
+      localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(cleaned));
+    }
     return cleaned;
   } catch {
-    return [];
+    return INITIAL_STUDENTS;
   }
 };
 

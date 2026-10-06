@@ -32,6 +32,31 @@ export const COLLECTIONS = {
 };
 
 
+export const syncMissingInitialStudentsToFirestore = async (): Promise<void> => {
+  if (!db || !isFirebaseConfigured()) return;
+  try {
+    const studentsSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+    const existingNisns = new Set<string>();
+    studentsSnap.forEach((d) => {
+      const data = d.data();
+      if (data.nisn) existingNisns.add(data.nisn);
+    });
+
+    const missingStudents = INITIAL_STUDENTS.filter((s) => !existingNisns.has(s.nisn));
+    if (missingStudents.length > 0) {
+      console.log(`🔄 Menyinkronkan ${missingStudents.length} siswa baru ke Cloud Firestore...`);
+      const batch = writeBatch(db);
+      missingStudents.forEach((student) => {
+        batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
+      });
+      await batch.commit();
+      console.log(`✅ Berhasil menyinkronkan ${missingStudents.length} siswa baru ke Cloud Firestore!`);
+    }
+  } catch (err) {
+    console.warn('⚠️ Gagal sinkronisasi siswa baru ke Firestore:', err);
+  }
+};
+
 /**
  * Seed & harmonize initial data for CBT SMAN 1 Batu (CT Informatika & MPK-OSIS).
  * Preserves user-edited admin accounts and prevents reverting.
@@ -43,8 +68,9 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
     const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'general');
     const settingsSnap = await getDoc(settingsRef);
 
-    // Jika database sudah pernah diinisialisasi, jangan pernah menimpa atau mengembalikan data ujian yang dihapus admin
+    // Jika database sudah pernah diinisialisasi, jangan pernah menimpa ujian tetapi tetap sinkronkan siswa baru jika ada
     if (settingsSnap.exists() && settingsSnap.data()?.isInitialized) {
+      syncMissingInitialStudentsToFirestore().catch(console.warn);
       return true;
     }
 

@@ -22,6 +22,7 @@ import {
   saveSettingsToFirestore,
 } from './utils/firebaseService';
 import {
+  INITIAL_STUDENTS,
   addStudentSubmission,
   getCurrentAdminSession,
   getStoredActiveStudentSession,
@@ -175,8 +176,13 @@ export default function App() {
     const unsubStudents = subscribeToStudents(
       (remoteStudents) => {
         if (remoteStudents) {
-          setStudents(remoteStudents);
-          saveStoredStudents(remoteStudents);
+          // Pertahankan siswa terdaftar lokal/initial jika belum tercatat di Firestore
+          const remoteNisnSet = new Set(remoteStudents.map((s) => s.nisn));
+          const missingLocals = INITIAL_STUDENTS.filter((s) => !remoteNisnSet.has(s.nisn));
+          const mergedStudents = missingLocals.length > 0 ? [...remoteStudents, ...missingLocals] : remoteStudents;
+
+          setStudents(mergedStudents);
+          saveStoredStudents(mergedStudents);
           setIsCloudConnected(true);
         }
       },
