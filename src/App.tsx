@@ -50,10 +50,24 @@ import {
   saveStoredResetStudentAttempts,
   saveStoredStudents,
   saveStoredSubmissions,
+  getStoredActiveRole,
+  saveStoredActiveRole,
+  saveStoredAdminActiveTab,
 } from './utils/storage';
 
 export default function App() {
-  const [role, setRole] = useState<UserRole>('student');
+  const [role, setRole] = useState<UserRole>(() => {
+    const activeStudentSession = getStoredActiveStudentSession();
+    if (activeStudentSession) return 'student';
+
+    const adminSession = getCurrentAdminSession();
+    const storedRole = getStoredActiveRole();
+    if (adminSession) {
+      if (storedRole === 'student') return 'student';
+      return 'admin';
+    }
+    return 'student';
+  });
   const [exams, setExams] = useState<Exam[]>([]);
   const [submissions, setSubmissions] = useState<StudentExamSubmission[]>([]);
   const [students, setStudents] = useState<RegisteredStudent[]>([]);
@@ -82,7 +96,13 @@ export default function App() {
     setSubmissions(getStoredSubmissions());
     setStudents(getStoredStudents());
     setAdminAccounts(getStoredAdminAccounts());
-    setCurrentAdmin(getCurrentAdminSession());
+    const adminSession = getCurrentAdminSession();
+    setCurrentAdmin(adminSession);
+    const activeStudentSession = getStoredActiveStudentSession();
+    const storedRole = getStoredActiveRole();
+    if (adminSession && !activeStudentSession && storedRole !== 'student') {
+      setRole('admin');
+    }
     setEnforceWhitelist(getStoredEnforceWhitelist());
 
     // Restore student exam session if interrupted
@@ -435,12 +455,22 @@ export default function App() {
   const handleAdminLoginSuccess = (account: AdminAccount) => {
     setCurrentAdmin(account);
     saveCurrentAdminSession(account);
+    saveStoredActiveRole('admin');
     setRole('admin');
   };
 
   const handleLogoutAdmin = () => {
     setCurrentAdmin(null);
     saveCurrentAdminSession(null);
+    saveStoredActiveRole('student');
+    saveStoredAdminActiveTab(null);
+    try {
+      if (typeof window !== 'undefined' && window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    } catch {
+      // ignore
+    }
     setRole('student');
     handleBackToStudentHome();
   };
@@ -541,6 +571,7 @@ export default function App() {
               setIsAdminLoginModalOpen(true);
             } else {
               setRole(newRole);
+              saveStoredActiveRole(newRole);
               if (newRole === 'student') {
                 handleBackToStudentHome();
               }

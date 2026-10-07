@@ -57,6 +57,12 @@ import { StudentEditorModal } from './StudentEditorModal';
 import { WordImportModal } from './WordImportModal';
 import { LiveMonitorTab } from './LiveMonitorTab';
 import { Pagination } from '../common/Pagination';
+import {
+  getStoredAdminActiveTab,
+  saveStoredAdminActiveTab,
+  getStoredSelectedExamId,
+  saveStoredSelectedExamId,
+} from '../../utils/storage';
 
 interface AdminDashboardProps {
   exams: Exam[];
@@ -76,8 +82,34 @@ interface AdminDashboardProps {
   onLogoutAdmin: () => void;
 }
 
-type AdminTab = 'exams' | 'live' | 'questions' | 'students' | 'submissions' | 'accounts';
+export type AdminTab = 'exams' | 'live' | 'questions' | 'students' | 'submissions' | 'accounts';
 
+const VALID_ADMIN_TABS: AdminTab[] = [
+  'exams',
+  'live',
+  'questions',
+  'students',
+  'submissions',
+  'accounts',
+];
+
+const getInitialAdminTab = (): AdminTab => {
+  try {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const hash = window.location.hash.replace('#', '').toLowerCase() as AdminTab;
+      if (VALID_ADMIN_TABS.includes(hash)) {
+        return hash;
+      }
+    }
+    const stored = getStoredAdminActiveTab() as AdminTab;
+    if (stored && VALID_ADMIN_TABS.includes(stored)) {
+      return stored;
+    }
+  } catch {
+    // ignore
+  }
+  return 'exams';
+};
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   exams,
@@ -96,19 +128,76 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onToggleEnforceWhitelist,
   onLogoutAdmin,
 }) => {
-  const [activeTab, setActiveTab] = useState<AdminTab>('exams');
+  const [activeTab, setActiveTabState] = useState<AdminTab>(getInitialAdminTab);
+
+  const setActiveTab = (tab: AdminTab) => {
+    setActiveTabState(tab);
+    saveStoredAdminActiveTab(tab);
+    try {
+      if (typeof window !== 'undefined') {
+        const newHash = `#${tab}`;
+        if (window.location.hash !== newHash) {
+          window.history.replaceState(null, '', newHash);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const expectedHash = `#${activeTab}`;
+        if (window.location.hash !== expectedHash) {
+          window.history.replaceState(null, '', expectedHash);
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    const handleHashChange = () => {
+      try {
+        const hash = window.location.hash.replace('#', '').toLowerCase() as AdminTab;
+        if (VALID_ADMIN_TABS.includes(hash) && hash !== activeTab) {
+          setActiveTabState(hash);
+          saveStoredAdminActiveTab(hash);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [activeTab]);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
-  const [selectedExamId, setSelectedExamId] = useState<string>(
-    exams.find((e) => e.id === 'exam-ct-informatika-30')?.id || exams[0]?.id || ''
-  );
+  const [selectedExamId, setSelectedExamIdState] = useState<string>(() => {
+    const saved = getStoredSelectedExamId();
+    if (saved && exams.some((e) => e.id === saved)) {
+      return saved;
+    }
+    return exams.find((e) => e.id === 'exam-ct-informatika-30')?.id || exams[0]?.id || '';
+  });
+
+  const setSelectedExamId = (id: string) => {
+    setSelectedExamIdState(id);
+    saveStoredSelectedExamId(id);
+  };
 
   useEffect(() => {
     if (exams.length > 0) {
-      if (!selectedExamId || !exams.some((e) => e.id === selectedExamId)) {
+      const saved = getStoredSelectedExamId();
+      if (saved && exams.some((e) => e.id === saved) && selectedExamId !== saved) {
+        setSelectedExamIdState(saved);
+      } else if (!selectedExamId || !exams.some((e) => e.id === selectedExamId)) {
         const preferred = exams.find((e) => e.id === 'exam-ct-informatika-30') || exams[0];
-        setSelectedExamId(preferred.id);
+        setSelectedExamIdState(preferred.id);
+        saveStoredSelectedExamId(preferred.id);
       }
     }
   }, [exams, selectedExamId]);

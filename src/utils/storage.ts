@@ -14,6 +14,8 @@ const STORAGE_KEYS = {
   ACTIVE_EXAM_ID: 'cbt_sman1batu_active_exam_id',
   DELETED_SUBMISSION_IDS: 'cbt_sman1batu_deleted_sub_ids',
   RESET_STUDENT_ATTEMPTS: 'cbt_sman1batu_reset_student_attempts',
+  ADMIN_ACTIVE_TAB: 'cbt_sman1batu_admin_active_tab',
+  ACTIVE_ROLE: 'cbt_sman1batu_active_role',
 };
 
 export const DEFAULT_OPTION_SCORES: OptionScoreMap = {
@@ -372,6 +374,66 @@ export const saveCurrentAdminSession = (account: AdminAccount | null): void => {
     }
   } catch (e) {
     console.error('Failed to update admin session in localStorage', e);
+  }
+};
+
+export const getStoredAdminActiveTab = (): string | null => {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.ADMIN_ACTIVE_TAB);
+  } catch {
+    return null;
+  }
+};
+
+export const saveStoredAdminActiveTab = (tab: string | null): void => {
+  try {
+    if (tab) {
+      localStorage.setItem(STORAGE_KEYS.ADMIN_ACTIVE_TAB, tab);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.ADMIN_ACTIVE_TAB);
+    }
+  } catch (e) {
+    console.error('Failed to save admin active tab to localStorage', e);
+  }
+};
+
+export const getStoredActiveRole = (): string | null => {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.ACTIVE_ROLE);
+  } catch {
+    return null;
+  }
+};
+
+export const saveStoredActiveRole = (role: string | null): void => {
+  try {
+    if (role) {
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_ROLE, role);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.ACTIVE_ROLE);
+    }
+  } catch (e) {
+    console.error('Failed to save active role to localStorage', e);
+  }
+};
+
+export const getStoredSelectedExamId = (): string | null => {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.ACTIVE_EXAM_ID);
+  } catch {
+    return null;
+  }
+};
+
+export const saveStoredSelectedExamId = (examId: string | null): void => {
+  try {
+    if (examId) {
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_EXAM_ID, examId);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.ACTIVE_EXAM_ID);
+    }
+  } catch (e) {
+    console.error('Failed to save selected exam ID to localStorage', e);
   }
 };
 
