@@ -30,6 +30,10 @@ async function run() {
     const x1 = JSON.parse(fs.readFileSync('scripts/formatted_students_x1.json', 'utf8'));
     allToSync.push(...x1);
   }
+  if (fs.existsSync('scripts/formatted_students_x4.json')) {
+    const x4 = JSON.parse(fs.readFileSync('scripts/formatted_students_x4.json', 'utf8'));
+    allToSync.push(...x4);
+  }
   if (fs.existsSync('scripts/formatted_students_x5.json')) {
     const x5 = JSON.parse(fs.readFileSync('scripts/formatted_students_x5.json', 'utf8'));
     allToSync.push(...x5);
