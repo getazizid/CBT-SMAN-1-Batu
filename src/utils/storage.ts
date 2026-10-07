@@ -12,6 +12,8 @@ const STORAGE_KEYS = {
   ENFORCE_WHITELIST: 'cbt_sman1batu_enforce_whitelist',
   FIREBASE_CONFIG: 'cbt_sman1batu_firebase_config',
   ACTIVE_EXAM_ID: 'cbt_sman1batu_active_exam_id',
+  DELETED_SUBMISSION_IDS: 'cbt_sman1batu_deleted_sub_ids',
+  RESET_STUDENT_ATTEMPTS: 'cbt_sman1batu_reset_student_attempts',
 };
 
 export const DEFAULT_OPTION_SCORES: OptionScoreMap = {
@@ -96,13 +98,10 @@ if (typeof window !== 'undefined') {
   (window as any).restoreExamsFromLocalStorage = restoreExamsFromLocalStorage;
 }
 
-export const getStoredSubmissions = (): StudentExamSubmission[] => {
+export const getStoredDeletedSubmissionIds = (): string[] => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.SUBMISSIONS);
-    if (raw === null) {
-      localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(INITIAL_SUBMISSIONS));
-      return INITIAL_SUBMISSIONS;
-    }
+    const raw = localStorage.getItem(STORAGE_KEYS.DELETED_SUBMISSION_IDS);
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -110,9 +109,94 @@ export const getStoredSubmissions = (): StudentExamSubmission[] => {
   }
 };
 
+export const saveStoredDeletedSubmissionIds = (ids: string[]): void => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.DELETED_SUBMISSION_IDS, JSON.stringify(Array.from(new Set(ids))));
+  } catch (e) {
+    console.error('Failed to save deleted submission ids to localStorage', e);
+  }
+};
+
+export const addStoredDeletedSubmissionId = (id: string): void => {
+  if (!id) return;
+  const current = getStoredDeletedSubmissionIds();
+  if (!current.includes(id)) {
+    saveStoredDeletedSubmissionIds([...current, id]);
+  }
+};
+
+export const getStoredResetStudentAttempts = (): Record<string, string> => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.RESET_STUDENT_ATTEMPTS);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+};
+
+export const saveStoredResetStudentAttempts = (attempts: Record<string, string>): void => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.RESET_STUDENT_ATTEMPTS, JSON.stringify(attempts));
+  } catch (e) {
+    console.error('Failed to save reset student attempts to localStorage', e);
+  }
+};
+
+export const getStoredSubmissions = (): StudentExamSubmission[] => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.SUBMISSIONS);
+    const deletedIdSet = new Set(getStoredDeletedSubmissionIds());
+    const resetAttempts = getStoredResetStudentAttempts();
+
+    if (raw === null) {
+      const filteredInitials = INITIAL_SUBMISSIONS.filter((s) => !deletedIdSet.has(s.id));
+      localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(filteredInitials));
+      return filteredInitials;
+    }
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    // Filter out submissions that have been deleted or reset by admin
+    const cleaned = parsed.filter((s) => {
+      if (!s || !s.id) return false;
+      if (deletedIdSet.has(s.id)) return false;
+      const normExamId = s.examId ? s.examId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30') : '';
+      const key = `${(s.studentNisn || '').trim().toLowerCase()}_${normExamId}`;
+      const resetTime = resetAttempts[key];
+      if (resetTime && s.submittedAt && new Date(s.submittedAt) <= new Date(resetTime)) {
+        return false;
+      }
+      return true;
+    });
+
+    if (cleaned.length !== parsed.length) {
+      localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(cleaned));
+    }
+    return cleaned;
+  } catch {
+    return [];
+  }
+};
+
 export const saveStoredSubmissions = (submissions: StudentExamSubmission[]): void => {
   try {
-    localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(submissions));
+    const deletedIdSet = new Set(getStoredDeletedSubmissionIds());
+    const resetAttempts = getStoredResetStudentAttempts();
+
+    const filtered = (submissions || []).filter((s) => {
+      if (!s || !s.id) return false;
+      if (deletedIdSet.has(s.id)) return false;
+      const normExamId = s.examId ? s.examId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30') : '';
+      const key = `${(s.studentNisn || '').trim().toLowerCase()}_${normExamId}`;
+      const resetTime = resetAttempts[key];
+      if (resetTime && s.submittedAt && new Date(s.submittedAt) <= new Date(resetTime)) {
+        return false;
+      }
+      return true;
+    });
+
+    localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(filtered));
   } catch (e) {
     console.error('Failed to save submissions to localStorage', e);
   }
@@ -122,6 +206,63 @@ export const addStudentSubmission = (submission: StudentExamSubmission): void =>
   const current = getStoredSubmissions();
   const updated = [submission, ...current];
   saveStoredSubmissions(updated);
+};
+
+export const deleteStoredSubmission = (submissionId: string): void => {
+  addStoredDeletedSubmissionId(submissionId);
+  const current = getStoredSubmissions();
+  const updated = current.filter((s) => s.id !== submissionId);
+  localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(updated));
+};
+
+export const recordLocalStudentExamReset = (
+  nisn: string,
+  examId: string,
+  submissionId?: string
+): void => {
+  const cleanNisn = (nisn || '').trim().toLowerCase();
+  const cleanExamId = (examId || '').trim();
+  const normExamId = cleanExamId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+  const now = new Date().toISOString();
+
+  // 1. Record reset attempt
+  const attempts = getStoredResetStudentAttempts();
+  attempts[`${cleanNisn}_${cleanExamId}`] = now;
+  attempts[`${cleanNisn}_${normExamId}`] = now;
+  saveStoredResetStudentAttempts(attempts);
+
+  // 2. Mark submission ID as deleted
+  if (submissionId) {
+    addStoredDeletedSubmissionId(submissionId);
+  }
+
+  // 3. Purge matching submission from local submissions
+  const currentSubs = getStoredSubmissions();
+  const filteredSubs = currentSubs.filter(
+    (s) =>
+      s.id !== submissionId &&
+      !(
+        (s.studentNisn || '').trim().toLowerCase() === cleanNisn &&
+        (s.examId === cleanExamId || s.examId === normExamId)
+      )
+  );
+  localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(filteredSubs));
+
+  // 4. Clear active session and progress for this student & exam
+  clearStoredExamProgress(cleanExamId, cleanNisn);
+  clearStoredExamProgress(cleanExamId, nisn);
+  clearStoredExamProgress(normExamId, cleanNisn);
+  clearStoredExamProgress(normExamId, nisn);
+
+  const activeSession = getStoredActiveStudentSession();
+  if (
+    activeSession &&
+    (activeSession.studentData?.nisn?.trim()?.toLowerCase() === cleanNisn ||
+      activeSession.exam?.id === cleanExamId ||
+      activeSession.exam?.id === normExamId)
+  ) {
+    saveStoredActiveStudentSession(null);
+  }
 };
 
 export const getStoredStudents = (): RegisteredStudent[] => {

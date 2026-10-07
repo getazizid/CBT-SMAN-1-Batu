@@ -17,6 +17,7 @@ import {
   Play,
   Radio,
   RefreshCw,
+  RotateCcw,
   Search,
   Shield,
   ShieldAlert,
@@ -29,7 +30,7 @@ import {
   VolumeX,
   X
 } from 'lucide-react';
-import { Exam, LiveStudentSession, Question } from '../../types';
+import { Exam, LiveStudentSession, Question, StudentExamSubmission } from '../../types';
 import {
   clearAllLiveSessionsForExam,
   deleteLiveSessionFromFirestore,
@@ -42,6 +43,8 @@ interface LiveMonitorTabProps {
   selectedExamId: string;
   onSelectExam: (examId: string) => void;
   onSwitchToExamsTab?: () => void;
+  submissions?: StudentExamSubmission[];
+  onResetStudentSubmission?: (submission: StudentExamSubmission) => Promise<void>;
 }
 
 export const LiveMonitorTab: React.FC<LiveMonitorTabProps> = ({
@@ -49,6 +52,8 @@ export const LiveMonitorTab: React.FC<LiveMonitorTabProps> = ({
   selectedExamId,
   onSelectExam,
   onSwitchToExamsTab,
+  submissions,
+  onResetStudentSubmission,
 }) => {
   const [liveSessions, setLiveSessions] = useState<LiveStudentSession[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -202,6 +207,55 @@ export const LiveMonitorTab: React.FC<LiveMonitorTabProps> = ({
     for (const s of submittedList) {
       await deleteLiveSessionFromFirestore(s.id);
     }
+  };
+
+  const handleResetLiveStudent = async (session: LiveStudentSession) => {
+    if (!onResetStudentSubmission) return;
+
+    if (
+      !confirm(
+        `Reset ujian siswa "${session.studentName}" (NISN: ${session.studentNisn})?\n\nTindakan ini akan:\n1. Menghapus riwayat pengerjaan siswa dari sistem & Cloud Firestore\n2. Membuka blokir pengerjaan agar siswa dapat login dan mengerjakan ulang dengan waktu penuh.`
+      )
+    ) {
+      return;
+    }
+
+    // Cari submission yang cocok dari daftar submissions jika ada
+    const matchedSub = (submissions || []).find(
+      (s) =>
+        s.studentNisn.trim().toLowerCase() === session.studentNisn.trim().toLowerCase() &&
+        (s.examId === session.examId ||
+          s.examId === session.examId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30'))
+    );
+
+    const targetSub: StudentExamSubmission = matchedSub || {
+      id: `sub-reset-${session.studentNisn}-${Date.now()}`,
+      examId: session.examId,
+      examTitle: session.examTitle || '',
+      subject: '',
+      studentName: session.studentName,
+      studentNisn: session.studentNisn,
+      studentClass: session.studentClass,
+      startTime: session.startTime || new Date().toISOString(),
+      answers: {},
+      flaggedQuestions: [],
+      answersDetail: [],
+      totalScoreEarned: session.scoreScale100 || 0,
+      maxPossibleScore: 100,
+      finalScoreScale100: session.scoreScale100 || 0,
+      isPassed: false,
+      tabSwitchCount: session.violationCount || 0,
+      submittedAt: session.lastActiveAt || new Date().toISOString(),
+    };
+
+    await onResetStudentSubmission(targetSub);
+    await deleteLiveSessionFromFirestore(session.id);
+    await deleteLiveSessionFromFirestore(session.studentNisn);
+    setLiveSessions((prev) => prev.filter((s) => s.id !== session.id && s.studentNisn !== session.studentNisn));
+    if (selectedStudentDetail?.id === session.id) {
+      setSelectedStudentDetail(null);
+    }
+    alert(`✅ Akses ujian siswa "${session.studentName}" berhasil direset! Siswa sekarang dapat login kembali.`);
   };
 
   const handleResetAllLive = async () => {
@@ -662,14 +716,26 @@ export const LiveMonitorTab: React.FC<LiveMonitorTabProps> = ({
                   )}
                 </div>
 
-                {/* Inspect Button */}
-                <button
-                  onClick={() => setSelectedStudentDetail(session)}
-                  className="w-full py-2.5 px-4 bg-slate-100 hover:bg-blue-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 rounded-xl font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-slate-200/80 dark:border-slate-700"
-                >
-                  <Eye className="w-4 h-4" />
-                  <span>Periksa Lembar Jawaban Live</span>
-                </button>
+                {/* Inspect & Reset Action Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setSelectedStudentDetail(session)}
+                    className="flex-1 py-2 px-3 bg-slate-100 hover:bg-blue-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 rounded-xl font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-slate-200/80 dark:border-slate-700"
+                  >
+                    <Eye className="w-4 h-4" />
+                    <span>Periksa</span>
+                  </button>
+                  {onResetStudentSubmission && (
+                    <button
+                      onClick={() => handleResetLiveStudent(session)}
+                      className="py-2 px-3 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 rounded-xl font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1 border border-amber-200 dark:border-amber-800"
+                      title="Reset Ujian & Buka Akses Agar Siswa Dapat Mengerjakan Ulang"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Reset</span>
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -841,7 +907,17 @@ export const LiveMonitorTab: React.FC<LiveMonitorTabProps> = ({
               )}
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+              {onResetStudentSubmission ? (
+                <button
+                  onClick={() => handleResetLiveStudent(selectedStudentDetail)}
+                  className="py-2 px-4 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/50 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 font-bold text-xs rounded-xl border border-amber-200 dark:border-amber-800 cursor-pointer flex items-center gap-1.5 transition-colors"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset Ujian Siswa Ini</span>
+                </button>
+              ) : <div></div>}
+
               <button
                 onClick={() => {
                   setSelectedStudentDetail(null);

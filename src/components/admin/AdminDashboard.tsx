@@ -29,6 +29,7 @@ import {
   ShieldCheck,
   Shuffle,
   Sliders,
+  RotateCcw,
   Trash2,
   Upload,
   UserCheck,
@@ -66,6 +67,9 @@ interface AdminDashboardProps {
   enforceWhitelist: boolean;
   onUpdateExams: (exams: Exam[]) => void;
   onUpdateSubmissions: (submissions: StudentExamSubmission[]) => void;
+  onResetStudentSubmission?: (submission: StudentExamSubmission) => Promise<void>;
+  onDeleteMultipleSubmissions?: (submissions: StudentExamSubmission[]) => Promise<void>;
+  onClearAllSubmissions?: () => Promise<void>;
   onUpdateStudents: (students: RegisteredStudent[]) => void;
   onUpdateAdminAccounts: (accounts: AdminAccount[]) => void;
   onToggleEnforceWhitelist: (enforce: boolean) => void;
@@ -84,6 +88,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   enforceWhitelist,
   onUpdateExams,
   onUpdateSubmissions,
+  onResetStudentSubmission,
+  onDeleteMultipleSubmissions,
+  onClearAllSubmissions,
   onUpdateStudents,
   onUpdateAdminAccounts,
   onToggleEnforceWhitelist,
@@ -478,12 +485,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Submissions CRUD & selection actions
-  const handleDeleteSubmission = (subId: string) => {
+  const handleDeleteSubmission = async (subId: string) => {
     const target = submissions.find((s) => s.id === subId);
-    if (confirm(`Hapus data riwayat nilai ujian siswa "${target?.studentName || 'ini'}"?`)) {
-      const updated = submissions.filter((s) => s.id !== subId);
-      onUpdateSubmissions(updated);
+    if (!target) return;
+
+    const studentName = target.studentName || 'Siswa ini';
+    const studentNisn = target.studentNisn || '-';
+
+    if (
+      confirm(
+        `Reset ujian & hapus data riwayat nilai siswa "${studentName}" (NISN: ${studentNisn})?\n\nTindakan ini akan:\n1. Menghapus riwayat nilai dari sistem & Cloud Firestore secara permanen\n2. Membuka blokir 1x pengerjaan agar siswa dapat login kembali\n3. Mereset timer ujian dari awal sehingga siswa dapat mengerjakan ulang dengan waktu penuh.`
+      )
+    ) {
+      if (onResetStudentSubmission) {
+        await onResetStudentSubmission(target);
+      } else {
+        const updated = submissions.filter((s) => s.id !== subId);
+        onUpdateSubmissions(updated);
+      }
       setSelectedSubmissionIds((prev) => prev.filter((id) => id !== subId));
+      alert(`✅ Riwayat nilai siswa "${studentName}" berhasil dihapus dan akses ujian telah direset! Siswa dapat login kembali untuk mengerjakan ujian.`);
     }
   };
 
@@ -532,32 +553,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     );
   };
 
-  const handleDeleteSelectedSubmissions = () => {
+  const handleDeleteSelectedSubmissions = async () => {
     if (selectedSubmissionIds.length === 0) return;
+    const toDeleteTargets = submissions.filter((s) => selectedSubmissionIds.includes(s.id));
+
     if (
       confirm(
-        `Hapus ${selectedSubmissionIds.length} data riwayat nilai siswa yang dipilih secara permanen dari sistem dan Cloud Firestore?`
+        `⚠️ Hapus ${selectedSubmissionIds.length} data riwayat nilai siswa yang dipilih dan IZINKAN SEMUA SISWA TERPILIH MENGERJAKAN ULANG?\n\nData lembar jawaban akan dihapus secara permanen dari Cloud Firestore dan blokir 1x pengerjaan akan dibuka untuk siswa yang dipilih.`
       )
     ) {
-      const toDeleteSet = new Set(selectedSubmissionIds);
-      const updated = submissions.filter((s) => !toDeleteSet.has(s.id));
-      onUpdateSubmissions(updated);
+      if (onDeleteMultipleSubmissions) {
+        await onDeleteMultipleSubmissions(toDeleteTargets);
+      } else {
+        const toDeleteSet = new Set(selectedSubmissionIds);
+        const updated = submissions.filter((s) => !toDeleteSet.has(s.id));
+        onUpdateSubmissions(updated);
+      }
       setSelectedSubmissionIds([]);
+      alert(`✅ Sebanyak ${toDeleteTargets.length} riwayat nilai berhasil dihapus dan akses ujian siswa telah direset.`);
     }
   };
 
-  const handleDeleteAllSubmissions = () => {
+  const handleDeleteAllSubmissions = async () => {
     if (submissions.length === 0) {
       alert('Belum ada data riwayat nilai siswa untuk dihapus.');
       return;
     }
     if (
       confirm(
-        `⚠️ PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA (${submissions.length}) data riwayat nilai ujian siswa?\n\nTindakan ini akan menghapus seluruh rekaman lembar jawaban dan nilai dari sistem dan Cloud Firestore.`
+        `⚠️ PERINGATAN: Apakah Anda yakin ingin MENGHAPUS SEMUA (${submissions.length}) data riwayat nilai ujian siswa?\n\nTindakan ini akan menghapus seluruh rekaman lembar jawaban dan nilai dari sistem dan Cloud Firestore, serta mengizinkan semua siswa untuk mengerjakan kembali jika paket ujian aktif.`
       )
     ) {
-      onUpdateSubmissions([]);
+      if (onClearAllSubmissions) {
+        await onClearAllSubmissions();
+      } else {
+        onUpdateSubmissions([]);
+      }
       setSelectedSubmissionIds([]);
+      alert('✅ Seluruh data riwayat nilai berhasil dihapus dan akses ujian telah direset.');
     }
   };
 
@@ -1381,6 +1414,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               selectedExamId={selectedExamId}
               onSelectExam={(id) => setSelectedExamId(id)}
               onSwitchToExamsTab={() => setActiveTab('exams')}
+              submissions={submissions}
+              onResetStudentSubmission={onResetStudentSubmission}
             />
           )}
 
@@ -2625,15 +2660,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   onClick={() => setViewingSubmission(sub)}
-                                  className="px-2.5 py-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
+                                  className="px-2 py-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
                                   title="Lihat Detail Lembar Jawaban"
                                 >
                                   Detail
                                 </button>
                                 <button
                                   onClick={() => handleDeleteSubmission(sub.id)}
+                                  className="px-2 py-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/50 rounded-xl border border-amber-200 dark:border-amber-800 transition-colors cursor-pointer flex items-center gap-1"
+                                  title="Reset Ujian & Buka Akses Agar Siswa Dapat Mengerjakan Ulang"
+                                >
+                                  <RotateCcw className="w-3 h-3" />
+                                  <span>Reset</span>
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteSubmission(sub.id)}
                                   className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
-                                  title="Hapus Riwayat Nilai Siswa Ini"
+                                  title="Hapus Riwayat Nilai Siswa Ini & Reset Ujian"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>

@@ -8,35 +8,46 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminAccount, Exam, RegisteredStudent, StudentExamSubmission, UserRole } from './types';
 import { isFirebaseConfigured } from './firebase';
 import {
-  seedInitialFirestoreDataIfEmpty,
-  subscribeToExams,
-  subscribeToSubmissions,
-  subscribeToStudents,
-  subscribeToAdminAccounts,
-  subscribeToSettings,
-  syncAllExamsToFirestore,
-  syncAllSubmissionsToFirestore,
-  syncAllStudentsToFirestore,
-  syncAllAdminAccountsToFirestore,
-  saveSubmissionToFirestore,
+  LIVE_CHANNEL_NAME,
+  clearAllSubmissionsFromFirestore,
+  deleteMultipleSubmissionsFromFirestore,
+  resetStudentExamInFirestore,
   saveSettingsToFirestore,
+  saveSubmissionToFirestore,
+  seedInitialFirestoreDataIfEmpty,
+  subscribeToAdminAccounts,
+  subscribeToExamResets,
+  subscribeToExams,
+  subscribeToSettings,
+  subscribeToStudents,
+  subscribeToSubmissions,
+  syncAllAdminAccountsToFirestore,
+  syncAllExamsToFirestore,
+  syncAllStudentsToFirestore,
+  syncAllSubmissionsToFirestore,
 } from './utils/firebaseService';
 import {
   INITIAL_STUDENTS,
   addStudentSubmission,
+  clearStoredExamProgress,
   getCurrentAdminSession,
   getStoredActiveStudentSession,
   getStoredAdminAccounts,
+  getStoredDeletedSubmissionIds,
   getStoredEnforceWhitelist,
   getStoredExams,
+  getStoredResetStudentAttempts,
   getStoredStudents,
   getStoredSubmissions,
+  recordLocalStudentExamReset,
   restoreExamsFromLocalStorage,
   saveCurrentAdminSession,
   saveStoredActiveStudentSession,
   saveStoredAdminAccounts,
+  saveStoredDeletedSubmissionIds,
   saveStoredEnforceWhitelist,
   saveStoredExams,
+  saveStoredResetStudentAttempts,
   saveStoredStudents,
   saveStoredSubmissions,
 } from './utils/storage';
@@ -84,15 +95,70 @@ export default function App() {
         (storedExamsList.length > 0 ? storedExamsList[0] : null);
 
       if (matchedExam && Array.isArray(matchedExam.questions) && matchedExam.questions.length > 0) {
-        setStudentFlow({
-          phase: 'exam',
-          activeExam: matchedExam,
-          studentData: activeSession.studentData,
-          latestSubmission: null,
-        });
+        // Jangan restore jika siswa sudah dinilai / sudah ada lembar jawaban / sudah direset
+        const cleanNisn = (activeSession.studentData.nisn || '').trim().toLowerCase();
+        const storedSubs = getStoredSubmissions();
+        const alreadySubmitted = storedSubs.some(
+          (s) =>
+            s.examId === matchedExam.id &&
+            (s.studentNisn || '').trim().toLowerCase() === cleanNisn
+        );
+        if (alreadySubmitted) {
+          saveStoredActiveStudentSession(null);
+        } else {
+          setStudentFlow({
+            phase: 'exam',
+            activeExam: matchedExam,
+            studentData: activeSession.studentData,
+            latestSubmission: null,
+          });
+        }
       }
     }
   }, []);
+
+  // BroadcastChannel listener for instant cross-tab / cross-window sync
+  useEffect(() => {
+    let bc: BroadcastChannel | null = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        bc = new BroadcastChannel(LIVE_CHANNEL_NAME);
+        bc.onmessage = (event) => {
+          const data = event.data;
+          if (
+            data &&
+            (data.type === 'STUDENT_EXAM_RESET' ||
+              data.type === 'MULTIPLE_EXAMS_RESET')
+          ) {
+            console.log('📢 BroadcastChannel: Menerima sinyal reset ujian siswa:', data);
+            const currentSubs = getStoredSubmissions();
+            setSubmissions(currentSubs);
+
+            // Jika tab ini sedang menampilkan siswa yang direset, kembalikan ke login
+            if (studentFlow.studentData) {
+              const currentNisn = studentFlow.studentData.nisn.trim().toLowerCase();
+              if (
+                data.studentNisn?.trim()?.toLowerCase() === currentNisn ||
+                data.type === 'MULTIPLE_EXAMS_RESET'
+              ) {
+                saveStoredActiveStudentSession(null);
+                setStudentFlow({
+                  phase: 'login',
+                  activeExam: null,
+                  studentData: null,
+                  latestSubmission: null,
+                });
+              }
+            }
+          }
+        };
+      }
+    } catch {}
+
+    return () => {
+      bc?.close();
+    };
+  }, [studentFlow.studentData]);
 
   // Ensure cbt-ios-fullscreen class is removed when not in exam phase
   useEffect(() => {
@@ -125,27 +191,90 @@ export default function App() {
       () => setIsCloudConnected(false)
     );
 
+    // 1. Subscribe to Exam Resets from Firestore
+    const unsubResets = subscribeToExamResets((resetsData) => {
+      if (resetsData) {
+        if (Array.isArray(resetsData.deletedSubmissionIds)) {
+          saveStoredDeletedSubmissionIds(resetsData.deletedSubmissionIds);
+        }
+        if (resetsData.resetStudentAttempts) {
+          saveStoredResetStudentAttempts(resetsData.resetStudentAttempts);
+        }
+
+        // Segera bersihkan submissions lokal
+        const localStored = getStoredSubmissions();
+        setSubmissions(localStored);
+
+        // Jika siswa di browser ini adalah yang direset, bersihkan active session & progress
+        const activeSess = getStoredActiveStudentSession();
+        if (activeSess?.studentData) {
+          const sNisn = activeSess.studentData.nisn.trim().toLowerCase();
+          const sExamId = (activeSess.exam?.id || '').trim();
+          const sNormExamId = sExamId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+          if (
+            resetsData.resetStudentAttempts?.[`${sNisn}_${sExamId}`] ||
+            resetsData.resetStudentAttempts?.[`${sNisn}_${sNormExamId}`]
+          ) {
+            saveStoredActiveStudentSession(null);
+            clearStoredExamProgress(sExamId, sNisn);
+            clearStoredExamProgress(sNormExamId, sNisn);
+            setStudentFlow({
+              phase: 'login',
+              activeExam: null,
+              studentData: null,
+              latestSubmission: null,
+            });
+          }
+        }
+      }
+    });
+
     const unsubSubmissions = subscribeToSubmissions(
       (remoteSubmissions) => {
         if (remoteSubmissions) {
-          // Auto-Recovery: Pertahankan data submission siswa yang tersimpan di localStorage perangkat siswa/lokal
+          const deletedIdSet = new Set(getStoredDeletedSubmissionIds());
+          const resetAttempts = getStoredResetStudentAttempts();
+
+          // Saring remoteSubmissions agar TIDAK menyertakan dokumen yang telah dihapus atau siswa yang direset
+          const validRemotes = remoteSubmissions.filter((sub) => {
+            if (!sub || !sub.id) return false;
+            if (deletedIdSet.has(sub.id)) return false;
+            const normExamId = (sub.examId || '').replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+            const key = `${(sub.studentNisn || '').trim().toLowerCase()}_${normExamId}`;
+            const resetTime = resetAttempts[key];
+            if (resetTime && sub.submittedAt && new Date(sub.submittedAt) <= new Date(resetTime)) {
+              return false;
+            }
+            return true;
+          });
+
+          // Auto-Recovery: Hanya pulihkan data submission lokal offline yang SAH
+          // (TIDAK BOLEH memulihkan submission yang sengaja dihapus atau direset oleh Admin!)
           const localStored = getStoredSubmissions();
-          const remoteIdSet = new Set(remoteSubmissions.map((s) => s.id));
-          const missingLocals = localStored.filter(
-            (localSub) =>
-              !remoteIdSet.has(localSub.id) &&
-              !localSub.id.startsWith('sub-mpk-') // bukan dummy MPK OSIS bawaan
-          );
+          const remoteIdSet = new Set(validRemotes.map((s) => s.id));
+          const missingLocals = localStored.filter((localSub) => {
+            if (!localSub || !localSub.id) return false;
+            if (remoteIdSet.has(localSub.id)) return false;
+            if (localSub.id.startsWith('sub-mpk-')) return false; // dummy bawaan
+            if (deletedIdSet.has(localSub.id)) return false; // dihapus admin
+            const normExamId = (localSub.examId || '').replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+            const key = `${(localSub.studentNisn || '').trim().toLowerCase()}_${normExamId}`;
+            const resetTime = resetAttempts[key];
+            if (resetTime && localSub.submittedAt && new Date(localSub.submittedAt) <= new Date(resetTime)) {
+              return false; // direset admin
+            }
+            return true;
+          });
 
           // Jika ada lembar jawaban siswa di HP/perangkat yang belum ada di Cloud, otomatis re-upload ke Cloud Firestore!
           if (missingLocals.length > 0) {
-            console.log(`🔄 Auto-Recovery: Mengunggah ulang ${missingLocals.length} riwayat siswa dari penyimpanan perangkat ke Cloud Firestore...`);
+            console.log(`🔄 Auto-Recovery: Mengunggah ulang ${missingLocals.length} riwayat siswa offline dari perangkat ke Cloud Firestore...`);
             missingLocals.forEach((sub) => {
               saveSubmissionToFirestore(sub).catch(console.warn);
             });
           }
 
-          const merged = [...remoteSubmissions];
+          const merged = [...validRemotes];
           missingLocals.forEach((sub) => {
             if (!merged.some((m) => m.id === sub.id)) {
               merged.push(sub);
@@ -157,8 +286,8 @@ export default function App() {
           const deduplicated: StudentExamSubmission[] = [];
           const seenKeys = new Set<string>();
           for (const sub of merged) {
-            const normExamId = sub.examId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
-            const key = `${sub.studentNisn.trim()}_${normExamId}`;
+            const normExamId = (sub.examId || '').replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+            const key = `${(sub.studentNisn || '').trim().toLowerCase()}_${normExamId}`;
             if (!seenKeys.has(key)) {
               seenKeys.add(key);
               deduplicated.push(sub);
@@ -208,6 +337,7 @@ export default function App() {
 
     return () => {
       unsubExams?.();
+      unsubResets?.();
       unsubSubmissions?.();
       unsubStudents?.();
       unsubAdminAccounts?.();
@@ -225,6 +355,54 @@ export default function App() {
     setSubmissions(updated);
     saveStoredSubmissions(updated);
     await syncAllSubmissionsToFirestore(updated);
+  };
+
+  // Reset pengerjaan siswa & hapus riwayat secara permanen (menjamin siswa bisa login & mulai ujian lagi)
+  const handleResetStudentSubmission = async (targetSubmission: StudentExamSubmission) => {
+    // 1. Simpan reset di local storage & bersihkan progress
+    recordLocalStudentExamReset(
+      targetSubmission.studentNisn,
+      targetSubmission.examId,
+      targetSubmission.id
+    );
+
+    // 2. Perbarui state submissions secara instan
+    const updated = submissions.filter((s) => s.id !== targetSubmission.id);
+    setSubmissions(updated);
+    saveStoredSubmissions(updated);
+
+    // 3. Hapus dan sinkronkan ke Cloud Firestore
+    await resetStudentExamInFirestore(
+      targetSubmission.id,
+      targetSubmission.studentNisn,
+      targetSubmission.examId
+    );
+  };
+
+  // Hapus massal beberapa riwayat siswa terpilih
+  const handleDeleteMultipleSubmissions = async (toDelete: StudentExamSubmission[]) => {
+    if (!toDelete || toDelete.length === 0) return;
+    const deleteIdSet = new Set(toDelete.map((s) => s.id));
+
+    toDelete.forEach((s) => {
+      recordLocalStudentExamReset(s.studentNisn, s.examId, s.id);
+    });
+
+    const updated = submissions.filter((s) => !deleteIdSet.has(s.id));
+    setSubmissions(updated);
+    saveStoredSubmissions(updated);
+
+    await deleteMultipleSubmissionsFromFirestore(toDelete);
+  };
+
+  // Hapus seluruh data riwayat siswa
+  const handleClearAllSubmissions = async () => {
+    submissions.forEach((s) => {
+      recordLocalStudentExamReset(s.studentNisn, s.examId, s.id);
+    });
+    setSubmissions([]);
+    saveStoredSubmissions([]);
+    await clearAllSubmissionsFromFirestore(submissions);
   };
 
   const handleUpdateStudents = async (updated: RegisteredStudent[]) => {
@@ -299,6 +477,11 @@ export default function App() {
         return;
       }
     }
+
+    // Bersihkan progress ujian lama agar siswa mulai dari awal dengan timer penuh & soal bersih
+    clearStoredExamProgress(exam.id, studentData.nisn);
+    const normExamId = exam.id.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+    clearStoredExamProgress(normExamId, studentData.nisn);
 
     saveStoredActiveStudentSession({
       exam,
@@ -415,6 +598,9 @@ export default function App() {
             enforceWhitelist={enforceWhitelist}
             onUpdateExams={handleUpdateExams}
             onUpdateSubmissions={handleUpdateSubmissions}
+            onResetStudentSubmission={handleResetStudentSubmission}
+            onDeleteMultipleSubmissions={handleDeleteMultipleSubmissions}
+            onClearAllSubmissions={handleClearAllSubmissions}
             onUpdateStudents={handleUpdateStudents}
             onUpdateAdminAccounts={handleUpdateAdminAccounts}
             onToggleEnforceWhitelist={handleToggleEnforceWhitelist}

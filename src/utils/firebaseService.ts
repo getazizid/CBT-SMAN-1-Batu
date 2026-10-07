@@ -258,6 +258,53 @@ export const subscribeToSubmissions = (
   }
 };
 
+export const LIVE_CHANNEL_NAME = 'cbt_sman1batu_live_channel';
+
+export const getBroadcastChannel = (): BroadcastChannel | null => {
+  if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+    try {
+      return new BroadcastChannel(LIVE_CHANNEL_NAME);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
+export interface ExamResetSyncData {
+  deletedSubmissionIds: string[];
+  resetStudentAttempts: Record<string, string>;
+  lastUpdatedAt: string;
+}
+
+export const subscribeToExamResets = (
+  onUpdate: (resets: ExamResetSyncData) => void,
+  onError?: (error: Error) => void
+): Unsubscribe | null => {
+  if (!db || !isFirebaseConfigured()) return null;
+  try {
+    const docRef = doc(db, COLLECTIONS.SETTINGS, 'resets');
+    return onSnapshot(
+      docRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data() as ExamResetSyncData;
+          if (data) {
+            onUpdate(data);
+          }
+        }
+      },
+      (err) => {
+        console.warn('Firestore ExamResets subscription notice:', err);
+        onError?.(err);
+      }
+    );
+  } catch (err) {
+    console.warn('Failed to subscribe to exam resets:', err);
+    return null;
+  }
+};
+
 export const saveSubmissionToFirestore = async (submission: StudentExamSubmission): Promise<void> => {
   if (!db || !isFirebaseConfigured()) return;
   try {
@@ -296,6 +343,223 @@ export const deleteSubmissionFromFirestore = async (submissionId: string): Promi
     await deleteDoc(doc(db, COLLECTIONS.SUBMISSIONS, submissionId));
   } catch (err) {
     console.error('Error deleting submission from Firestore:', err);
+  }
+};
+
+/**
+ * Reset student's exam attempt in Cloud Firestore:
+ * 1. Deletes the submission record from cbt_submissions collection
+ * 2. Records deleted ID and student attempt reset timestamp in cbt_settings/resets
+ * 3. Removes live proctoring session from cbt_settings and local storage
+ * 4. Broadcasts reset event via BroadcastChannel for instant multi-tab sync
+ */
+export const resetStudentExamInFirestore = async (
+  submissionId: string,
+  studentNisn: string,
+  examId: string
+): Promise<void> => {
+  const cleanNisn = (studentNisn || '').trim().toLowerCase();
+  const cleanExamId = (examId || '').trim();
+  const normExamId = cleanExamId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+  const now = new Date().toISOString();
+
+  // 1. Dual-sync locally via BroadcastChannel for instant cross-tab / cross-window sync
+  try {
+    const bc = getBroadcastChannel();
+    if (bc) {
+      bc.postMessage({
+        type: 'STUDENT_EXAM_RESET',
+        submissionId,
+        studentNisn,
+        examId,
+        timestamp: now,
+      });
+      bc.close();
+    }
+  } catch {}
+
+  // 2. Clear local storage live session
+  try {
+    localStorage.removeItem(`cbt_live_session_${studentNisn}`);
+    localStorage.removeItem(`cbt_live_session_${cleanNisn}`);
+    localStorage.removeItem(`cbt_live_session_${cleanNisn}_${cleanExamId}`);
+    localStorage.removeItem(`cbt_live_session_${cleanNisn}_${normExamId}`);
+  } catch {}
+
+  if (!db || !isFirebaseConfigured()) return;
+
+  try {
+    const batch = writeBatch(db);
+
+    // 3. Delete submission document from cbt_submissions
+    if (submissionId) {
+      batch.delete(doc(db, COLLECTIONS.SUBMISSIONS, submissionId));
+    }
+
+    // 4. Update resets tracking document in cbt_settings/resets
+    const resetsRef = doc(db, COLLECTIONS.SETTINGS, 'resets');
+    const resetsSnap = await getDoc(resetsRef);
+    const existing = resetsSnap.exists()
+      ? (resetsSnap.data() as ExamResetSyncData)
+      : { deletedSubmissionIds: [], resetStudentAttempts: {}, lastUpdatedAt: '' };
+
+    const updatedDeletedIds = Array.from(
+      new Set([...(existing.deletedSubmissionIds || []), submissionId].filter(Boolean))
+    );
+    const updatedAttempts = {
+      ...(existing.resetStudentAttempts || {}),
+      [`${cleanNisn}_${cleanExamId}`]: now,
+      [`${cleanNisn}_${normExamId}`]: now,
+    };
+
+    batch.set(
+      resetsRef,
+      cleanForFirestore({
+        deletedSubmissionIds: updatedDeletedIds,
+        resetStudentAttempts: updatedAttempts,
+        lastUpdatedAt: now,
+      }),
+      { merge: true }
+    );
+
+    // 5. Delete student's live proctoring document
+    batch.delete(doc(db, COLLECTIONS.SETTINGS, `live_${studentNisn}`));
+    batch.delete(doc(db, COLLECTIONS.SETTINGS, `live_${cleanNisn}`));
+    batch.delete(doc(db, COLLECTIONS.SETTINGS, `live_${cleanNisn}_${cleanExamId}`));
+    batch.delete(doc(db, COLLECTIONS.SETTINGS, `live_${cleanNisn}_${normExamId}`));
+
+    await batch.commit();
+    console.log(`✅ Berhasil mereset pengerjaan ujian siswa ${studentNisn} (${examId}) di Cloud Firestore!`);
+  } catch (err) {
+    console.error('Error resetting student exam in Firestore:', err);
+  }
+};
+
+/**
+ * Batch delete multiple submissions and reset students in Cloud Firestore
+ */
+export const deleteMultipleSubmissionsFromFirestore = async (
+  submissionsToDelete: StudentExamSubmission[]
+): Promise<void> => {
+  if (!submissionsToDelete || submissionsToDelete.length === 0) return;
+
+  const toDeleteIds = submissionsToDelete.map((s) => s.id);
+  const now = new Date().toISOString();
+
+  // Local BroadcastChannel
+  try {
+    const bc = getBroadcastChannel();
+    if (bc) {
+      bc.postMessage({
+        type: 'MULTIPLE_EXAMS_RESET',
+        submissionIds: toDeleteIds,
+        timestamp: now,
+      });
+      bc.close();
+    }
+  } catch {}
+
+  if (!db || !isFirebaseConfigured()) return;
+
+  try {
+    const batch = writeBatch(db);
+    submissionsToDelete.forEach((s) => {
+      const cleanNisn = (s.studentNisn || '').trim().toLowerCase();
+      const cleanExamId = (s.examId || '').trim();
+      const normExamId = cleanExamId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+
+      batch.delete(doc(db, COLLECTIONS.SUBMISSIONS, s.id));
+      batch.delete(doc(db, COLLECTIONS.SETTINGS, `live_${s.studentNisn}`));
+      batch.delete(doc(db, COLLECTIONS.SETTINGS, `live_${cleanNisn}`));
+      batch.delete(doc(db, COLLECTIONS.SETTINGS, `live_${cleanNisn}_${cleanExamId}`));
+      batch.delete(doc(db, COLLECTIONS.SETTINGS, `live_${cleanNisn}_${normExamId}`));
+    });
+
+    const resetsRef = doc(db, COLLECTIONS.SETTINGS, 'resets');
+    const resetsSnap = await getDoc(resetsRef);
+    const existing = resetsSnap.exists()
+      ? (resetsSnap.data() as ExamResetSyncData)
+      : { deletedSubmissionIds: [], resetStudentAttempts: {}, lastUpdatedAt: '' };
+
+    const updatedDeletedIds = Array.from(new Set([...(existing.deletedSubmissionIds || []), ...toDeleteIds]));
+    const updatedAttempts = { ...(existing.resetStudentAttempts || {}) };
+    submissionsToDelete.forEach((s) => {
+      const cleanNisn = (s.studentNisn || '').trim().toLowerCase();
+      const cleanExamId = (s.examId || '').trim();
+      const normExamId = cleanExamId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+      updatedAttempts[`${cleanNisn}_${cleanExamId}`] = now;
+      updatedAttempts[`${cleanNisn}_${normExamId}`] = now;
+    });
+
+    batch.set(
+      resetsRef,
+      cleanForFirestore({
+        deletedSubmissionIds: updatedDeletedIds,
+        resetStudentAttempts: updatedAttempts,
+        lastUpdatedAt: now,
+      }),
+      { merge: true }
+    );
+
+    await batch.commit();
+    console.log(`✅ Berhasil menghapus ${submissionsToDelete.length} data riwayat nilai di Cloud Firestore!`);
+  } catch (err) {
+    console.error('Error batch deleting submissions from Firestore:', err);
+  }
+};
+
+/**
+ * Clear all student exam submissions from Cloud Firestore
+ */
+export const clearAllSubmissionsFromFirestore = async (
+  currentSubmissions: StudentExamSubmission[]
+): Promise<void> => {
+  if (!db || !isFirebaseConfigured()) return;
+  try {
+    const subsSnap = await getDocs(collection(db, COLLECTIONS.SUBMISSIONS));
+    const batch = writeBatch(db);
+    const allIds: string[] = [];
+
+    subsSnap.forEach((d) => {
+      batch.delete(d.ref);
+      allIds.push(d.id);
+    });
+
+    currentSubmissions.forEach((s) => {
+      if (!allIds.includes(s.id)) allIds.push(s.id);
+    });
+
+    const now = new Date().toISOString();
+    const resetsRef = doc(db, COLLECTIONS.SETTINGS, 'resets');
+    const resetsSnap = await getDoc(resetsRef);
+    const existing = resetsSnap.exists()
+      ? (resetsSnap.data() as ExamResetSyncData)
+      : { deletedSubmissionIds: [], resetStudentAttempts: {}, lastUpdatedAt: '' };
+
+    const updatedDeletedIds = Array.from(new Set([...(existing.deletedSubmissionIds || []), ...allIds]));
+    const updatedAttempts = { ...(existing.resetStudentAttempts || {}) };
+    currentSubmissions.forEach((s) => {
+      const cleanNisn = (s.studentNisn || '').trim().toLowerCase();
+      const cleanExamId = (s.examId || '').trim();
+      const normExamId = cleanExamId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+      updatedAttempts[`${cleanNisn}_${cleanExamId}`] = now;
+      updatedAttempts[`${cleanNisn}_${normExamId}`] = now;
+    });
+
+    batch.set(
+      resetsRef,
+      cleanForFirestore({
+        deletedSubmissionIds: updatedDeletedIds,
+        resetStudentAttempts: updatedAttempts,
+        lastUpdatedAt: now,
+      }),
+      { merge: true }
+    );
+
+    await batch.commit();
+    console.log('✅ Seluruh riwayat nilai berhasil dihapus dari Cloud Firestore!');
+  } catch (err) {
+    console.error('Error clearing all submissions from Firestore:', err);
   }
 };
 
@@ -499,18 +763,6 @@ export const saveSettingsToFirestore = async (settings: { enforceWhitelist: bool
  * Uses cbt_settings with live_ prefix to guarantee 100% Firestore write/read access.
  * =========================================================================
  */
-const LIVE_CHANNEL_NAME = 'cbt_sman1batu_live_channel';
-
-const getBroadcastChannel = (): BroadcastChannel | null => {
-  if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-    try {
-      return new BroadcastChannel(LIVE_CHANNEL_NAME);
-    } catch {
-      return null;
-    }
-  }
-  return null;
-};
 
 /**
  * Save / Update student live exam status and progress.
