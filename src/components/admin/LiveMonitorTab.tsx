@@ -126,14 +126,21 @@ export const LiveMonitorTab: React.FC<LiveMonitorTabProps> = ({
     };
   }, [selectedExamId, soundEnabled]);
 
-  // Extract all available classes for filtering
+  // Extract all available classes for filtering (hanya kelas yang sedang aktif ujian)
   const availableClasses = useMemo(() => {
     const list = new Set<string>();
     liveSessions.forEach((s) => {
-      if (s.studentClass) list.add(s.studentClass);
+      if (s.studentClass && s.studentClass.trim()) list.add(s.studentClass.trim());
     });
     return ['ALL', ...sortClassList(Array.from(list))];
   }, [liveSessions]);
+
+  // Reset filter kelas jika kelas tersebut sudah tidak ada lagi di sesi aktif
+  useEffect(() => {
+    if (classFilter !== 'ALL' && !availableClasses.includes(classFilter)) {
+      setClassFilter('ALL');
+    }
+  }, [availableClasses, classFilter]);
 
   // Filtered live sessions
   const filteredSessions = useMemo(() => {
@@ -390,11 +397,16 @@ export const LiveMonitorTab: React.FC<LiveMonitorTabProps> = ({
               onChange={(e) => setClassFilter(e.target.value)}
               className="bg-transparent text-slate-700 dark:text-slate-200 font-semibold focus:outline-none cursor-pointer"
             >
-              {availableClasses.map((cls) => (
-                <option key={cls} value={cls}>
-                  {cls === 'ALL' ? 'Semua Kelas' : `Kelas ${cls}`}
-                </option>
-              ))}
+              {availableClasses.map((cls) => {
+                const count = cls === 'ALL'
+                  ? liveSessions.length
+                  : liveSessions.filter((s) => s.studentClass === cls).length;
+                return (
+                  <option key={cls} value={cls}>
+                    {cls === 'ALL' ? `Semua Kelas (${count})` : `Kelas ${cls} (${count})`}
+                  </option>
+                );
+              })}
             </select>
           </div>
 

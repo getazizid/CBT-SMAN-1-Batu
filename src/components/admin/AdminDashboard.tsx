@@ -47,7 +47,7 @@ import {
   StudentExamSubmission,
 } from '../../types';
 import { exportExamResultsToExcel } from '../../utils/exportTools';
-import { ALL_SCHOOL_CLASSES, sortClassList } from '../../utils/constants';
+import { sortClassList } from '../../utils/constants';
 import { AccountEditorModal } from './AccountEditorModal';
 import { ExamEditorModal } from './ExamEditorModal';
 import { StudentBatchImportModal } from './StudentBatchImportModal';
@@ -727,16 +727,63 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }));
   };
 
-  // Distinct classes in submissions, registered students, & full school catalog sorted naturally
-  const availableClasses = sortClassList(
-    Array.from(
-      new Set([
-        ...ALL_SCHOOL_CLASSES,
-        ...submissions.map((s) => s.studentClass).filter(Boolean),
-        ...students.map((s) => s.studentClass).filter(Boolean),
-      ])
-    )
-  );
+  // Distinct classes present in registered students only (filter dinamis mengikuti isi data)
+  const availableStudentClasses = React.useMemo(() => {
+    const classSet = new Set<string>();
+    students.forEach((s) => {
+      if (s.studentClass && s.studentClass.trim()) {
+        classSet.add(s.studentClass.trim());
+      }
+    });
+    return sortClassList(Array.from(classSet));
+  }, [students]);
+
+  // Unique submissions for the currently selected exam filter
+  const uniqueSubmissionsForExam = React.useMemo(() => {
+    const seen = new Set<string>();
+    const uniqueList: StudentExamSubmission[] = [];
+    for (const sub of submissions) {
+      const matchExam =
+        submissionExamFilter === 'ALL'
+          ? true
+          : sub.examId === submissionExamFilter ||
+            ((submissionExamFilter === 'exam-ct-inf-x-30' || submissionExamFilter === 'exam-ct-informatika-30') &&
+              (sub.examId === 'exam-ct-inf-x-30' || sub.examId === 'exam-ct-informatika-30'));
+      if (!matchExam) continue;
+
+      const normExamId = sub.examId.replace('exam-ct-informatika-30', 'exam-ct-inf-x-30');
+      const key = `${sub.studentNisn.trim()}_${normExamId}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueList.push(sub);
+      }
+    }
+    return uniqueList;
+  }, [submissions, submissionExamFilter]);
+
+  // Distinct classes present in submissions for current exam filter (filter dinamis mengikuti isi data)
+  const availableSubmissionClasses = React.useMemo(() => {
+    const classSet = new Set<string>();
+    uniqueSubmissionsForExam.forEach((s) => {
+      if (s.studentClass && s.studentClass.trim()) {
+        classSet.add(s.studentClass.trim());
+      }
+    });
+    return sortClassList(Array.from(classSet));
+  }, [uniqueSubmissionsForExam]);
+
+  // Reset filter jika kelas yang dipilih sudah tidak ada lagi di data
+  useEffect(() => {
+    if (studentClassFilter !== 'ALL' && !availableStudentClasses.includes(studentClassFilter)) {
+      setStudentClassFilter('ALL');
+    }
+  }, [availableStudentClasses, studentClassFilter]);
+
+  useEffect(() => {
+    if (selectedClassFilter !== 'ALL' && !availableSubmissionClasses.includes(selectedClassFilter)) {
+      setSelectedClassFilter('ALL');
+    }
+  }, [availableSubmissionClasses, selectedClassFilter]);
 
   // Navigation items with "Manajemen Akun"
   const navItems = [
@@ -2083,11 +2130,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       >
                         <option value="ALL" className="dark:bg-slate-800">Semua Kelas ({students.length})</option>
-                        {availableClasses.map((cls) => (
-                          <option key={cls} value={cls} className="dark:bg-slate-800">
-                            Kelas {cls}
-                          </option>
-                        ))}
+                        {availableStudentClasses.map((cls) => {
+                          const count = students.filter((s) => s.studentClass === cls).length;
+                          return (
+                            <option key={cls} value={cls} className="dark:bg-slate-800">
+                              Kelas {cls} ({count})
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
 
@@ -2385,15 +2435,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <Filter className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                     <select
                       value={selectedClassFilter}
-                      onChange={(e) => setSelectedClassFilter(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedClassFilter(e.target.value);
+                        setSubmissionsPage(1);
+                      }}
                       className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     >
-                      <option value="ALL" className="dark:bg-slate-800">Semua Kelas</option>
-                      {availableClasses.map((cls) => (
-                        <option key={cls} value={cls} className="dark:bg-slate-800">
-                          Kelas {cls}
-                        </option>
-                      ))}
+                      <option value="ALL" className="dark:bg-slate-800">Semua Kelas ({uniqueSubmissionsForExam.length})</option>
+                      {availableSubmissionClasses.map((cls) => {
+                        const count = uniqueSubmissionsForExam.filter((s) => s.studentClass === cls).length;
+                        return (
+                          <option key={cls} value={cls} className="dark:bg-slate-800">
+                            Kelas {cls} ({count})
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
 
