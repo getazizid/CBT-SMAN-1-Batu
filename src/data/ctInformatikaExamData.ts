@@ -735,6 +735,373 @@ export const STUDENTS_KELAS_X_2: RegisteredStudent[] = [
 ];
 
 /**
+ * Siswa Kelas X-3 (36 Siswa)
+ * Berpikir Komputasional SMAN 1 Batu
+ */
+export const STUDENTS_KELAS_X_3: RegisteredStudent[] = [
+  {
+    "id": "std-x3-01",
+    "nisn": "0113817473",
+    "name": "Aaliya Salsabil Zweita Islami",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0113817473",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0113817473"
+  },
+  {
+    "id": "std-x3-02",
+    "nisn": "0103651019",
+    "name": "Aditya Raisya Irendra Putra Syahvega",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0103651019",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0103651019"
+  },
+  {
+    "id": "std-x3-03",
+    "nisn": "0115548617",
+    "name": "AINAYA SALWA FAIRUZA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0115548617",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0115548617"
+  },
+  {
+    "id": "std-x3-04",
+    "nisn": "0109345271",
+    "name": "ALMIRA NAYUNDA LUVINA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0109345271",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0109345271"
+  },
+  {
+    "id": "std-x3-05",
+    "nisn": "0108140398",
+    "name": "ANANDA SEPTA IBRAHIM FADHILLANSYAH",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0108140398",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0108140398"
+  },
+  {
+    "id": "std-x3-06",
+    "nisn": "0106080327",
+    "name": "Angel Putri Agustina",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0106080327",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0106080327"
+  },
+  {
+    "id": "std-x3-07",
+    "nisn": "0101147622",
+    "name": "Arima Altha Funisa",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0101147622",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0101147622"
+  },
+  {
+    "id": "std-x3-08",
+    "nisn": "0105139775",
+    "name": "ARYA MAULANA DIMASQI",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0105139775",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0105139775"
+  },
+  {
+    "id": "std-x3-09",
+    "nisn": "3119061346",
+    "name": "ATIQA MAISYA SYAMILA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "3119061346",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 3119061346"
+  },
+  {
+    "id": "std-x3-10",
+    "nisn": "0101209953",
+    "name": "BELVARA ZAKIYA ADZRA SAWITRI",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0101209953",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0101209953"
+  },
+  {
+    "id": "std-x3-11",
+    "nisn": "0109480976",
+    "name": "DIMAS PRASETYO",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0109480976",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0109480976"
+  },
+  {
+    "id": "std-x3-12",
+    "nisn": "3115807947",
+    "name": "ELMIRA ZAHRA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "3115807947",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 3115807947"
+  },
+  {
+    "id": "std-x3-13",
+    "nisn": "0105643210",
+    "name": "FANIA ZULIETA DWI WARDANI",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0105643210",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0105643210"
+  },
+  {
+    "id": "std-x3-14",
+    "nisn": "0113826143",
+    "name": "FEROZ EDWARD YAQIN",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0113826143",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0113826143"
+  },
+  {
+    "id": "std-x3-15",
+    "nisn": "0104655501",
+    "name": "GITA GRESILIA QUIN",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0104655501",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0104655501"
+  },
+  {
+    "id": "std-x3-16",
+    "nisn": "0119147562",
+    "name": "JIHAN NAILAH MIRZANI",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0119147562",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0119147562"
+  },
+  {
+    "id": "std-x3-17",
+    "nisn": "0101685082",
+    "name": "KAUTSAR ALBANI IZZACKY",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0101685082",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0101685082"
+  },
+  {
+    "id": "std-x3-18",
+    "nisn": "0113555784",
+    "name": "KINARA NAJHA ATHARIZHA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0113555784",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0113555784"
+  },
+  {
+    "id": "std-x3-19",
+    "nisn": "0104042620",
+    "name": "Lukman Abdillah Kinasih",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0104042620",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0104042620"
+  },
+  {
+    "id": "std-x3-20",
+    "nisn": "0117929744",
+    "name": "MAZARINA NITIYA SAFIA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0117929744",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0117929744"
+  },
+  {
+    "id": "std-x3-21",
+    "nisn": "0118045637",
+    "name": "MOZALYA FIORENZA PUTRI",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0118045637",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0118045637"
+  },
+  {
+    "id": "std-x3-22",
+    "nisn": "0102009565",
+    "name": "MUHAMMAD FARHAN AL MUHLISIN",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0102009565",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0102009565"
+  },
+  {
+    "id": "std-x3-23",
+    "nisn": "3101531136",
+    "name": "NADYA MULYA NATASYA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "3101531136",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 3101531136"
+  },
+  {
+    "id": "std-x3-24",
+    "nisn": "0112117496",
+    "name": "NATHANAEL NICO CHRISTIAN",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0112117496",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0112117496"
+  },
+  {
+    "id": "std-x3-25",
+    "nisn": "0107742915",
+    "name": "NOAHJUNIO ABIANTARA PUTRA",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0107742915",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0107742915"
+  },
+  {
+    "id": "std-x3-26",
+    "nisn": "0118765042",
+    "name": "PAMUNGKAS AKBAR ABHIRAMA",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0118765042",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0118765042"
+  },
+  {
+    "id": "std-x3-27",
+    "nisn": "3107873517",
+    "name": "QUEENSHA SABRINA RIZKY ARBY",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "3107873517",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 3107873517"
+  },
+  {
+    "id": "std-x3-28",
+    "nisn": "0102023926",
+    "name": "RAJWA SABRINA ROHMA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0102023926",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0102023926"
+  },
+  {
+    "id": "std-x3-29",
+    "nisn": "0117186920",
+    "name": "RIFQI ZAFRIZAL AUNUR RAHMAN",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0117186920",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0117186920"
+  },
+  {
+    "id": "std-x3-30",
+    "nisn": "3103351056",
+    "name": "SALMA PARAMITA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "3103351056",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 3103351056"
+  },
+  {
+    "id": "std-x3-31",
+    "nisn": "0117735847",
+    "name": "SEFIA FIRANKA AZAHRA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0117735847",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0117735847"
+  },
+  {
+    "id": "std-x3-32",
+    "nisn": "0101588014",
+    "name": "SHELLY ANGGELIA PUTRI",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0101588014",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0101588014"
+  },
+  {
+    "id": "std-x3-33",
+    "nisn": "0103720833",
+    "name": "Tarangga Sava Suyekso",
+    "studentClass": "X-3",
+    "gender": "L",
+    "password": "0103720833",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0103720833"
+  },
+  {
+    "id": "std-x3-34",
+    "nisn": "0106381331",
+    "name": "ULLATUS MARDIANA AMBARWATI",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0106381331",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0106381331"
+  },
+  {
+    "id": "std-x3-35",
+    "nisn": "0101752205",
+    "name": "VANESSA ANASTASYA",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "0101752205",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 0101752205"
+  },
+  {
+    "id": "std-x3-36",
+    "nisn": "3093099386",
+    "name": "ZIRAH SATIRAH ARIFAH",
+    "studentClass": "X-3",
+    "gender": "P",
+    "password": "3093099386",
+    "isActive": true,
+    "notes": "Siswa Kelas X-3 - NISN: 3093099386"
+  }
+];
+
+/**
  * Siswa Kelas X-4 (36 Siswa)
  * Berpikir Komputasional SMAN 1 Batu
  */
@@ -1469,12 +1836,13 @@ export const STUDENTS_KELAS_X_5: RegisteredStudent[] = [
 ];
 
 /**
- * Siswa Representatif Kelas X (Kelas X-1, X-2, X-4 & X-5: Total 144 Siswa)
+ * Siswa Representatif Kelas X (Kelas X-1, X-2, X-3, X-4 & X-5: Total 180 Siswa)
  * Mata Pelajaran Informatika - Berpikir Komputasional SMAN 1 Batu
  */
 export const STUDENTS_KELAS_X: RegisteredStudent[] = [
   ...STUDENTS_KELAS_X_1,
   ...STUDENTS_KELAS_X_2,
+  ...STUDENTS_KELAS_X_3,
   ...STUDENTS_KELAS_X_4,
   ...STUDENTS_KELAS_X_5,
 ];
