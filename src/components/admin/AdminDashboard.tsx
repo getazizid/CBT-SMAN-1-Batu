@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
   BookOpen,
   CheckCircle2,
   CheckSquare,
@@ -214,6 +217,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Submissions multi-select
   const [selectedSubmissionIds, setSelectedSubmissionIds] = useState<string[]>([]);
 
+  // Sorting state for Tab 4 (Submissions / Riwayat Nilai Siswa)
+  type SubmissionSortKey =
+    | 'no'
+    | 'studentName'
+    | 'studentNisn'
+    | 'studentClass'
+    | 'subject'
+    | 'finalScoreScale100'
+    | 'isPassed'
+    | 'tabSwitchCount'
+    | 'submittedAt';
+  const [submissionSortKey, setSubmissionSortKey] = useState<SubmissionSortKey | null>(null);
+  const [submissionSortDir, setSubmissionSortDir] = useState<'asc' | 'desc'>('asc');
+
+  // Sorting state for Tab 3 (Students / Daftar Siswa)
+  type StudentSortKey = 'no' | 'nisn' | 'name' | 'studentClass' | 'isActive';
+  const [studentSortKey, setStudentSortKey] = useState<StudentSortKey | null>(null);
+  const [studentSortDir, setStudentSortDir] = useState<'asc' | 'desc'>('asc');
+
   // Account management state
   const [searchAccount, setSearchAccount] = useState('');
   const [showPasswordsMap, setShowPasswordsMap] = useState<Record<string, boolean>>({});
@@ -252,7 +274,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const currentExam = exams.find((e) => e.id === selectedExamId) || exams[0];
 
-  // Filtered submissions (mendukung filter Semua Paket, backward compatibility ID lama, dan deduplikasi 1 siswa 1 baris)
+  // Filtered submissions (mendukung filter Semua Paket, backward compatibility ID lama, deduplikasi 1 siswa 1 baris, dan sorting dinamis di semua kolom)
   const relevantSubmissions = React.useMemo(() => {
     const list = submissions.filter((s) => {
       const matchExam =
@@ -279,21 +301,121 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         uniqueList.push(sub);
       }
     }
-    return uniqueList;
-  }, [submissions, submissionExamFilter, searchStudent, selectedClassFilter]);
 
-  // Filtered registered students
-  const filteredStudents = students.filter((std) => {
-    const matchSearch =
-      std.name.toLowerCase().includes(searchRegisteredStudent.toLowerCase()) ||
-      std.nisn.includes(searchRegisteredStudent);
-    const matchClass = studentClassFilter === 'ALL' || std.studentClass === studentClassFilter;
-    const matchStatus =
-      studentStatusFilter === 'ALL' ||
-      (studentStatusFilter === 'ACTIVE' && std.isActive) ||
-      (studentStatusFilter === 'INACTIVE' && !std.isActive);
-    return matchSearch && matchClass && matchStatus;
-  });
+    if (!submissionSortKey) return uniqueList;
+
+    const indexed = uniqueList.map((item, originalIndex) => ({ item, originalIndex }));
+    indexed.sort((a, b) => {
+      let comparison = 0;
+      switch (submissionSortKey) {
+        case 'no':
+          comparison = a.originalIndex - b.originalIndex;
+          break;
+        case 'studentName':
+          comparison = (a.item.studentName || '').localeCompare(b.item.studentName || '', 'id-ID', {
+            sensitivity: 'base',
+          });
+          break;
+        case 'studentNisn':
+          comparison = (a.item.studentNisn || '').localeCompare(b.item.studentNisn || '', undefined, {
+            numeric: true,
+          });
+          break;
+        case 'studentClass':
+          comparison = (a.item.studentClass || '').localeCompare(b.item.studentClass || '', undefined, {
+            numeric: true,
+          });
+          break;
+        case 'subject':
+          comparison = (a.item.subject || '').localeCompare(b.item.subject || '', 'id-ID', {
+            sensitivity: 'base',
+          });
+          break;
+        case 'finalScoreScale100':
+          comparison = (a.item.finalScoreScale100 ?? 0) - (b.item.finalScoreScale100 ?? 0);
+          if (comparison === 0) {
+            comparison = (a.item.totalScoreEarned ?? 0) - (b.item.totalScoreEarned ?? 0);
+          }
+          break;
+        case 'isPassed': {
+          const aPassed = a.item.isPassed ?? ((a.item.finalScoreScale100 ?? 0) >= (currentExam?.passingGrade || 75));
+          const bPassed = b.item.isPassed ?? ((b.item.finalScoreScale100 ?? 0) >= (currentExam?.passingGrade || 75));
+          comparison = Number(aPassed) - Number(bPassed);
+          break;
+        }
+        case 'tabSwitchCount':
+          comparison = (a.item.tabSwitchCount || 0) - (b.item.tabSwitchCount || 0);
+          break;
+        case 'submittedAt': {
+          const timeA = a.item.submittedAt ? new Date(a.item.submittedAt).getTime() : 0;
+          const timeB = b.item.submittedAt ? new Date(b.item.submittedAt).getTime() : 0;
+          comparison = timeA - timeB;
+          break;
+        }
+      }
+
+      if (comparison === 0) {
+        comparison = a.originalIndex - b.originalIndex;
+      }
+
+      return submissionSortDir === 'asc' ? comparison : -comparison;
+    });
+
+    return indexed.map((x) => x.item);
+  }, [
+    submissions,
+    submissionExamFilter,
+    searchStudent,
+    selectedClassFilter,
+    submissionSortKey,
+    submissionSortDir,
+    currentExam?.passingGrade,
+  ]);
+
+  // Filtered registered students (dengan sorting dinamis di semua kolom)
+  const filteredStudents = React.useMemo(() => {
+    const list = students.filter((std) => {
+      const matchSearch =
+        std.name.toLowerCase().includes(searchRegisteredStudent.toLowerCase()) ||
+        std.nisn.includes(searchRegisteredStudent);
+      const matchClass = studentClassFilter === 'ALL' || std.studentClass === studentClassFilter;
+      const matchStatus =
+        studentStatusFilter === 'ALL' ||
+        (studentStatusFilter === 'ACTIVE' && std.isActive) ||
+        (studentStatusFilter === 'INACTIVE' && !std.isActive);
+      return matchSearch && matchClass && matchStatus;
+    });
+
+    if (!studentSortKey) return list;
+
+    const indexed = list.map((item, originalIndex) => ({ item, originalIndex }));
+    indexed.sort((a, b) => {
+      let cmp = 0;
+      switch (studentSortKey) {
+        case 'no':
+          cmp = a.originalIndex - b.originalIndex;
+          break;
+        case 'nisn':
+          cmp = (a.item.nisn || '').localeCompare(b.item.nisn || '', undefined, { numeric: true });
+          break;
+        case 'name':
+          cmp = (a.item.name || '').localeCompare(b.item.name || '', 'id-ID', { sensitivity: 'base' });
+          break;
+        case 'studentClass':
+          cmp = (a.item.studentClass || '').localeCompare(b.item.studentClass || '', undefined, { numeric: true });
+          break;
+        case 'isActive':
+          cmp = Number(a.item.isActive) - Number(b.item.isActive);
+          break;
+      }
+      if (cmp === 0) {
+        cmp = a.originalIndex - b.originalIndex;
+      }
+      return studentSortDir === 'asc' ? cmp : -cmp;
+    });
+
+    return indexed.map((x) => x.item);
+  }, [students, searchRegisteredStudent, studentClassFilter, studentStatusFilter, studentSortKey, studentSortDir]);
 
   // Filtered admin accounts
   const filteredAccounts = adminAccounts.filter((acc) => {
@@ -562,6 +684,182 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setEditQuestionDraft(newQ);
     const lastPage = Math.ceil(updatedQuestions.length / questionsPerPage);
     setQuestionsPage(lastPage);
+  };
+
+  // Sorting handlers & UI renderers for Submissions (Riwayat Nilai Siswa)
+  const handleSortSubmission = (key: SubmissionSortKey) => {
+    if (submissionSortKey === key) {
+      if (submissionSortDir === 'asc') {
+        setSubmissionSortDir('desc');
+      } else {
+        setSubmissionSortKey(null);
+        setSubmissionSortDir('asc');
+      }
+    } else {
+      setSubmissionSortKey(key);
+      if (key === 'finalScoreScale100' || key === 'tabSwitchCount' || key === 'submittedAt') {
+        setSubmissionSortDir('desc');
+      } else {
+        setSubmissionSortDir('asc');
+      }
+    }
+    setSubmissionsPage(1);
+  };
+
+  const getSubmissionSortLabel = (key: SubmissionSortKey) => {
+    switch (key) {
+      case 'no':
+        return 'No';
+      case 'studentName':
+        return 'Nama Siswa';
+      case 'studentNisn':
+        return 'NISN';
+      case 'studentClass':
+        return 'Kelas';
+      case 'subject':
+        return 'Mata Pelajaran';
+      case 'finalScoreScale100':
+        return 'Nilai Akhir';
+      case 'isPassed':
+        return 'Status';
+      case 'tabSwitchCount':
+        return 'Pelanggaran';
+      case 'submittedAt':
+        return 'Waktu Selesai';
+    }
+  };
+
+  const renderSubmissionSortHeader = (
+    key: SubmissionSortKey,
+    label: string,
+    align: 'left' | 'center' | 'right' = 'left',
+    extraClasses: string = ''
+  ) => {
+    const isActive = submissionSortKey === key;
+    return (
+      <th
+        onClick={() => handleSortSubmission(key)}
+        className={`py-3 px-3.5 cursor-pointer select-none transition-colors group hover:bg-slate-100/90 dark:hover:bg-slate-700/60 ${
+          isActive
+            ? 'bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300'
+            : 'text-slate-600 dark:text-slate-300'
+        } ${extraClasses}`}
+        title={`Klik untuk mengurutkan berdasarkan ${label} ${
+          isActive
+            ? submissionSortDir === 'asc'
+              ? '(Naik / A-Z, klik untuk Turun / Z-A)'
+              : '(Turun / Z-A, klik untuk reset urutan)'
+            : '(Klik untuk mengurutkan)'
+        }`}
+      >
+        <div
+          className={`flex items-center gap-1.5 ${
+            align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'
+          }`}
+        >
+          <span>{label}</span>
+          <span
+            className={`inline-flex items-center justify-center transition-transform ${
+              isActive
+                ? 'text-blue-600 dark:text-blue-400 font-bold'
+                : 'text-slate-400 opacity-40 group-hover:opacity-100 group-hover:text-slate-600 dark:group-hover:text-slate-200'
+            }`}
+          >
+            {isActive ? (
+              submissionSortDir === 'asc' ? (
+                <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
+              ) : (
+                <ArrowDown className="w-3.5 h-3.5 stroke-[2.5]" />
+              )
+            ) : (
+              <ArrowUpDown className="w-3.5 h-3.5" />
+            )}
+          </span>
+        </div>
+      </th>
+    );
+  };
+
+  // Sorting handlers & UI renderers for Students (Daftar Siswa)
+  const handleSortStudent = (key: StudentSortKey) => {
+    if (studentSortKey === key) {
+      if (studentSortDir === 'asc') {
+        setStudentSortDir('desc');
+      } else {
+        setStudentSortKey(null);
+        setStudentSortDir('asc');
+      }
+    } else {
+      setStudentSortKey(key);
+      setStudentSortDir('asc');
+    }
+    setStudentsPage(1);
+  };
+
+  const getStudentSortLabel = (key: StudentSortKey) => {
+    switch (key) {
+      case 'no':
+        return 'No';
+      case 'nisn':
+        return 'NISN';
+      case 'name':
+        return 'Nama Lengkap';
+      case 'studentClass':
+        return 'Kelas';
+      case 'isActive':
+        return 'Status Izin';
+    }
+  };
+
+  const renderStudentSortHeader = (
+    key: StudentSortKey,
+    label: string,
+    align: 'left' | 'center' | 'right' = 'left',
+    extraClasses: string = ''
+  ) => {
+    const isActive = studentSortKey === key;
+    return (
+      <th
+        onClick={() => handleSortStudent(key)}
+        className={`py-3 px-3.5 cursor-pointer select-none transition-colors group hover:bg-slate-100/90 dark:hover:bg-slate-700/60 ${
+          isActive
+            ? 'bg-blue-50/80 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300'
+            : 'text-slate-600 dark:text-slate-300'
+        } ${extraClasses}`}
+        title={`Klik untuk mengurutkan berdasarkan ${label} ${
+          isActive
+            ? studentSortDir === 'asc'
+              ? '(Naik / A-Z, klik untuk Turun / Z-A)'
+              : '(Turun / Z-A, klik untuk reset urutan)'
+            : '(Klik untuk mengurutkan)'
+        }`}
+      >
+        <div
+          className={`flex items-center gap-1.5 ${
+            align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'
+          }`}
+        >
+          <span>{label}</span>
+          <span
+            className={`inline-flex items-center justify-center transition-transform ${
+              isActive
+                ? 'text-blue-600 dark:text-blue-400 font-bold'
+                : 'text-slate-400 opacity-40 group-hover:opacity-100 group-hover:text-slate-600 dark:group-hover:text-slate-200'
+            }`}
+          >
+            {isActive ? (
+              studentSortDir === 'asc' ? (
+                <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
+              ) : (
+                <ArrowDown className="w-3.5 h-3.5 stroke-[2.5]" />
+              )
+            ) : (
+              <ArrowUpDown className="w-3.5 h-3.5" />
+            )}
+          </span>
+        </div>
+      </th>
+    );
   };
 
   const handleExportExcel = () => {
@@ -2280,6 +2578,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <option value="INACTIVE" className="dark:bg-slate-800">Hanya Nonaktif</option>
                       </select>
                     </div>
+
+                    {studentSortKey && (
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-semibold animate-in fade-in">
+                        <span>
+                          Urutan: {getStudentSortLabel(studentSortKey)} (
+                          {studentSortDir === 'asc' ? 'Naik / A-Z' : 'Turun / Z-A'})
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStudentSortKey(null);
+                            setStudentsPage(1);
+                          }}
+                          className="hover:text-rose-600 dark:hover:text-rose-400 ml-0.5 cursor-pointer p-0.5"
+                          title="Batal / Reset urutan ke posisi asal"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
@@ -2398,12 +2716,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             title={isAllCurrentPageStudentsSelected ? 'Batal pilih semua di halaman ini' : 'Pilih semua siswa di halaman ini'}
                           />
                         </th>
-                        <th className="py-3 px-3.5 text-center w-12">No</th>
-                        <th className="py-3 px-3.5 font-mono">NISN (Username)</th>
-                        <th className="py-3 px-3.5">Nama Lengkap Siswa</th>
-                        <th className="py-3 px-3.5">Kelas</th>
+                        {renderStudentSortHeader('no', 'No', 'center', 'w-14')}
+                        {renderStudentSortHeader('nisn', 'NISN (Username)', 'left', 'font-mono')}
+                        {renderStudentSortHeader('name', 'Nama Lengkap Siswa', 'left')}
+                        {renderStudentSortHeader('studentClass', 'Kelas', 'left')}
                         <th className="py-3 px-3.5 font-mono">Password / PIN</th>
-                        <th className="py-3 px-3.5 text-center">Status Izin</th>
+                        {renderStudentSortHeader('isActive', 'Status Izin', 'center')}
                         <th className="py-3 px-3.5 text-center">Aksi</th>
                       </tr>
                     </thead>
@@ -2580,6 +2898,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
                     Total: {relevantSubmissions.length} Lembar Jawaban
                   </span>
+
+                  {submissionSortKey && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-semibold animate-in fade-in">
+                      <span>
+                        Urutan: {getSubmissionSortLabel(submissionSortKey)} (
+                        {submissionSortDir === 'asc' ? 'Naik / A-Z' : 'Turun / Z-A'})
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSubmissionSortKey(null);
+                          setSubmissionsPage(1);
+                        }}
+                        className="hover:text-rose-600 dark:hover:text-rose-400 ml-0.5 cursor-pointer p-0.5"
+                        title="Batal / Reset urutan ke posisi asal"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -2658,15 +2996,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           title={isAllCurrentPageSubmissionsSelected ? 'Batal pilih semua di halaman ini' : 'Pilih semua riwayat di halaman ini'}
                         />
                       </th>
-                      <th className="py-3 px-3.5 text-center w-12">No</th>
-                      <th className="py-3 px-3.5">Nama Siswa</th>
-                      <th className="py-3 px-3.5 font-mono">NISN</th>
-                      <th className="py-3 px-3.5">Kelas</th>
-                      <th className="py-3 px-3.5">Mata Pelajaran</th>
-                      <th className="py-3 px-3.5 text-center">Nilai Akhir</th>
-                      <th className="py-3 px-3.5 text-center">Status</th>
-                      <th className="py-3 px-3.5 text-center">Pelanggaran</th>
-                      <th className="py-3 px-3.5">Waktu Selesai</th>
+                      {renderSubmissionSortHeader('no', 'No', 'center', 'w-14')}
+                      {renderSubmissionSortHeader('studentName', 'Nama Siswa', 'left')}
+                      {renderSubmissionSortHeader('studentNisn', 'NISN', 'left', 'font-mono')}
+                      {renderSubmissionSortHeader('studentClass', 'Kelas', 'left')}
+                      {renderSubmissionSortHeader('subject', 'Mata Pelajaran', 'left')}
+                      {renderSubmissionSortHeader('finalScoreScale100', 'Nilai Akhir', 'center')}
+                      {renderSubmissionSortHeader('isPassed', 'Status', 'center')}
+                      {renderSubmissionSortHeader('tabSwitchCount', 'Pelanggaran', 'center')}
+                      {renderSubmissionSortHeader('submittedAt', 'Waktu Selesai', 'left')}
                       <th className="py-3 px-3.5 text-center">Aksi</th>
                     </tr>
                   </thead>

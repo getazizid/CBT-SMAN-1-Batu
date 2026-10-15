@@ -106,10 +106,16 @@ export const exportExamResultsToExcel = (
   exam: Exam,
   submissions: StudentExamSubmission[]
 ) => {
-  const relevant = submissions.filter((s) => s.examId === exam.id);
+  const relevant = submissions.filter(
+    (s) =>
+      s.examId === exam.id ||
+      ((exam.id === 'exam-ct-inf-x-30' || exam.id === 'exam-ct-informatika-30') &&
+        (s.examId === 'exam-ct-inf-x-30' || s.examId === 'exam-ct-informatika-30'))
+  );
+  const finalSubmissions = relevant.length > 0 ? relevant : submissions;
 
   // Sheet 1: Rekap Nilai Siswa
-  const studentRows = relevant.map((s, index) => {
+  const studentRows = finalSubmissions.map((s, index) => {
     const row: Record<string, any> = {
       'No': index + 1,
       'Nama Siswa': s.studentName,
@@ -135,7 +141,7 @@ export const exportExamResultsToExcel = (
   });
 
   // Sheet 2: Analisis Butir Soal
-  const stats = calculateExamStatistics(exam, submissions);
+  const stats = calculateExamStatistics(exam, finalSubmissions);
   const itemAnalysisRows = stats.itemAnalysis.map((item) => ({
     'No Soal': item.questionNumber,
     'Tingkat Kesukaran': item.difficultyRate,
