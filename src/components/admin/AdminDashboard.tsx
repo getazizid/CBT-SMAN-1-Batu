@@ -133,7 +133,86 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 }) => {
   const [activeTab, setActiveTabState] = useState<AdminTab>(getInitialAdminTab);
 
+  // Role & Scope Helpers
+  const isAdmin = currentAdmin?.role === 'Administrator' || !currentAdmin?.role;
+  const isGuru = currentAdmin?.role === 'Guru Pengampu';
+  const isProktor = currentAdmin?.role === 'Proktor';
+
+  // Teacher subjects assigned to current user
+  const teacherSubjects = React.useMemo(() => {
+    if (!currentAdmin) return [];
+    if (currentAdmin.subjects && currentAdmin.subjects.length > 0) {
+      return currentAdmin.subjects.map((s) => s.trim()).filter(Boolean);
+    }
+    if (currentAdmin.subject) {
+      return currentAdmin.subject.split(',').map((s) => s.trim()).filter(Boolean);
+    }
+    return [];
+  }, [currentAdmin]);
+
+  // Synchronized CBT subjects list across all exams in system
+  const availableCbtSubjects = React.useMemo(() => {
+    const fromExams = exams.map((e) => e.subject?.trim()).filter(Boolean);
+    const defaults = [
+      'Informatika',
+      'Informatika - Computational Thinking',
+      'Matematika',
+      'Bahasa Indonesia',
+      'Bahasa Inggris',
+      'Biologi',
+      'Fisika',
+      'Kimia',
+      'Ekonomi',
+      'Sosiologi',
+      'Geografi',
+      'Sejarah',
+      'Pendidikan Pancasila',
+      'Seni Budaya',
+      'Pendidikan Jasmani, Olahraga, dan Kesehatan (PJOK)',
+      'Pendidikan Agama Islam & Budi Pekerti',
+      'Pendidikan Agama Kristen & Budi Pekerti',
+      'Bimbingan Konseling (BK)',
+      'Prakarya dan Kewirausahaan',
+      'Bahasa Jawa',
+    ];
+    return Array.from(new Set([...fromExams, ...defaults])).sort();
+  }, [exams]);
+
+  // Filtered exams according to role & assigned subjects
+  const accessibleExams = React.useMemo(() => {
+    if (isAdmin || isProktor) return exams;
+    if (!currentAdmin) return [];
+    return exams.filter((exam) => {
+      const examSubj = (exam.subject || '').trim().toLowerCase();
+      if (teacherSubjects.length > 0) {
+        return teacherSubjects.some((ts) => ts.toLowerCase() === examSubj);
+      }
+      if (currentAdmin.name && exam.teacherName) {
+        return exam.teacherName.trim().toLowerCase() === currentAdmin.name.trim().toLowerCase();
+      }
+      return false;
+    });
+  }, [exams, currentAdmin, isAdmin, isProktor, teacherSubjects]);
+
+  // Filtered submissions according to role & accessible exams / subjects
+  const accessibleSubmissions = React.useMemo(() => {
+    if (isAdmin || isProktor) return submissions;
+    if (!currentAdmin) return [];
+    const accessibleExamIds = new Set(accessibleExams.map((e) => e.id));
+    return submissions.filter((s) => {
+      if (accessibleExamIds.has(s.examId)) return true;
+      if (teacherSubjects.length > 0) {
+        const subSubj = (s.subject || '').trim().toLowerCase();
+        return teacherSubjects.some((ts) => ts.toLowerCase() === subSubj);
+      }
+      return false;
+    });
+  }, [submissions, accessibleExams, teacherSubjects, isAdmin, isProktor, currentAdmin]);
+
   const setActiveTab = (tab: AdminTab) => {
+    if (!isAdmin && tab === 'accounts') {
+      tab = 'exams';
+    }
     setActiveTabState(tab);
     saveStoredAdminActiveTab(tab);
     try {
@@ -147,6 +226,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       // ignore
     }
   };
+
+  useEffect(() => {
+    if (!isAdmin && activeTab === 'accounts') {
+      setActiveTab('exams');
+    }
+  }, [isAdmin, activeTab]);
 
   useEffect(() => {
     try {
@@ -164,6 +249,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       try {
         const hash = window.location.hash.replace('#', '').toLowerCase() as AdminTab;
         if (VALID_ADMIN_TABS.includes(hash) && hash !== activeTab) {
+          if (!isAdmin && hash === 'accounts') {
+            setActiveTab('exams');
+            return;
+          }
           setActiveTabState(hash);
           saveStoredAdminActiveTab(hash);
         }
@@ -174,17 +263,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [activeTab]);
+  }, [activeTab, isAdmin]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   const [selectedExamId, setSelectedExamIdState] = useState<string>(() => {
     const saved = getStoredSelectedExamId();
-    if (saved && exams.some((e) => e.id === saved)) {
+    if (saved && accessibleExams.some((e) => e.id === saved)) {
       return saved;
     }
-    return exams.find((e) => e.id === 'exam-ct-informatika-30')?.id || exams[0]?.id || '';
+    return accessibleExams.find((e) => e.id === 'exam-ct-informatika-30')?.id || accessibleExams[0]?.id || '';
   });
 
   const setSelectedExamId = (id: string) => {
@@ -193,17 +282,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   useEffect(() => {
-    if (exams.length > 0) {
+    if (accessibleExams.length > 0) {
       const saved = getStoredSelectedExamId();
-      if (saved && exams.some((e) => e.id === saved) && selectedExamId !== saved) {
+      if (saved && accessibleExams.some((e) => e.id === saved) && selectedExamId !== saved) {
         setSelectedExamIdState(saved);
-      } else if (!selectedExamId || !exams.some((e) => e.id === selectedExamId)) {
-        const preferred = exams.find((e) => e.id === 'exam-ct-informatika-30') || exams[0];
+      } else if (!selectedExamId || !accessibleExams.some((e) => e.id === selectedExamId)) {
+        const preferred = accessibleExams.find((e) => e.id === 'exam-ct-informatika-30') || accessibleExams[0];
         setSelectedExamIdState(preferred.id);
         saveStoredSelectedExamId(preferred.id);
       }
     }
-  }, [exams, selectedExamId]);
+  }, [accessibleExams, selectedExamId]);
   const [searchStudent, setSearchStudent] = useState('');
   const [selectedClassFilter, setSelectedClassFilter] = useState('ALL');
   const [submissionExamFilter, setSubmissionExamFilter] = useState('ALL');
@@ -272,11 +361,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [editingStudent, setEditingStudent] = useState<RegisteredStudent | null>(null);
   const [isStudentBatchImportOpen, setIsStudentBatchImportOpen] = useState(false);
 
-  const currentExam = exams.find((e) => e.id === selectedExamId) || exams[0];
+  const currentExam = accessibleExams.find((e) => e.id === selectedExamId) || accessibleExams[0];
 
   // Filtered submissions (mendukung filter Semua Paket, backward compatibility ID lama, deduplikasi 1 siswa 1 baris, dan sorting dinamis di semua kolom)
   const relevantSubmissions = React.useMemo(() => {
-    const list = submissions.filter((s) => {
+    const list = accessibleSubmissions.filter((s) => {
       const matchExam =
         submissionExamFilter === 'ALL'
           ? true
@@ -363,7 +452,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
     return indexed.map((x) => x.item);
   }, [
-    submissions,
+    accessibleSubmissions,
     submissionExamFilter,
     searchStudent,
     selectedClassFilter,
@@ -419,10 +508,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Filtered admin accounts
   const filteredAccounts = adminAccounts.filter((acc) => {
+    const q = searchAccount.toLowerCase();
     return (
-      acc.name.toLowerCase().includes(searchAccount.toLowerCase()) ||
-      acc.username.toLowerCase().includes(searchAccount.toLowerCase()) ||
-      acc.role.toLowerCase().includes(searchAccount.toLowerCase())
+      acc.name.toLowerCase().includes(q) ||
+      acc.username.toLowerCase().includes(q) ||
+      acc.role.toLowerCase().includes(q) ||
+      (acc.subject && acc.subject.toLowerCase().includes(q)) ||
+      (acc.subjects && acc.subjects.some((s) => s.toLowerCase().includes(q)))
     );
   });
 
@@ -468,9 +560,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const safeExamsPage = Math.min(
     examsPage,
-    Math.max(1, Math.ceil(exams.length / examsPerPage))
+    Math.max(1, Math.ceil(accessibleExams.length / examsPerPage))
   );
-  const paginatedExams = exams.slice(
+  const paginatedExams = accessibleExams.slice(
     (safeExamsPage - 1) * examsPerPage,
     safeExamsPage * examsPerPage
   );
@@ -514,6 +606,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const handleDeleteAllExams = () => {
+    if (!isAdmin) {
+      alert('Akses Ditolak: Hanya Administrator yang berhak menghapus seluruh paket ujian.');
+      return;
+    }
     if (exams.length === 0) {
       alert('Belum ada paket ujian untuk dihapus.');
       return;
@@ -865,7 +961,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const handleExportExcel = () => {
     const targetExam =
       submissionExamFilter !== 'ALL'
-        ? exams.find((e) => e.id === submissionExamFilter) || currentExam
+        ? accessibleExams.find((e) => e.id === submissionExamFilter) || currentExam
         : currentExam;
     if (!targetExam) return;
     exportExamResultsToExcel(targetExam, relevantSubmissions);
@@ -962,6 +1058,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const handleDeleteAllSubmissions = async () => {
+    if (!isAdmin) {
+      alert('Akses Ditolak: Hanya Administrator yang berhak menghapus seluruh riwayat nilai siswa.');
+      return;
+    }
     if (submissions.length === 0) {
       alert('Belum ada data riwayat nilai siswa untuk dihapus.');
       return;
@@ -1162,7 +1262,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const uniqueSubmissionsForExam = React.useMemo(() => {
     const seen = new Set<string>();
     const uniqueList: StudentExamSubmission[] = [];
-    for (const sub of submissions) {
+    for (const sub of accessibleSubmissions) {
       const matchExam =
         submissionExamFilter === 'ALL'
           ? true
@@ -1179,7 +1279,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       }
     }
     return uniqueList;
-  }, [submissions, submissionExamFilter]);
+  }, [accessibleSubmissions, submissionExamFilter]);
 
   // Distinct classes present in submissions for current exam filter (filter dinamis mengikuti isi data)
   const availableSubmissionClasses = React.useMemo(() => {
@@ -1205,13 +1305,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   }, [availableSubmissionClasses, selectedClassFilter]);
 
-  // Navigation items with "Manajemen Akun"
+  // Navigation items with "Manajemen Akun" (Khusus Administrator)
   const navItems = [
     {
       id: 'exams' as AdminTab,
       label: 'Paket Ujian',
       icon: BookOpen,
-      badge: `${exams.length}`,
+      badge: `${accessibleExams.length}`,
     },
     {
       id: 'live' as AdminTab,
@@ -1235,14 +1335,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       id: 'submissions' as AdminTab,
       label: 'Riwayat Siswa',
       icon: Users,
-      badge: `${submissions.length}`,
+      badge: `${accessibleSubmissions.length}`,
     },
-    {
-      id: 'accounts' as AdminTab,
-      label: 'Manajemen Akun',
-      icon: UserCog,
-      badge: `${adminAccounts.length}`,
-    },
+    ...(isAdmin
+      ? [
+          {
+            id: 'accounts' as AdminTab,
+            label: 'Manajemen Akun',
+            icon: UserCog,
+            badge: `${adminAccounts.length}`,
+          },
+        ]
+      : []),
   ];
 
   const renderSimpleNav = () => (
@@ -1444,7 +1548,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {/* Right: Action Buttons */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* Select Exam Dropdown when on Exams or Questions */}
-              {(activeTab === 'exams' || activeTab === 'questions') && exams.length > 0 && (
+              {(activeTab === 'exams' || activeTab === 'questions') && accessibleExams.length > 0 && (
                 <div className="flex items-center gap-2 text-xs">
                   <span className="text-slate-400 dark:text-slate-500 hidden md:inline">Paket:</span>
                   <select
@@ -1456,7 +1560,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     }}
                     className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-slate-900 dark:text-white rounded-xl px-3 py-1.5 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none max-w-[200px] sm:max-w-xs truncate"
                   >
-                    {exams.map((e) => (
+                    {accessibleExams.map((e) => (
                       <option key={e.id} value={e.id} className="dark:bg-slate-800">
                         {e.subject} ({e.questions.length} Soal &bull; Token: {e.token})
                       </option>
@@ -1467,19 +1571,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
               {activeTab === 'exams' && (
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleDeleteAllExams}
-                    disabled={exams.length === 0}
-                    className={`text-xs font-semibold px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${
-                      exams.length === 0
-                        ? 'text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800 cursor-not-allowed'
-                        : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border-rose-200 dark:border-rose-800 hover:border-rose-300 cursor-pointer'
-                    }`}
-                    title="Hapus seluruh paket ujian di sistem"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    <span>Hapus All</span>
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={handleDeleteAllExams}
+                      disabled={exams.length === 0}
+                      className={`text-xs font-semibold px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${
+                        exams.length === 0
+                          ? 'text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800 cursor-not-allowed'
+                          : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border-rose-200 dark:border-rose-800 hover:border-rose-300 cursor-pointer'
+                      }`}
+                      title="Hapus seluruh paket ujian di sistem"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>Hapus All</span>
+                    </button>
+                  )}
 
                   <button
                     onClick={() => {
@@ -1507,29 +1613,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
               {activeTab === 'students' && (
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setIsStudentBatchImportOpen(true)}
-                    className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs"
-                    title="Import data siswa sekaligus dari Excel / CSV"
-                  >
-                    <Upload className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span className="hidden sm:inline">Import Cepat (Batch)</span>
-                  </button>
+                  {isAdmin ? (
+                    <>
+                      <button
+                        onClick={() => setIsStudentBatchImportOpen(true)}
+                        className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs"
+                        title="Import data siswa sekaligus dari Excel / CSV"
+                      >
+                        <Upload className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <span className="hidden sm:inline">Import Cepat (Batch)</span>
+                      </button>
 
-                  <button
-                    onClick={() => {
-                      setEditingStudent(null);
-                      setIsStudentEditorOpen(true);
-                    }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    <span>Tambah Siswa</span>
-                  </button>
+                      <button
+                        onClick={() => {
+                          setEditingStudent(null);
+                          setIsStudentEditorOpen(true);
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        <span>Tambah Siswa</span>
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-semibold">
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>Mode Baca Siswa</span>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {activeTab === 'accounts' && (
+              {isAdmin && activeTab === 'accounts' && (
                 <button
                   onClick={() => {
                     setEditingAccount(null);
@@ -1547,16 +1662,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* TAB 1: MANAJEMEN PAKET UJIAN */}
           {activeTab === 'exams' && (
             <div className="space-y-4">
-              {exams.length === 0 ? (
+              {accessibleExams.length === 0 ? (
                 <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800 shadow-xs">
                   <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <BookOpen className="w-8 h-8" />
                   </div>
                   <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
-                    Belum Ada Paket Ujian
+                    {isGuru
+                      ? `Belum Ada Paket Ujian: ${teacherSubjects.join(', ') || 'Mapel Anda'}`
+                      : 'Belum Ada Paket Ujian'}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
-                    Semua paket ujian telah dihapus atau belum dibuat. Klik tombol di bawah untuk membuat paket ujian baru.
+                    {isGuru
+                      ? 'Belum ada paket ujian untuk mata pelajaran yang Anda ampu. Klik tombol di bawah untuk membuat paket ujian baru.'
+                      : 'Semua paket ujian telah dihapus atau belum dibuat. Klik tombol di bawah untuk membuat paket ujian baru.'}
                   </p>
                   <button
                     onClick={() => {
@@ -1774,10 +1893,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 })}
               </div>
 
-              {exams.length > 6 && (
+              {accessibleExams.length > 6 && (
                 <Pagination
                   currentPage={safeExamsPage}
-                  totalItems={exams.length}
+                  totalItems={accessibleExams.length}
                   pageSize={examsPerPage}
                   pageSizeOptions={[6, 12, 24]}
                   onPageChange={(page) => setExamsPage(page)}
@@ -1797,7 +1916,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* TAB: LIVE PROCTORING MONITOR (QUIZIZZ PRO REALTIME) */}
           {activeTab === 'live' && (
             <LiveMonitorTab
-              exams={exams}
+              exams={accessibleExams}
               selectedExamId={selectedExamId}
               onSelectExam={(id) => setSelectedExamId(id)}
               onSwitchToExamsTab={() => setActiveTab('exams')}
@@ -2470,6 +2589,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           {/* TAB 3: DATA SISWA & HAK AKSES LOGIN */}
           {activeTab === 'students' && (
             <div className="space-y-4">
+              {/* Info Banner Khusus Guru / Non-Admin */}
+              {!isAdmin && (
+                <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-center gap-3 text-xs text-amber-800 dark:text-amber-200 animate-in fade-in">
+                  <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/60 flex items-center justify-center shrink-0">
+                    <Lock className="w-4 h-4 text-amber-700 dark:text-amber-300" />
+                  </div>
+                  <div>
+                    <p className="font-bold">Hak Akses: Mode Hanya Baca (Read-Only)</p>
+                    <p className="text-[11px] text-amber-700 dark:text-amber-300">
+                      Anda masuk sebagai <strong>{currentAdmin?.name} ({currentAdmin?.role})</strong>. Pengelolaan data siswa (tambah siswa, impor Excel, edit data, hapus, dan pembatasan whitelist) khusus dikelola oleh <strong>Administrator</strong>. Guru dapat melihat data & riwayat siswa.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Whitelist Security Setting Card */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-3.5">
@@ -2508,16 +2642,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => onToggleEnforceWhitelist(!enforceWhitelist)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs ${
-                      enforceWhitelist
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {enforceWhitelist ? 'Nonaktifkan Batasan' : 'Wajibkan Siswa Terdaftar'}
-                  </button>
+                  {isAdmin ? (
+                    <button
+                      onClick={() => onToggleEnforceWhitelist(!enforceWhitelist)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs ${
+                        enforceWhitelist
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      {enforceWhitelist ? 'Nonaktifkan Batasan' : 'Wajibkan Siswa Terdaftar'}
+                    </button>
+                  ) : (
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold border border-slate-200 dark:border-slate-700">
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>Dikelola Administrator</span>
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -2601,25 +2742,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingStudent(null);
-                        setIsStudentEditorOpen(true);
-                      }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Tambah Siswa</span>
-                    </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => {
+                          setEditingStudent(null);
+                          setIsStudentEditorOpen(true);
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Tambah Siswa</span>
+                      </button>
+                    )}
 
-                    <button
-                      onClick={() => setIsStudentBatchImportOpen(true)}
-                      className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs px-3 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
-                      title="Import data siswa sekaligus dari Excel / Word"
-                    >
-                      <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <span>Import Excel</span>
-                    </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => setIsStudentBatchImportOpen(true)}
+                        className="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs px-3 py-2 rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
+                        title="Import data siswa sekaligus dari Excel / Word"
+                      >
+                        <Upload className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <span>Import Excel</span>
+                      </button>
+                    )}
 
                     <button
                       onClick={handleExportStudentsCSV}
@@ -2630,24 +2775,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <span className="hidden sm:inline">Ekspor CSV</span>
                     </button>
 
-                    <button
-                      onClick={handleDeleteAllStudents}
-                      disabled={students.length === 0}
-                      className={`text-xs font-semibold px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${
-                        students.length === 0
-                          ? 'text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800 cursor-not-allowed'
-                          : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border-rose-200 dark:border-rose-800 hover:border-rose-300 cursor-pointer'
-                      }`}
-                      title="Hapus seluruh data siswa di sistem"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      <span>Hapus All</span>
-                    </button>
+                    {isAdmin && (
+                      <button
+                        onClick={handleDeleteAllStudents}
+                        disabled={students.length === 0}
+                        className={`text-xs font-semibold px-3 py-2 rounded-xl border flex items-center gap-1.5 transition-all ${
+                          students.length === 0
+                            ? 'text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800 cursor-not-allowed'
+                            : 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border-rose-200 dark:border-rose-800 hover:border-rose-300 cursor-pointer'
+                        }`}
+                        title="Hapus seluruh data siswa di sistem"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Hapus All</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                {/* Bulk Selection Action Bar */}
-                {selectedStudentIds.length > 0 && (
+                {/* Bulk Selection Action Bar (Hanya Administrator) */}
+                {isAdmin && selectedStudentIds.length > 0 && (
                   <div className="bg-blue-50/90 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3 animate-in fade-in duration-200">
                     <div className="flex items-center gap-2 text-xs font-bold text-blue-950 dark:text-blue-300">
                       <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
@@ -2707,15 +2854,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
                       <tr className="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
-                        <th className="py-3 px-3 text-center w-10">
-                          <input
-                            type="checkbox"
-                            checked={isAllCurrentPageStudentsSelected}
-                            onChange={toggleSelectCurrentPageStudents}
-                            className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
-                            title={isAllCurrentPageStudentsSelected ? 'Batal pilih semua di halaman ini' : 'Pilih semua siswa di halaman ini'}
-                          />
-                        </th>
+                        {isAdmin && (
+                          <th className="py-3 px-3 text-center w-10">
+                            <input
+                              type="checkbox"
+                              checked={isAllCurrentPageStudentsSelected}
+                              onChange={toggleSelectCurrentPageStudents}
+                              className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
+                              title={isAllCurrentPageStudentsSelected ? 'Batal pilih semua di halaman ini' : 'Pilih semua siswa di halaman ini'}
+                            />
+                          </th>
+                        )}
                         {renderStudentSortHeader('no', 'No', 'center', 'w-14')}
                         {renderStudentSortHeader('nisn', 'NISN (Username)', 'left', 'font-mono')}
                         {renderStudentSortHeader('name', 'Nama Lengkap Siswa', 'left')}
@@ -2737,14 +2886,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 isChecked ? 'bg-blue-50/60 dark:bg-blue-950/40' : 'hover:bg-slate-50/70 dark:hover:bg-slate-800/50'
                               }`}
                             >
-                              <td className="py-3 px-3 text-center w-10">
-                                <input
-                                  type="checkbox"
-                                  checked={isChecked}
-                                  onChange={() => toggleSelectStudent(std.id)}
-                                  className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
-                                />
-                              </td>
+                              {isAdmin && (
+                                <td className="py-3 px-3 text-center w-10">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => toggleSelectStudent(std.id)}
+                                    className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
+                                  />
+                                </td>
+                              )}
                               <td className="py-3 px-3.5 text-center font-semibold text-slate-500 dark:text-slate-400">
                                 {rowNum}
                               </td>
@@ -2770,45 +2921,73 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 )}
                               </td>
                               <td className="py-3 px-3.5 text-center">
-                                <button
-                                  onClick={() => handleToggleStudentActive(std.id)}
-                                  className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border cursor-pointer transition-colors ${
-                                    std.isActive
-                                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
-                                      : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800 hover:bg-rose-100'
-                                  }`}
-                                  title="Klik untuk mengubah status aktif/nonaktif"
-                                >
-                                  {std.isActive ? 'Diizinkan (Aktif)' : 'Diblokir (Nonaktif)'}
-                                </button>
+                                {isAdmin ? (
+                                  <button
+                                    onClick={() => handleToggleStudentActive(std.id)}
+                                    className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border cursor-pointer transition-colors ${
+                                      std.isActive
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
+                                        : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800 hover:bg-rose-100'
+                                    }`}
+                                    title="Klik untuk mengubah status aktif/nonaktif"
+                                  >
+                                    {std.isActive ? 'Diizinkan (Aktif)' : 'Diblokir (Nonaktif)'}
+                                  </button>
+                                ) : (
+                                  <span
+                                    className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] border inline-block ${
+                                      std.isActive
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                                        : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+                                    }`}
+                                  >
+                                    {std.isActive ? 'Aktif' : 'Nonaktif'}
+                                  </span>
+                                )}
                               </td>
                               <td className="py-3 px-3.5 text-center">
-                                <div className="flex items-center justify-center gap-1.5">
-                                  <button
-                                    onClick={() => {
-                                      setEditingStudent(std);
-                                      setIsStudentEditorOpen(true);
-                                    }}
-                                    className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
-                                    title="Edit Data Siswa"
-                                  >
-                                    <Edit className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteStudent(std.id)}
-                                    className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
-                                    title="Hapus Siswa"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
+                                {isAdmin ? (
+                                  <div className="flex items-center justify-center gap-1.5">
+                                    <button
+                                      onClick={() => {
+                                        setEditingStudent(std);
+                                        setIsStudentEditorOpen(true);
+                                      }}
+                                      className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                                      title="Edit Data Siswa"
+                                    >
+                                      <Edit className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteStudent(std.id)}
+                                      className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                                      title="Hapus Siswa"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center justify-center">
+                                    <button
+                                      onClick={() => {
+                                        setEditingStudent(std);
+                                        setIsStudentEditorOpen(true);
+                                      }}
+                                      className="px-2.5 py-1 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-semibold"
+                                      title="Lihat Detail Siswa (Hanya Baca)"
+                                    >
+                                      <Eye className="w-3.5 h-3.5" />
+                                      <span>Lihat</span>
+                                    </button>
+                                  </div>
+                                )}
                               </td>
                             </tr>
                           );
                         })
                       ) : (
                         <tr>
-                          <td colSpan={8} className="text-center py-8 text-slate-400 dark:text-slate-500">
+                          <td colSpan={isAdmin ? 8 : 7} className="text-center py-8 text-slate-400 dark:text-slate-500">
                             Tidak ada siswa yang sesuai dengan filter pencarian.
                           </td>
                         </tr>
@@ -2863,8 +3042,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       }}
                       className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     >
-                      <option value="ALL" className="dark:bg-slate-800">Semua Paket Ujian</option>
-                      {exams.map((e) => (
+                      <option value="ALL" className="dark:bg-slate-800">Semua Paket Ujian ({accessibleExams.length})</option>
+                      {accessibleExams.map((e) => (
                         <option key={e.id} value={e.id} className="dark:bg-slate-800">
                           {e.subject} ({e.token})
                         </option>
@@ -2921,15 +3100,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleDeleteAllSubmissions}
-                    disabled={submissions.length === 0}
-                    className="bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-700 dark:text-slate-200 hover:text-rose-600 border border-slate-200 dark:border-slate-700 hover:border-rose-300 font-semibold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Hapus seluruh data riwayat nilai siswa"
-                  >
-                    <Trash2 className="w-4 h-4 text-rose-500" />
-                    <span className="hidden sm:inline">Hapus Semua</span>
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={handleDeleteAllSubmissions}
+                      disabled={submissions.length === 0}
+                      className="bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-700 dark:text-slate-200 hover:text-rose-600 border border-slate-200 dark:border-slate-700 hover:border-rose-300 font-semibold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Hapus seluruh data riwayat nilai siswa"
+                    >
+                      <Trash2 className="w-4 h-4 text-rose-500" />
+                      <span className="hidden sm:inline">Hapus Semua</span>
+                    </button>
+                  )}
 
                   <button
                     onClick={handleExportExcel}
@@ -3194,6 +3375,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <th className="py-3 px-3.5 font-mono">Username</th>
                         <th className="py-3 px-3.5">Password</th>
                         <th className="py-3 px-3.5">Peran / Hak Akses</th>
+                        <th className="py-3 px-3.5">Mata Pelajaran Diampu</th>
                         <th className="py-3 px-3.5">Email Pengampu</th>
                         <th className="py-3 px-3.5 text-center">Aksi</th>
                       </tr>
@@ -3261,6 +3443,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   {acc.role}
                                 </span>
                               </td>
+                              <td className="py-3 px-3.5">
+                                {acc.role === 'Administrator' ? (
+                                  <span className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                                    Semua Mata Pelajaran
+                                  </span>
+                                ) : acc.role === 'Proktor' ? (
+                                  <span className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                                    Semua (Pengawas)
+                                  </span>
+                                ) : acc.subjects && acc.subjects.length > 0 ? (
+                                  <div className="flex flex-wrap gap-1">
+                                    {acc.subjects.map((s) => (
+                                      <span
+                                        key={s}
+                                        className="inline-block px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[10px] font-bold"
+                                      >
+                                        {s}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : acc.subject ? (
+                                  <span className="inline-block px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[10px] font-bold">
+                                    {acc.subject}
+                                  </span>
+                                ) : (
+                                  <span className="text-rose-500 text-[11px] italic font-medium">
+                                    Belum ditentukan
+                                  </span>
+                                )}
+                              </td>
                               <td className="py-3 px-3.5 text-slate-600 dark:text-slate-400">
                                 {acc.email || '-'}
                               </td>
@@ -3299,7 +3511,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         })
                       ) : (
                         <tr>
-                          <td colSpan={7} className="text-center py-8 text-slate-400 dark:text-slate-500">
+                          <td colSpan={8} className="text-center py-8 text-slate-400 dark:text-slate-500">
                             Tidak ada akun yang sesuai dengan pencarian.
                           </td>
                         </tr>
@@ -3333,6 +3545,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         onClose={() => setIsEditorOpen(false)}
         exam={editingExam}
         onSaveExam={handleSaveExam}
+        currentAdmin={currentAdmin}
+        availableSubjects={availableCbtSubjects}
       />
 
       <WordImportModal
@@ -3356,6 +3570,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         onClose={() => setIsStudentEditorOpen(false)}
         student={editingStudent}
         onSaveStudent={handleSaveStudent}
+        isReadOnly={!isAdmin}
       />
 
       <StudentBatchImportModal
@@ -3369,6 +3584,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         isOpen={isAccountEditorOpen}
         onClose={() => setIsAccountEditorOpen(false)}
         account={editingAccount}
+        availableSubjects={availableCbtSubjects}
         onSaveAccount={handleSaveAccount}
       />
     </div>

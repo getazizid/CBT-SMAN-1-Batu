@@ -8,6 +8,7 @@ interface StudentEditorModalProps {
   onClose: () => void;
   student: RegisteredStudent | null;
   onSaveStudent: (student: RegisteredStudent) => void;
+  isReadOnly?: boolean;
 }
 
 export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
@@ -15,6 +16,7 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
   onClose,
   student,
   onSaveStudent,
+  isReadOnly = false,
 }) => {
   const [nisn, setNisn] = useState('');
   const [name, setName] = useState('');
@@ -85,11 +87,18 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
               <GraduationCap className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
-                {student ? 'Edit Data Siswa' : 'Tambah Siswa Baru'}
+              <h3 className="font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                <span>{isReadOnly ? 'Detail Data Siswa' : student ? 'Edit Data Siswa' : 'Tambah Siswa Baru'}</span>
+                {isReadOnly && (
+                  <span className="text-[10px] bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-full font-bold">
+                    Hanya Baca
+                  </span>
+                )}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Peserta terverifikasi untuk login ujian CBT SMAN 1 Batu
+                {isReadOnly
+                  ? 'Akses hanya baca. Pengubahan dan penambahan data siswa hanya dapat dilakukan oleh Administrator.'
+                  : 'Peserta terverifikasi untuk login ujian CBT SMAN 1 Batu'}
               </p>
             </div>
           </div>
@@ -122,8 +131,9 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
                   placeholder="Contoh: 0061829101"
                   value={nisn}
                   onChange={(e) => setNisn(e.target.value)}
+                  disabled={isReadOnly}
                   required
-                  className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-mono focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-mono focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -140,7 +150,8 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
                   placeholder="Bebas / PIN khusus"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  disabled={isReadOnly}
+                  className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -158,8 +169,9 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
                 placeholder="Contoh: Muhammad Bintang Pratama"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                disabled={isReadOnly}
                 required
-                className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500 disabled:opacity-75 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -173,7 +185,8 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
               <select
                 value={studentClass}
                 onChange={(e) => setStudentClass(e.target.value)}
-                className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none"
+                disabled={isReadOnly}
+                className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none disabled:opacity-75 disabled:cursor-not-allowed"
               >
                 {ALL_SCHOOL_CLASSES.map((c) => (
                   <option key={c} value={c} className="dark:bg-slate-800">
@@ -191,7 +204,8 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value as 'L' | 'P')}
-                className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none"
+                disabled={isReadOnly}
+                className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none disabled:opacity-75 disabled:cursor-not-allowed"
               >
                 <option value="L" className="dark:bg-slate-800">Laki-laki (L)</option>
                 <option value="P" className="dark:bg-slate-800">Perempuan (P)</option>
@@ -209,18 +223,20 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
               placeholder="Contoh: Peserta Ujian Khusus / Sesi 1"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+              disabled={isReadOnly}
+              className="w-full px-3 py-2.5 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 disabled:opacity-75 disabled:cursor-not-allowed"
             />
           </div>
 
           {/* Is Active Status */}
           <div className="pt-2">
-            <label className="flex items-center gap-2.5 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+            <label className={`flex items-center gap-2.5 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 ${isReadOnly ? 'cursor-default' : 'cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800'} transition-colors`}>
               <input
                 type="checkbox"
                 checked={isActive}
                 onChange={(e) => setIsActive(e.target.checked)}
-                className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                disabled={isReadOnly}
+                className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 disabled:opacity-75"
               />
               <div className="text-xs">
                 <span className="font-bold text-slate-800 dark:text-slate-200">Status Akun Aktif</span>
@@ -233,20 +249,32 @@ export const StudentEditorModal: React.FC<StudentEditorModalProps> = ({
 
           {/* Footer Actions */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Simpan Data Siswa</span>
-            </button>
+            {isReadOnly ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs transition-colors cursor-pointer"
+              >
+                Tutup
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Simpan Data Siswa</span>
+                </button>
+              </>
+            )}
           </div>
         </form>
       </div>

@@ -118,6 +118,8 @@ export interface AdminAccount {
   name: string;
   role: 'Administrator' | 'Guru Pengampu' | 'Proktor';
   email?: string;
+  subject?: string; // Mata pelajaran utama (e.g. "Informatika - Computational Thinking")
+  subjects?: string[]; // Daftar mata pelajaran yang diampu guru
   lastLogin?: string;
   createdAt?: string;
 }

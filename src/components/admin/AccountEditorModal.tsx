@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Lock, Mail, Shield, CheckCircle2 } from 'lucide-react';
+import { X, User, Lock, Mail, Shield, CheckCircle2, BookOpen } from 'lucide-react';
 import { AdminAccount } from '../../types';
 
 interface AccountEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
   account: AdminAccount | null;
+  availableSubjects?: string[];
   onSaveAccount: (account: AdminAccount) => void;
 }
 
@@ -13,6 +14,7 @@ export const AccountEditorModal: React.FC<AccountEditorModalProps> = ({
   isOpen,
   onClose,
   account,
+  availableSubjects = [],
   onSaveAccount,
 }) => {
   const [username, setUsername] = useState('');
@@ -20,6 +22,8 @@ export const AccountEditorModal: React.FC<AccountEditorModalProps> = ({
   const [name, setName] = useState('');
   const [role, setRole] = useState<'Administrator' | 'Guru Pengampu' | 'Proktor'>('Guru Pengampu');
   const [email, setEmail] = useState('');
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [customSubjectInput, setCustomSubjectInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
@@ -29,17 +33,41 @@ export const AccountEditorModal: React.FC<AccountEditorModalProps> = ({
       setName(account.name);
       setRole(account.role || 'Guru Pengampu');
       setEmail(account.email || '');
+      if (account.subjects && account.subjects.length > 0) {
+        setSelectedSubjects(account.subjects);
+      } else if (account.subject) {
+        setSelectedSubjects(account.subject.split(',').map((s) => s.trim()).filter(Boolean));
+      } else {
+        setSelectedSubjects([]);
+      }
     } else {
       setUsername('');
       setPassword('');
       setName('');
       setRole('Guru Pengampu');
       setEmail('');
+      setSelectedSubjects([]);
     }
+    setCustomSubjectInput('');
     setErrorMsg('');
   }, [account, isOpen]);
 
   if (!isOpen) return null;
+
+  const handleAddSubject = (subjectName: string) => {
+    const clean = subjectName.trim();
+    if (!clean) return;
+    if (!selectedSubjects.some((s) => s.toLowerCase() === clean.toLowerCase())) {
+      setSelectedSubjects((prev) => [...prev, clean]);
+    }
+    setCustomSubjectInput('');
+  };
+
+  const handleRemoveSubject = (subjectName: string) => {
+    setSelectedSubjects((prev) =>
+      prev.filter((s) => s.toLowerCase() !== subjectName.toLowerCase())
+    );
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +83,10 @@ export const AccountEditorModal: React.FC<AccountEditorModalProps> = ({
       setErrorMsg('Nama Lengkap Guru/Admin wajib diisi.');
       return;
     }
+    if (role === 'Guru Pengampu' && selectedSubjects.length === 0) {
+      setErrorMsg('Guru Pengampu wajib memilih atau menambahkan minimal 1 Mata Pelajaran.');
+      return;
+    }
 
     const saved: AdminAccount = {
       id: account?.id || `adm-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -62,6 +94,12 @@ export const AccountEditorModal: React.FC<AccountEditorModalProps> = ({
       password: password.trim(),
       name: name.trim(),
       role,
+      ...(role === 'Guru Pengampu'
+        ? {
+            subject: selectedSubjects.join(', '),
+            subjects: selectedSubjects,
+          }
+        : {}),
       ...(email.trim() ? { email: email.trim() } : {}),
       createdAt: account?.createdAt || new Date().toISOString(),
       ...(account?.lastLogin ? { lastLogin: account.lastLogin } : {}),
@@ -175,6 +213,105 @@ export const AccountEditorModal: React.FC<AccountEditorModalProps> = ({
               <option value="Administrator">Administrator (Semua Akses & Pengaturan Akun)</option>
             </select>
           </div>
+
+          {/* Mata Pelajaran (Khusus Guru Pengampu) */}
+          {role === 'Guru Pengampu' && (
+            <div className="p-3.5 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 rounded-2xl space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="block font-bold text-slate-800 dark:text-blue-200 flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <span>Mata Pelajaran yang Diampu <span className="text-rose-500">*</span></span>
+                </label>
+                <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold bg-blue-100 dark:bg-blue-900/60 px-2 py-0.5 rounded-full">
+                  {selectedSubjects.length} Dipilih
+                </span>
+              </div>
+
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                Sinkron dengan paket ujian di CBT. Guru hanya dapat melihat soal, nilai, dan sesi ujian sesuai mata pelajaran ini (tidak campur antar guru).
+              </p>
+
+              {/* Chips mata pelajaran terpilih */}
+              {selectedSubjects.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {selectedSubjects.map((subj) => (
+                    <span
+                      key={subj}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-600 text-white font-semibold text-[11px] shadow-xs"
+                    >
+                      <span>{subj}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSubject(subj)}
+                        className="hover:bg-blue-700 rounded-full p-0.5 cursor-pointer transition-colors"
+                        title="Hapus mata pelajaran"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Pilih dari daftar mapel CBT */}
+              <div>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      handleAddSubject(e.target.value);
+                      e.target.value = '';
+                    }
+                  }}
+                  defaultValue=""
+                  className="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  <option value="" disabled>
+                    + Pilih Mata Pelajaran (Sinkron dari CBT)
+                  </option>
+                  {availableSubjects && availableSubjects.length > 0 ? (
+                    availableSubjects.map((s) => (
+                      <option
+                        key={s}
+                        value={s}
+                        disabled={selectedSubjects.some((sel) => sel.toLowerCase() === s.toLowerCase())}
+                      >
+                        {s} {selectedSubjects.some((sel) => sel.toLowerCase() === s.toLowerCase()) ? '✓ (Sudah dipilih)' : ''}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="Informatika - Computational Thinking">
+                      Informatika - Computational Thinking
+                    </option>
+                  )}
+                </select>
+              </div>
+
+              {/* Tambah mapel manual jika belum ada di CBT */}
+              <div className="flex items-center gap-1.5 pt-0.5">
+                <input
+                  type="text"
+                  placeholder="Atau ketik mapel manual (cth: Sejarah Indonesia)..."
+                  value={customSubjectInput}
+                  onChange={(e) => setCustomSubjectInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddSubject(customSubjectInput);
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleAddSubject(customSubjectInput)}
+                  disabled={!customSubjectInput.trim()}
+                  className="px-3 py-2 text-xs bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl font-bold cursor-pointer transition-colors shadow-xs"
+                >
+                  Tambah
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Email */}
           <div>

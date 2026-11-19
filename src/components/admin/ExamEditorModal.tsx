@@ -16,7 +16,7 @@ import {
   ShieldAlert,
   CheckCircle2,
 } from 'lucide-react';
-import { Exam, OptionKey, OptionScoreMap, Question, QuestionOption } from '../../types';
+import { AdminAccount, Exam, OptionKey, OptionScoreMap, Question, QuestionOption } from '../../types';
 import {
   ALL_SCHOOL_CLASSES,
   KELAS_X_OPTIONS,
@@ -32,6 +32,8 @@ interface ExamEditorModalProps {
   onClose: () => void;
   exam: Exam | null;
   onSaveExam: (exam: Exam) => void;
+  currentAdmin?: AdminAccount | null;
+  availableSubjects?: string[];
 }
 
 export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
@@ -39,6 +41,8 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
   onClose,
   exam,
   onSaveExam,
+  currentAdmin,
+  availableSubjects = [],
 }) => {
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('');
@@ -102,13 +106,26 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setDisallowMultipleAttempts(exam.disallowMultipleAttempts ?? true);
     } else {
       setTitle('');
-      setSubject('');
       setSelectedClasses([...ALL_SCHOOL_CLASSES]);
       setAcademicYear('2025/2026 Ganjil');
       setDurationMinutes(90);
       setToken('BATU' + Math.floor(1000 + Math.random() * 9000));
       setPassingGrade(75);
-      setTeacherName('Tim Pembina OSIS & Kesiswaan SMAN 1 Batu');
+
+      const isGuru = currentAdmin?.role === 'Guru Pengampu';
+      const guruSubjects = (currentAdmin?.subjects && currentAdmin.subjects.length > 0)
+        ? currentAdmin.subjects
+        : (currentAdmin?.subject ? currentAdmin.subject.split(',').map((s) => s.trim()).filter(Boolean) : []);
+
+      if (isGuru && guruSubjects.length > 0) {
+        setSubject(guruSubjects[0]);
+      } else if (availableSubjects && availableSubjects.length > 0) {
+        setSubject(availableSubjects[0]);
+      } else {
+        setSubject('');
+      }
+
+      setTeacherName(currentAdmin?.name || 'Guru SMAN 1 Batu');
       setDefaultOptionScores({ A: 10, B: 0, C: 0, D: 0, E: 0 });
       setUseWeightedScoring(false);
       setQuestions([]);
@@ -120,7 +137,7 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
       setDisallowMultipleAttempts(true);
     }
     setActiveTab('settings');
-  }, [exam, isOpen]);
+  }, [exam, isOpen, currentAdmin, availableSubjects]);
 
   if (!isOpen) return null;
 
@@ -362,17 +379,81 @@ export const ExamEditorModal: React.FC<ExamEditorModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
-                    Mata Pelajaran
-                  </label>
-                  <input
-                    type="text"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    placeholder="Contoh: Pendidikan Karakter & Literasi"
-                    required
-                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">
+                      Mata Pelajaran <span className="text-rose-500">*</span>
+                    </label>
+                    {currentAdmin?.role === 'Guru Pengampu' && (
+                      <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">
+                        Terkunci sesuai mapel guru
+                      </span>
+                    )}
+                  </div>
+                  {currentAdmin?.role === 'Guru Pengampu' ? (
+                    (() => {
+                      const guruSubjects = (currentAdmin.subjects && currentAdmin.subjects.length > 0)
+                        ? currentAdmin.subjects
+                        : (currentAdmin.subject ? currentAdmin.subject.split(',').map((s) => s.trim()).filter(Boolean) : []);
+                      if (guruSubjects.length > 1) {
+                        return (
+                          <select
+                            value={subject}
+                            onChange={(e) => setSubject(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          >
+                            {guruSubjects.map((s) => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </select>
+                        );
+                      }
+                      const lockedSubj = guruSubjects[0] || currentAdmin.subject || subject;
+                      return (
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={lockedSubj}
+                            readOnly
+                            className="w-full bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold rounded-xl px-3.5 py-2 text-xs cursor-not-allowed"
+                          />
+                          <span className="absolute right-3 top-2 text-[10px] bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold px-2 py-0.5 rounded-md">
+                            Hak Akses Terkunci
+                          </span>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <div className="space-y-1.5">
+                      <input
+                        type="text"
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        placeholder="Contoh: Pendidikan Karakter & Literasi"
+                        required
+                        className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-3.5 py-2 text-xs font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                      />
+                      {availableSubjects && availableSubjects.length > 0 && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] text-slate-400 shrink-0">Pilih cepat:</span>
+                          <select
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                setSubject(e.target.value);
+                                e.target.value = '';
+                              }
+                            }}
+                            defaultValue=""
+                            className="text-[11px] bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-slate-700 dark:text-slate-300"
+                          >
+                            <option value="" disabled>-- Pilih dari Mapel CBT --</option>
+                            {availableSubjects.map((s) => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
