@@ -20,7 +20,7 @@ import {
   INITIAL_SUBMISSIONS,
 } from './storage';
 import { MPK_OSIS_50_EXAM, REAL_STUDENTS_MPK_OSIS, REAL_SUBMISSIONS_MPK_OSIS } from '../data/mpkOsisExamData';
-import { CT_INFORMATIKA_30_EXAM, STUDENTS_KELAS_X } from '../data/ctInformatikaExamData';
+import { CT_INFORMATIKA_30_EXAM } from '../data/ctInformatikaExamData';
 
 export const COLLECTIONS = {
   EXAMS: 'cbt_exams',
@@ -45,11 +45,15 @@ export const syncMissingInitialStudentsToFirestore = async (): Promise<void> => 
     const missingStudents = INITIAL_STUDENTS.filter((s) => !existingNisns.has(s.nisn));
     if (missingStudents.length > 0) {
       console.log(`🔄 Menyinkronkan ${missingStudents.length} siswa baru ke Cloud Firestore...`);
-      const batch = writeBatch(db);
-      missingStudents.forEach((student) => {
-        batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
-      });
-      await batch.commit();
+      const chunkSize = 400;
+      for (let i = 0; i < missingStudents.length; i += chunkSize) {
+        const chunk = missingStudents.slice(i, i + chunkSize);
+        const batch = writeBatch(db);
+        chunk.forEach((student) => {
+          batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
+        });
+        await batch.commit();
+      }
       console.log(`✅ Berhasil menyinkronkan ${missingStudents.length} siswa baru ke Cloud Firestore!`);
     }
   } catch (err) {
@@ -75,51 +79,60 @@ export const seedInitialFirestoreDataIfEmpty = async (): Promise<boolean> => {
     }
 
     console.log('🔄 Menginisialisasi dataset awal CBT SMAN 1 Batu ke Cloud Firestore...');
-    const batch = writeBatch(db);
-
-    // Hapus dokumen duplikat paket lama jika ada
-    batch.delete(doc(db, COLLECTIONS.EXAMS, 'exam-ct-informatika-30'));
 
     // 1. Seed paket ujian awal HANYA jika koleksi ujian masih kosong
     const examsSnap = await getDocs(collection(db, COLLECTIONS.EXAMS));
     if (examsSnap.empty) {
-      batch.set(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), cleanForFirestore(CT_INFORMATIKA_30_EXAM));
-      batch.set(doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id), cleanForFirestore(MPK_OSIS_50_EXAM));
+      const examBatch = writeBatch(db);
+      examBatch.delete(doc(db, COLLECTIONS.EXAMS, 'exam-ct-informatika-30'));
+      examBatch.set(doc(db, COLLECTIONS.EXAMS, CT_INFORMATIKA_30_EXAM.id), cleanForFirestore(CT_INFORMATIKA_30_EXAM));
+      examBatch.set(doc(db, COLLECTIONS.EXAMS, MPK_OSIS_50_EXAM.id), cleanForFirestore(MPK_OSIS_50_EXAM));
+      await examBatch.commit();
     }
 
-    // 2. Seed data siswa jika koleksi masih kosong
+    // 2. Seed data siswa jika koleksi masih kosong (chunking <= 400 per commit)
     const studentsSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
     if (studentsSnap.empty) {
-      const allStudents = [...STUDENTS_KELAS_X, ...REAL_STUDENTS_MPK_OSIS];
-      allStudents.forEach((student) => {
-        batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
-      });
+      const chunkSize = 400;
+      for (let i = 0; i < INITIAL_STUDENTS.length; i += chunkSize) {
+        const chunk = INITIAL_STUDENTS.slice(i, i + chunkSize);
+        const batch = writeBatch(db);
+        chunk.forEach((student) => {
+          batch.set(doc(db, COLLECTIONS.STUDENTS, student.id), cleanForFirestore(student));
+        });
+        await batch.commit();
+      }
     }
 
     // 3. Submissions
     const subsSnap = await getDocs(collection(db, COLLECTIONS.SUBMISSIONS));
     if (subsSnap.empty) {
+      const subBatch = writeBatch(db);
       REAL_SUBMISSIONS_MPK_OSIS.forEach((sub) => {
-        batch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), cleanForFirestore(sub));
+        subBatch.set(doc(db, COLLECTIONS.SUBMISSIONS, sub.id), cleanForFirestore(sub));
       });
+      await subBatch.commit();
     }
 
     // 4. Admin accounts
     const accountsSnap = await getDocs(collection(db, COLLECTIONS.ADMIN_ACCOUNTS));
     if (accountsSnap.empty) {
+      const accBatch = writeBatch(db);
       INITIAL_ADMIN_ACCOUNTS.forEach((account) => {
-        batch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), cleanForFirestore(account));
+        accBatch.set(doc(db, COLLECTIONS.ADMIN_ACCOUNTS, account.id), cleanForFirestore(account));
       });
+      await accBatch.commit();
     }
 
-    batch.set(settingsRef, {
+    const settingsBatch = writeBatch(db);
+    settingsBatch.set(settingsRef, {
       enforceWhitelist: true,
       isInitialized: true,
-      version: 'ct_v8_36_students_x2',
+      version: 'erapor_smaba_1270_students',
       updatedAt: new Date().toISOString(),
     }, { merge: true });
+    await settingsBatch.commit();
 
-    await batch.commit();
     console.log('✅ Inisialisasi awal database Firestore berhasil!');
     return true;
   } catch (error) {
@@ -612,19 +625,34 @@ export const syncAllStudentsToFirestore = async (students: RegisteredStudent[]):
   try {
     const existingSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
     const currentIds = new Set(students.map((s) => s.id));
-    const batch = writeBatch(db);
-
+    
+    // Hapus data lama yang sudah tidak ada (chunked <= 400 per batch)
+    const toDelete: string[] = [];
     existingSnap.forEach((d) => {
       if (!currentIds.has(d.id)) {
-        batch.delete(doc(db, COLLECTIONS.STUDENTS, d.id));
+        toDelete.push(d.id);
       }
     });
 
-    students.forEach((s) => {
-      batch.set(doc(db, COLLECTIONS.STUDENTS, s.id), cleanForFirestore(s));
-    });
+    const chunkSize = 400;
+    for (let i = 0; i < toDelete.length; i += chunkSize) {
+      const chunk = toDelete.slice(i, i + chunkSize);
+      const batch = writeBatch(db);
+      chunk.forEach((id) => {
+        batch.delete(doc(db, COLLECTIONS.STUDENTS, id));
+      });
+      await batch.commit();
+    }
 
-    await batch.commit();
+    // Upsert data siswa baru / terupdate (chunked <= 400 per batch)
+    for (let i = 0; i < students.length; i += chunkSize) {
+      const chunk = students.slice(i, i + chunkSize);
+      const batch = writeBatch(db);
+      chunk.forEach((s) => {
+        batch.set(doc(db, COLLECTIONS.STUDENTS, s.id), cleanForFirestore(s));
+      });
+      await batch.commit();
+    }
   } catch (err) {
     console.error('Error syncing all students to Firestore:', err);
   }

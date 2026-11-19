@@ -1,6 +1,7 @@
 import { AdminAccount, Exam, OptionScoreMap, RegisteredStudent, StudentExamSubmission } from '../types';
 import { MPK_OSIS_50_EXAM, REAL_STUDENTS_MPK_OSIS, REAL_SUBMISSIONS_MPK_OSIS } from '../data/mpkOsisExamData';
-import { CT_INFORMATIKA_30_EXAM, STUDENTS_KELAS_X } from '../data/ctInformatikaExamData';
+import { CT_INFORMATIKA_30_EXAM } from '../data/ctInformatikaExamData';
+import { ALL_ERAPOR_STUDENTS } from '../data/eraporStudentsData';
 
 const STORAGE_KEYS = {
   EXAMS: 'cbt_sman1batu_exams',
@@ -32,11 +33,19 @@ export const INITIAL_EXAMS: Exam[] = [CT_INFORMATIKA_30_EXAM, MPK_OSIS_50_EXAM];
 // 5 Riwayat Nilai Siswa Real
 export const INITIAL_SUBMISSIONS: StudentExamSubmission[] = REAL_SUBMISSIONS_MPK_OSIS;
 
-// Data Siswa: Perwakilan Kelas X-1 s/d X-5 & Calon Pengurus MPK OSIS
-export const INITIAL_STUDENTS: RegisteredStudent[] = [
-  ...STUDENTS_KELAS_X,
-  ...REAL_STUDENTS_MPK_OSIS,
-];
+// Data Siswa Lengkap: 1270 Siswa SMAN 1 Batu (36 Rombel X, XI, XII) dari e-Rapor SMABA & Asesmen MPK OSIS
+// Dideduplikasi ketat via NISN untuk menjamin tidak ada duplikasi data siswa
+const studentNisnMap = new Map<string, RegisteredStudent>();
+ALL_ERAPOR_STUDENTS.forEach((std) => {
+  if (std.nisn) studentNisnMap.set(std.nisn.trim(), std);
+});
+REAL_STUDENTS_MPK_OSIS.forEach((std) => {
+  if (std.nisn && !studentNisnMap.has(std.nisn.trim())) {
+    studentNisnMap.set(std.nisn.trim(), std);
+  }
+});
+
+export const INITIAL_STUDENTS: RegisteredStudent[] = Array.from(studentNisnMap.values());
 
 // 1 Akun Admin Utama Sistem
 export const INITIAL_ADMIN_ACCOUNTS: AdminAccount[] = [
@@ -277,21 +286,31 @@ export const getStoredStudents = (): RegisteredStudent[] => {
     const parsed: RegisteredStudent[] = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
 
-    // Bersihkan dummy lama std-ct-x1-*, std-ct-x2-*, dst jika ada
-    const cleaned = parsed.filter(
-      (s) => !s.id.startsWith('std-ct-x1-') && 
-             !s.id.startsWith('std-ct-x2-') && 
-             !s.id.startsWith('std-ct-x3-') && 
-             !s.id.startsWith('std-ct-x4-')
-    );
+    // Bersihkan dummy lama std-ct-x1-*, std-ct-x2-*, dst jika ada serta pastikan bebas duplikasi NISN
+    const existingNisns = new Set<string>();
+    const cleaned: RegisteredStudent[] = [];
+    for (const s of parsed) {
+      if (
+        !s.id.startsWith('std-ct-x1-') && 
+        !s.id.startsWith('std-ct-x2-') && 
+        !s.id.startsWith('std-ct-x3-') && 
+        !s.id.startsWith('std-ct-x4-')
+      ) {
+        const cleanNisn = (s.nisn || '').trim();
+        if (cleanNisn && !existingNisns.has(cleanNisn)) {
+          existingNisns.add(cleanNisn);
+          cleaned.push(s);
+        }
+      }
+    }
 
-    // Sinkronkan data siswa dari INITIAL_STUDENTS (termasuk X-5) yang belum ada di localStorage
-    const existingNisns = new Set(cleaned.map((s) => s.nisn));
+    // Sinkronkan data siswa dari INITIAL_STUDENTS (seluruh siswa e-Rapor) yang belum ada di localStorage
     let hasNewStudents = false;
     for (const initStd of INITIAL_STUDENTS) {
-      if (!existingNisns.has(initStd.nisn)) {
+      const cleanNisn = (initStd.nisn || '').trim();
+      if (cleanNisn && !existingNisns.has(cleanNisn)) {
         cleaned.push(initStd);
-        existingNisns.add(initStd.nisn);
+        existingNisns.add(cleanNisn);
         hasNewStudents = true;
       }
     }
